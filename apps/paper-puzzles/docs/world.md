@@ -12,7 +12,7 @@ Chosen on 13 Nov 2026 so that building could start, and **approved by Anass the 
 | Shape and depth | Square corners (radius 2). Hairline rules in place of cards. No shadows, no gradients, no blur |
 | Icons | None from a set. The three puzzle marks and one chevron are our own drawings; tools are words ("Undo", "Hint") |
 | Motion | Almost none. The stamp drops in 220 ms. Reduce Motion: it simply appears |
-| Sound | Not built yet. Planned: pencil tick, paper, one stamp thud; recorded or CC0, one loudness |
+| Sound | Three sounds made by our own script: a pencil tick, a firmer tap for a tent, a stamp thud. Quiet by design. Not yet judged by ear on a phone |
 | Voice | A friendly puzzle editor. Short, plain, warm. Never says "Oops", "Great job!!", "You failed", never uses an exclamation mark |
 | **Signature** | The red rubber stamp, SOLVED, slightly crooked, landing on the grid. It also marks solved days on the front page |
 

@@ -7,11 +7,12 @@ import { GRASS, Puzzle, TENT, UNKNOWN } from '../game/types';
 import { clock, t } from '../i18n/en';
 import { GameSave } from '../store/save';
 import { useTheme } from '../theme/ThemeContext';
-import { space, tapMin } from '../theme/tokens';
+import { hairline, space, tapMin } from '../theme/tokens';
 import { Board } from '../ui/Board';
 import { Btn } from '../ui/Btn';
 import { Chevron } from '../ui/Glyphs';
 import { haptic } from '../ui/haptics';
+import { sound } from '../ui/sound';
 import { Rule } from '../ui/Rule';
 import { Stamp } from '../ui/Stamp';
 import { Type } from '../ui/Type';
@@ -78,6 +79,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
         setFinalMs(ms);
         setHint(null);
         haptic.stamp();
+        sound.stamp();
         onSolved(ms, hintCount);
       }
     },
@@ -97,8 +99,13 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       setHint(null);
       const next = marks.slice();
       next[i] = to;
-      if (to === TENT) haptic.tent();
-      else haptic.mark();
+      if (to === TENT) {
+        haptic.tent();
+        sound.peg();
+      } else {
+        haptic.mark();
+        sound.pencil();
+      }
       commit(next, hints);
     },
     [commit, hints, marks, puzzle.trees, solved],
@@ -112,6 +119,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       const next = marks.slice();
       next[i] = s.to;
       haptic.mark();
+      sound.pencil();
       commit(next, hints);
     },
     [commit, hints, marks, puzzle.trees, solved],
@@ -142,6 +150,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     else if (hint.kind === 'mistake') for (const i of hint.cells) next[i] = UNKNOWN;
     setUndo((u) => [...u.slice(-199), marks]);
     setHint(null);
+    sound.pencil();
     commit(next, hints);
   }, [commit, hint, hints, marks]);
 
@@ -153,92 +162,103 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
   const boardWidth = Math.min(window.width - space.l * 2, 520);
   const empty = !marks.some((m) => m === GRASS || m === TENT);
 
-  return (
-    <ScrollView
-      style={{ backgroundColor: c.bg }}
-      contentContainerStyle={[styles.page, { paddingTop: insets.top + space.s, paddingBottom: insets.bottom + space.xl }]}
-      scrollEnabled={solved || !!hint}
-    >
-      <View style={[styles.column, { width: boardWidth }]}>
-        <View style={styles.bar}>
-          <Pressable accessibilityRole="button" accessibilityLabel={t.game.back} onPress={onExit} hitSlop={8} style={styles.back}>
-            <Chevron size={20} color={c.text} />
-            <Type variant="label">{t.game.back}</Type>
-          </Pressable>
-          <Btn label={t.game.rules} kind="quiet" onPress={onRules} />
-        </View>
-        <Rule strong />
-        <Type variant="title" accessibilityRole="header" style={styles.title}>
-          {title}
-        </Type>
-        <Type variant="label" tone="muted" style={styles.meta}>
-          {t.sizeLine(puzzle.n, puzzle.grade)}
-        </Type>
+  const tentsWanted = useMemo(() => puzzle.solution.filter(Boolean).length, [puzzle]);
+  const tentsPlaced = marks.filter((m) => m === TENT).length;
 
-        <View>
-          <Board
-            puzzle={puzzle}
-            marks={marks}
-            width={boardWidth}
-            locked={solved}
-            focus={focus}
-            because={because}
-            line={line}
-            problems={problems.touching}
-            overLines={problems.over}
-            onStrokeStart={onStrokeStart}
-            onStrokeMove={onStrokeMove}
-          />
+  return (
+    <View style={[styles.screen, { backgroundColor: c.bg }]}>
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={[styles.page, { paddingTop: insets.top + space.s, paddingBottom: space.xl + (solved ? insets.bottom : 0) }]}
+        scrollEnabled={solved || !!hint}
+      >
+        <View style={[styles.column, { width: boardWidth }]}>
+          <View style={styles.bar}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t.game.back} onPress={onExit} hitSlop={8} style={styles.back}>
+              <Chevron size={20} color={c.text} />
+              <Type variant="label">{t.game.back}</Type>
+            </Pressable>
+            <Btn label={t.game.rules} kind="quiet" onPress={onRules} />
+          </View>
+          <Rule strong />
+          <Type variant="title" accessibilityRole="header" style={styles.title}>
+            {title}
+          </Type>
+          <View style={styles.metaRow}>
+            <Type variant="label" tone="muted">
+              {t.sizeLine(puzzle.n, puzzle.grade)}
+            </Type>
+            <Type variant="label" tone={tentsPlaced > tentsWanted ? 'accent' : 'muted'}>
+              {t.game.tents(tentsPlaced, tentsWanted)}
+            </Type>
+          </View>
+
+          <View>
+            <Board
+              puzzle={puzzle}
+              marks={marks}
+              width={boardWidth}
+              locked={solved}
+              focus={focus}
+              because={because}
+              line={line}
+              problems={problems.touching}
+              overLines={problems.over}
+              onStrokeStart={onStrokeStart}
+              onStrokeMove={onStrokeMove}
+            />
+            {solved ? (
+              <View style={styles.stampOver} pointerEvents="none">
+                <Stamp word={t.game.solvedStamp} animate={freshWin.current} />
+              </View>
+            ) : null}
+          </View>
+
           {solved ? (
-            <View style={styles.stampOver} pointerEvents="none">
-              <Stamp word={t.game.solvedStamp} animate={freshWin.current} />
+            <View style={styles.after}>
+              <Type variant="bodyItalic" tone="muted" style={styles.center}>
+                {t.game.solvedLine(clock(finalMs), hints)}
+              </Type>
+              {onNext ? (
+                <Btn label={nextLabel ?? t.game.next} onPress={onNext} style={styles.afterBtn} />
+              ) : (
+                <Type tone="muted" style={[styles.center, styles.afterBtn]}>
+                  {t.game.seeYou}
+                </Type>
+              )}
+              <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
             </View>
+          ) : hint ? (
+            <View style={styles.note} accessibilityLiveRegion="polite">
+              <Rule />
+              <Type variant="bodyItalic" style={styles.noteText}>
+                {t.hint(hint)}
+              </Type>
+              <View style={styles.noteActions}>
+                {hint.kind !== 'solved' ? (
+                  <Btn label={hint.kind === 'mistake' ? t.game.clearThem : t.game.markIt} kind="quiet" onPress={applyHint} />
+                ) : null}
+                <Btn label={t.game.gotIt} kind="quiet" onPress={() => setHint(null)} />
+              </View>
+              <Rule />
+            </View>
+          ) : showLegend || empty ? (
+            <Type tone="muted" style={[styles.center, styles.legend]}>
+              {t.game.legend}
+            </Type>
           ) : null}
         </View>
+      </ScrollView>
 
-        {solved ? (
-          <View style={styles.after}>
-            <Type variant="bodyItalic" tone="muted" style={styles.center}>
-              {t.game.solvedLine(clock(finalMs), hints)}
-            </Type>
-            {onNext ? (
-              <Btn label={nextLabel ?? t.game.next} onPress={onNext} style={styles.afterBtn} />
-            ) : (
-              <Type tone="muted" style={[styles.center, styles.afterBtn]}>
-                {t.game.seeYou}
-              </Type>
-            )}
-            <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
+      {solved ? null : (
+        <View style={[styles.dock, { borderTopColor: c.rule, backgroundColor: c.bg, paddingBottom: insets.bottom + space.m }]}>
+          <View style={[styles.tools, { width: boardWidth }]}>
+            <Btn label={t.game.undo} kind="outline" onPress={onUndo} disabled={!undo.length} style={styles.tool} />
+            <Btn label={t.game.hint} kind="outline" onPress={onHint} style={styles.tool} />
           </View>
-        ) : (
-          <>
-            <View style={styles.tools}>
-              <Btn label={t.game.undo} kind="outline" onPress={onUndo} disabled={!undo.length} style={styles.tool} />
-              <Btn label={t.game.hint} kind="outline" onPress={onHint} style={styles.tool} />
-            </View>
-            {hint ? (
-              <View style={styles.note} accessibilityLiveRegion="polite">
-                <Rule />
-                <Type variant="bodyItalic" style={styles.noteText}>
-                  {t.hint(hint)}
-                </Type>
-                <View style={styles.noteActions}>
-                  {hint.kind !== 'solved' ? (
-                    <Btn label={hint.kind === 'mistake' ? t.game.clearThem : t.game.markIt} kind="quiet" onPress={applyHint} />
-                  ) : null}
-                  <Btn label={t.game.gotIt} kind="quiet" onPress={() => setHint(null)} />
-                </View>
-                <Rule />
-              </View>
-            ) : showLegend || empty ? (
-              <Type tone="muted" style={[styles.center, styles.legend]}>
-                {t.game.legend}
-              </Type>
-            ) : null}
-          </>
-        )}
-      </View>
-    </ScrollView>
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -248,9 +268,11 @@ const styles = StyleSheet.create({
   bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: tapMin },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.xs, minHeight: tapMin, paddingRight: space.m },
   title: { marginTop: space.l },
-  meta: { marginTop: space.xs, marginBottom: space.m },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.xs, marginBottom: space.m },
   stampOver: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
-  tools: { flexDirection: 'row', gap: space.m, marginTop: space.l },
+  screen: { flex: 1 },
+  dock: { alignItems: 'center', paddingTop: space.m, paddingHorizontal: space.l, borderTopWidth: hairline },
+  tools: { flexDirection: 'row', gap: space.m, maxWidth: 520 },
   tool: { flex: 1 },
   note: { marginTop: space.l },
   noteText: { marginTop: space.m },

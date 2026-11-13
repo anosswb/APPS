@@ -24,6 +24,29 @@ describe('reading a save', () => {
     expect(out.schema).toBe(SCHEMA);
   });
 
+  test('a version 1 save (before the sound switch) keeps everything and gets sound on', () => {
+    const v1 = {
+      schema: 1,
+      settings: { theme: 'dark', haptics: false },
+      book: { level: 22, relief: 0, solved: 21 },
+      daily: { '2026-11-13': { ms: 90000, hints: 0 } },
+      games: {},
+      seenRules: true,
+    };
+    const out = migrate(v1);
+    expect(out.schema).toBe(SCHEMA);
+    expect(out.settings).toEqual({ theme: 'dark', haptics: false, sound: true });
+    expect(out.book.level).toBe(22);
+    expect(out.daily['2026-11-13']).toEqual({ ms: 90000, hints: 0 });
+    expect(out.seenRules).toBe(true);
+  });
+
+  test('reading a save never changes the defaults for the next one', () => {
+    migrate({ book: { level: 50 }, settings: { theme: 'dark' } });
+    expect(freshSave().book.level).toBe(1);
+    expect(freshSave().settings.theme).toBe('system');
+  });
+
   test('broken pieces are dropped, the rest survives', () => {
     const out = migrate({
       book: { level: -3, relief: 99, solved: 4 },

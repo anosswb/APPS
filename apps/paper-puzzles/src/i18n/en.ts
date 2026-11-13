@@ -87,6 +87,35 @@ export const t = {
     bookBlurb: (done: number) => (done === 0 ? 'Start here. The first few teach you the game.' : `${done} ${done === 1 ? 'puzzle' : 'puzzles'} solved so far. They get bigger as you go.`),
     open: 'Open',
     rules: 'How to play',
+    past: 'Past puzzles',
+    settings: 'Settings',
+  },
+
+  archive: {
+    title: 'Past puzzles',
+    month: (year: number, month: number) => `${MONTHS[month]} ${year}`,
+    dayTitle: (d: Date) => `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`,
+    earlier: 'Earlier month',
+    later: 'Later month',
+    count: (solved: number) => (solved === 0 ? 'Nothing stamped this month yet.' : solved === 1 ? '1 puzzle stamped this month.' : `${solved} puzzles stamped this month.`),
+    dayLabel: (d: Date, state: 'solved' | 'started' | 'open' | 'closed') =>
+      `${MONTHS[d.getMonth()]} ${d.getDate()}${state === 'solved' ? ', solved' : state === 'started' ? ', started' : state === 'closed' ? ', not available' : ''}`,
+    week: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+  },
+
+  settings: {
+    title: 'Settings',
+    look: 'Look',
+    lookOptions: { system: 'Auto', light: 'Day', dark: 'Night' },
+    sound: 'Sound',
+    haptics: 'Vibration',
+    on: 'On',
+    off: 'Off',
+    privacy: 'Privacy',
+    privacyText: (name: string) => `Your puzzles and progress stay on this phone. ${name} collects nothing and needs no account.`,
+    credits: 'Credits',
+    creditsText: 'Type: Newsreader and Libre Franklin, used under the SIL Open Font License. Built with Expo and React Native (MIT License). The drawings, sounds and puzzles are our own.',
+    version: (name: string, v: string) => `${name}, version ${v}`,
   },
 
   game: {
@@ -96,6 +125,7 @@ export const t = {
     rules: 'Rules',
     legend: 'Tap once for grass, twice for a tent. Drag to mark several squares.',
     gridLabel: (n: number) => `Puzzle grid, ${n} by ${n}`,
+    tents: (have: number, want: number) => `Tents ${have} of ${want}`,
     markIt: 'Mark it for me',
     clearThem: 'Clear it',
     gotIt: 'Got it',

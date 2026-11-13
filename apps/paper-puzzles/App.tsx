@@ -11,19 +11,25 @@ import { AppState, BackHandler, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { bookPuzzle } from './src/game/book';
+import { Month, monthOf } from './src/game/archive';
 import { dailyPuzzle, dateKey, keyToDate } from './src/game/daily';
 import { t } from './src/i18n/en';
+import { Archive } from './src/screens/Archive';
 import { Game } from './src/screens/Game';
 import { Home } from './src/screens/Home';
 import { Rules } from './src/screens/Rules';
+import { Settings } from './src/screens/Settings';
 import { GameSave } from './src/store/save';
 import { StoreProvider, useStore } from './src/store/Store';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { setHaptics } from './src/ui/haptics';
+import { initSound, setSound } from './src/ui/sound';
 
 type Route =
   | { name: 'home' }
-  | { name: 'daily'; key: string }
+  | { name: 'daily'; key: string; back?: Route }
+  | { name: 'archive'; month: Month }
+  | { name: 'settings' }
   | { name: 'book'; level: number; relief: number }
   | { name: 'rules'; back: Route };
 
@@ -35,6 +41,8 @@ function Screens() {
   const [today, setToday] = useState(() => dateKey(new Date()));
 
   useEffect(() => setHaptics(save.settings.haptics), [save.settings.haptics]);
+  useEffect(() => setSound(save.settings.sound), [save.settings.sound]);
+  useEffect(() => initSound(), []);
 
   // A new day gives a new puzzle when the app comes back to the front.
   useEffect(() => {
@@ -48,7 +56,7 @@ function Screens() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (route.name === 'home') return false;
-      setRoute(route.name === 'rules' ? route.back : { name: 'home' });
+      setRoute(route.name === 'rules' ? route.back : route.name === 'daily' && route.back ? route.back : { name: 'home' });
       return true;
     });
     return () => sub.remove();
@@ -78,17 +86,29 @@ function Screens() {
   let screen: React.ReactNode;
   if (route.name === 'rules') {
     screen = <Rules onDone={() => setRoute(route.back)} />;
+  } else if (route.name === 'settings') {
+    screen = <Settings onExit={() => setRoute({ name: 'home' })} onRules={() => setRoute({ name: 'rules', back: route })} />;
+  } else if (route.name === 'archive') {
+    screen = (
+      <Archive
+        today={today}
+        month={route.month}
+        onMonth={(month) => setRoute({ name: 'archive', month })}
+        onOpen={(key) => setRoute({ name: 'daily', key, back: route })}
+        onExit={() => setRoute({ name: 'home' })}
+      />
+    );
   } else if (route.name === 'daily' && puzzle) {
     screen = (
       <Game
         key={puzzle.id}
         puzzle={puzzle}
-        title={t.home.dailyTitle(keyToDate(route.key))}
+        title={route.key === today ? t.home.dailyTitle(keyToDate(route.key)) : t.archive.dayTitle(keyToDate(route.key))}
         initial={save.games[puzzle.id]}
         alreadySolved={!!save.daily[route.key]}
         onKeep={keep}
         onSolved={(ms, hints) => store.finishDaily(route.key, ms, hints)}
-        onExit={() => setRoute({ name: 'home' })}
+        onExit={() => setRoute(route.back ?? { name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}
       />
     );
@@ -114,6 +134,8 @@ function Screens() {
         onDaily={() => setRoute({ name: 'daily', key: today })}
         onBook={openBook}
         onRules={() => setRoute({ name: 'rules', back: { name: 'home' } })}
+        onArchive={() => setRoute({ name: 'archive', month: monthOf(today) })}
+        onSettings={() => setRoute({ name: 'settings' })}
       />
     );
   }

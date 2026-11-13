@@ -13,3 +13,8 @@
 | 2026-11-13 | AsyncStorage for saves (not MMKV) | Works in Expo Go and on the web preview | Claude |
 | 2026-11-13 | Working title "Paper Pines" | A web search found nothing with that name; full check still to do | Claude |
 | 2026-11-13 | The newspaper look is approved | "Yes, it looks like a newspaper." Seen on screenshots; still to be judged on his phone | Anass |
+| 2026-11-14 | Calendar weeks start on Monday, also in the US | The puzzle week builds from a small Monday puzzle to the big Sunday one, like a newspaper | Claude |
+| 2026-11-14 | All past days are open for now | The pay-once unlock and the Android video for old days come with the money work; no gate is built before then | Claude |
+| 2026-11-14 | Sounds are made by our own script, not recorded or downloaded | We own them fully and can retune them; they must still be judged by ear on a phone | Claude |
+| 2026-11-14 | Sounds respect the silent switch and mix with the player's music | A puzzle tick must never cut off a podcast | Claude |
+| 2026-11-14 | Undo and Hint sit in a bottom bar | Thumb zone; the board stays clear | Claude |

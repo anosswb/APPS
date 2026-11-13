@@ -10,7 +10,16 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Step 9, first screens:** front page, puzzle screen (tap, drag, undo, hints, mistakes shown, SOLVED stamp), rules page. Light and dark. Seen working in a phone-sized browser (web build), including solving a puzzle with hints and real taps.
 - App text proofread for American English by a helper agent; fixes applied.
 
+## Done (14 Nov 2026)
+- **Past puzzles:** a month calendar. Solved days are inked red, a started day has a red dot, future days are greyed out. Any day back to 1 Nov 2026 can be played.
+- **Settings:** look (Auto / Day / Night), sound, vibration, how to play, privacy line, credits, version.
+- **Sound:** pencil tick (grass), a firmer tap (tent), a stamp thud (solved). Made by our own script (`scripts/gen-sounds.py`), measured for level and length. They stay quiet when the phone is on silent and do not stop the player's music.
+- **Puzzle screen:** Undo and Hint moved to a bar at the bottom (thumb zone); a "Tents 3 of 13" counter.
+- Save format version 2 (adds the sound switch), with a test that an old save keeps everything.
+- 31 tests green. Seen working in a phone-sized browser: solve, calendar, a past day, settings, and everything still there after a reload.
+
 ## Not checked (needs a real phone)
+**The sounds: nobody has heard them yet.** Listen for: the pencil tick 20 times in a row (annoying?), the tent tap (hollow?), the stamp (does it sound like a stamp on a phone speaker?). · 
 Touch feel and drag on a real screen · haptics · the stamp animation on device · font loading speed · Android back button · small phones (360 dp) and very large text.
 
 ## Decided by Anass
@@ -21,16 +30,14 @@ Touch feel and drag on a real screen · haptics · the stamp animation on device
 2. Is the name "Paper Pines" OK as a working title?
 
 ## Next (in order)
-1. Fixes from Anass's phone test.
-2. Fill the empty lower half of the puzzle screen on small grids; a calendar of past days with stamps (the archive).
-3. Settings page: theme, haptics, licences, "not affiliated" and privacy text.
-4. Sound: pencil, paper, stamp (recorded or CC0), with a switch.
-5. Screen-reader labels for each square; largest-font check; 360 dp check.
-6. Anonymous analytics with a closed event list (playbook/10) and the one number (puzzles finished on day 1).
-7. Money: Android ads between Book puzzles, iPhone one-time unlock (needs a development build; the app stops working in Expo Go from then on).
-8. Our own icon and splash (the template's placeholders are still in `assets/`).
-9. Name check in the stores and trademark databases; privacy and terms pages; store listing.
-10. Android closed test (12 testers, 14 days) as soon as the Play account exists.
+1. Fixes from Anass's phone test (look, feel, sounds).
+2. Screen-reader labels for each square; largest-font check; 360 dp check.
+3. A full "Open-source licences" page (today there is a short credits text in Settings).
+4. Anonymous analytics with a closed event list (playbook/10) and the one number (puzzles finished on day 1).
+5. Money: Android ads between Book puzzles, iPhone one-time unlock (needs a development build; the app stops working in Expo Go from then on).
+6. Our own icon and splash (the template's placeholders are still in `assets/`).
+7. Name check in the stores and trademark databases; privacy and terms pages; store listing.
+8. Android closed test (12 testers, 14 days) as soon as the Play account exists.
 
 ## Blocked
 - Paid store accounts (Anass decides when).

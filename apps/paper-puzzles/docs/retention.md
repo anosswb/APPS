@@ -5,7 +5,7 @@ Built means it is in the code today; planned means not yet.
 ## Loops
 - **Core (2–10 minutes):** one puzzle. Mark grass, pitch tents, the last tent brings the stamp. *(built)*
 - **Session (5–15 minutes):** the daily puzzle, then "Next puzzle" in the Book. *(built)*
-- **Return (days):** a new shared puzzle every morning; the week strip fills with red boxes; Sunday is the big one. *(built)* A calendar of past days. *(planned)*
+- **Return (days):** a new shared puzzle every morning; the week strip fills with red boxes; Sunday is the big one. *(built)* A calendar of past days with red stamps. *(built)*
 
 ## Difficulty (no player can "fail", so we tune size and the kind of thinking needed)
 - Three grades, measured by the solver, never guessed: **Gentle** (simple rules only), **Steady** (needs line-fitting or tree bookkeeping), **Tricky** (needs "picture a tent here: then…" reasoning).
@@ -19,7 +19,7 @@ A hint is always free. It first checks for a mistake ("these tents touch"), then
 ## Reasons to come back
 1. The daily puzzle and the week strip. *(built)*
 2. The Book's next number. *(built)*
-3. *(planned)* The archive calendar with a stamp on each solved day; a monthly page of stamps.
+3. The archive calendar with a stamp on each solved day. *(built)*
 4. *(planned)* One optional morning notification: "Today's puzzle is ready." Asked after the first daily is solved. Never more than one a day.
 No streak counter that can be "lost".
 

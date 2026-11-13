@@ -9,6 +9,8 @@
 - 2026-11-13: everything moved into the APPS repo: playbook at the root, idea briefs in `briefs/`, real apps in `apps/`.
 - 2026-11-13: **first app started: `apps/paper-puzzles/` (Paper Pines).** Research by helper agents, engine with 25 passing tests, three screens seen working. Its own `PROGRESS.md` has the details and what is next.
 
+- 2026-11-14: Paper Pines got past puzzles (calendar), settings, sound and a bottom tool bar. Details in `apps/paper-puzzles/PROGRESS.md`.
+
 ## Next
 1. Anass tries Paper Pines and says what feels wrong (look, name, feel).
 2. Continue Paper Pines from `apps/paper-puzzles/PROGRESS.md`.

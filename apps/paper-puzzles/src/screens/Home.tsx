@@ -20,10 +20,12 @@ interface Props {
   onDaily: () => void;
   onBook: () => void;
   onRules: () => void;
+  onArchive: () => void;
+  onSettings: () => void;
 }
 
 /** The front page: masthead, today's puzzle, the week, the book. */
-export function Home({ today, onDaily, onBook, onRules }: Props) {
+export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { save } = useStore();
@@ -75,9 +77,12 @@ export function Home({ today, onDaily, onBook, onRules }: Props) {
         </View>
         <Btn label={done ? t.home.look : started ? t.home.resume : t.home.start} kind={done ? 'outline' : 'ink'} onPress={onDaily} style={styles.wide} />
 
-        <Type variant="label" tone="muted" style={styles.kicker}>
-          {t.home.week}
-        </Type>
+        <View style={styles.weekHead}>
+          <Type variant="label" tone="muted">
+            {t.home.week}
+          </Type>
+          <Btn label={t.home.past} kind="quiet" onPress={onArchive} />
+        </View>
         <View style={styles.week}>
           {week.map((key) => {
             const solved = !!save.daily[key];
@@ -119,7 +124,10 @@ export function Home({ today, onDaily, onBook, onRules }: Props) {
 
         <View style={styles.gap} />
         <Rule />
-        <Btn label={t.home.rules} kind="quiet" onPress={onRules} style={styles.footer} />
+        <View style={styles.footer}>
+          <Btn label={t.home.rules} kind="quiet" onPress={onRules} />
+          <Btn label={t.home.settings} kind="quiet" onPress={onSettings} />
+        </View>
       </View>
     </ScrollView>
   );
@@ -142,5 +150,6 @@ const styles = StyleSheet.create({
   dayBox: { width: 30, height: 30 },
   gap: { height: space.xl },
   bookRow: { flexDirection: 'row' },
-  footer: { alignSelf: 'center', marginTop: space.s },
+  footer: { flexDirection: 'row', justifyContent: 'center', gap: space.l, marginTop: space.s },
+  weekHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.m, marginBottom: space.xs },
 });

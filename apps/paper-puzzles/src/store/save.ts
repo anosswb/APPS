@@ -1,7 +1,8 @@
 /** What is kept on the phone, and how an old save is read safely after an update. */
 import { ThemeChoice } from '../theme/ThemeContext';
 
-export const SCHEMA = 1;
+/** 2: added settings.sound */
+export const SCHEMA = 2;
 
 export interface GameSave {
   marks: number[];
@@ -16,7 +17,7 @@ export interface DailyResult {
 
 export interface Save {
   schema: number;
-  settings: { theme: ThemeChoice; haptics: boolean };
+  settings: { theme: ThemeChoice; haptics: boolean; sound: boolean };
   book: { level: number; relief: number; solved: number };
   /** finished daily puzzles, by date */
   daily: Record<string, DailyResult>;
@@ -28,7 +29,7 @@ export interface Save {
 export function freshSave(): Save {
   return {
     schema: SCHEMA,
-    settings: { theme: 'system', haptics: true },
+    settings: { theme: 'system', haptics: true, sound: true },
     book: { level: 1, relief: 0, solved: 0 },
     daily: {},
     games: {},
@@ -44,11 +45,12 @@ function isObject(x: unknown): x is Record<string, unknown> {
 export function migrate(raw: unknown): Save {
   const base = freshSave();
   if (!isObject(raw)) return base;
-  const out: Save = { ...base };
+  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book } };
   if (isObject(raw.settings)) {
     const s = raw.settings;
     if (s.theme === 'system' || s.theme === 'light' || s.theme === 'dark') out.settings.theme = s.theme;
     if (typeof s.haptics === 'boolean') out.settings.haptics = s.haptics;
+    if (typeof s.sound === 'boolean') out.settings.sound = s.sound;
   }
   if (isObject(raw.book)) {
     const b = raw.book;
