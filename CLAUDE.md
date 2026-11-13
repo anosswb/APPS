@@ -26,12 +26,17 @@ Anass. Solo founder in Morocco. Works 12-hour shifts, so his time and energy are
 
 ## Hard rules
 - **US first.** Every app is made for users in the United States, in English. No Arabic, no Darija, no app built around Morocco or its language or culture (Anass, 13 Nov 2026). Other languages only later, when the numbers ask for them (playbook/09).
-- No spending, no account opening, no store submission, no `git push` without Anass's yes.
+- No spending, no account opening and no store submission without Anass's yes. Git has its own rules below.
 - No medical, financial or legal claims in any app or listing.
 - Android in Morocco = ads only (no purchases). iOS = purchases allowed. Re-check `research/` before every money decision.
 - Only art, sound and code we have the right to sell. Log every source and licence.
 - No dark patterns: no fake timers, no hidden prices, no rigged "almost won", no guilt notifications, nothing aimed at children.
 - User content stays on the phone unless Anass approves a server.
+
+## Git (Anass's rule, 13 Nov 2026)
+- **Commits are in Anass's name.** Before the first commit of a session, in this repo: `git config user.name "anosswb"` and `git config user.email "147461163+anosswb@users.noreply.github.com"`.
+- **No AI or tool credit anywhere:** not in commit messages, pull request text or branch names. Write the message as a plain description of the change.
+- Work goes on a branch with a plain name (for example `paper-pines/archive`). Push the branch. **Anass opens and merges the pull request himself.** Never push to `main`, never force-push, never rewrite history that is already on GitHub.
 
 ## When Anass asks for an app
 Follow `CHEATSHEET.md` step by step (`/make-app`). It is the path from the idea to the stores, with the points where you stop and wait for him.

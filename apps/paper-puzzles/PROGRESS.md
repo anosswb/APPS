@@ -13,10 +13,12 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 ## Not checked (needs a real phone)
 Touch feel and drag on a real screen · haptics · the stamp animation on device · font loading speed · Android back button · small phones (360 dp) and very large text.
 
+## Decided by Anass
+- 13 Nov 2026: the newspaper look is approved (from screenshots).
+
 ## Waiting for Anass
-1. Try it on your phone with Expo Go (steps in the last message of the session, or `START_HERE.md`). Say what feels wrong.
-2. Is the newspaper look right, or do you want to see two other looks?
-3. Is the name "Paper Pines" OK as a working title?
+1. Try it on your phone with Expo Go (steps in `START_HERE.md` at the repo root). Say what feels wrong.
+2. Is the name "Paper Pines" OK as a working title?
 
 ## Next (in order)
 1. Fixes from Anass's phone test.

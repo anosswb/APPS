@@ -56,3 +56,5 @@ Long explanations · being asked the same thing twice · being asked to pay earl
 - 2026-11-13: wants each app to have its own special thing and a better design than Gobblo; wants Opus to learn his way of thinking, not copy one app.
 - 2026-11-13: wants one fixed path that is followed every time he asks for an app (now `CHEATSHEET.md`), and a wide list to choose from himself (20 ideas), not one idea chosen for him.
 - 2026-11-13: market rule: US first, English only, no Arabic and no Darija. Eight ideas were removed from the list for this reason.
+- 2026-11-13: commits must be in his own name with no AI credit lines; he opens and merges the pull requests himself (he wants the GitHub activity to be his).
+- 2026-11-13: approved the newspaper look of Paper Pines after seeing the screenshots ("it looks like a newspaper").

@@ -1,6 +1,6 @@
 # World — Paper Pines
 
-Chosen by Claude on 13 Nov 2026 so that building could start (Anass: "you decide"). **Anass can still change it:** it all lives in `src/theme/tokens.ts` and `src/ui/`, and a different look costs a day, not a rewrite. Listed in `WORLDS.md` at the repo root.
+Chosen on 13 Nov 2026 so that building could start, and **approved by Anass the same day** after he saw the screenshots. It can still change: it all lives in `src/theme/tokens.ts` and `src/ui/`, and a different look costs a day, not a rewrite. Listed in `WORLDS.md` at the repo root.
 
 | | |
 |---|---|
