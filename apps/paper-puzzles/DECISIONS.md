@@ -12,3 +12,4 @@
 | 2026-11-13 | Works in Expo Go for now (no native-only libraries); simple screen switch, no Expo Router yet | Anass can test on his phone today without a build | Claude |
 | 2026-11-13 | AsyncStorage for saves (not MMKV) | Works in Expo Go and on the web preview | Claude |
 | 2026-11-13 | Working title "Paper Pines" | A web search found nothing with that name; full check still to do | Claude |
+| 2026-11-13 | The newspaper look is approved | "Yes, it looks like a newspaper." Seen on screenshots; still to be judged on his phone | Anass |
