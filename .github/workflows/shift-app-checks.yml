@@ -1,4 +1,4 @@
-# Runs the type check and the tests of Paper Pines on every pull request that touches it.
+# Runs the type check and the tests of the Shift app on every pull request that touches it.
 name: Shift app checks
 
 on:
