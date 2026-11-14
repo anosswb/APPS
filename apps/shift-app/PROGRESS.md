@@ -12,12 +12,15 @@ Path: `CHEATSHEET.md` at the repo root. Second app of the factory, picked by Ana
 ## Anass's answer (14 Nov 2026)
 He saw the grey box. The plain look shocked him until he understood it was a test with no design. His real requirements are in `docs/brief.md` ("What Anass said"): irregular work and rest days with no pattern, his own overtime percentages, daily reminder and motivation, a wake-up alarm button, day and food planning, help with what blue-collar workers suffer from, and a lively modern look.
 
+## Done (14 Nov 2026, second session)
+- **"Version 1 does / does NOT do" rewritten** in `docs/brief.md` from his requirements: the rest-day calendar with no pattern, pay with his own overtime rules, the morning of a shift (alarm button, day line, one evening note).
+- **Step 6, three looks drawn:** `docs/looks/three-looks.png` (A Daybreak, B The Board, C The Dial), details in `docs/looks/README.md`. Recommendation: B. **Waiting for Anass to pick or mix.** ⏸
+
 ## Next (in order)
-0. **Rewrite "Version 1 does" in the brief from his requirements, then step 6, the look:** three directions as pictures of the main screen (`/app-world`). Alive, modern, nothing like Paper Pines. He picks. Then the first real screen.
+0. After his pick: write `docs/world.md`, the token file, `tools/contrast.py`, the row in `WORLDS.md`, the decision in `DECISIONS.md`. Then the real first screen.
 0b. Engine work his requirements need: a mode with no rotation (days marked one by one, rest days first), and overtime rules with the user's own percentages (`src/core/pay.ts` has only the fixed federal rule today).
 1. His answers → fix the brief.
 2. Name: 5 candidates, check stores, trademark, domain (needs a session that can open the stores).
-3. Step 6, the look: three directions as pictures (`/app-world`). Nothing from Paper Pines.
 4. Read blue-collar forum threads (needs reddit.com allowed) or ask 10 US workers, before building differential and attendance points.
 5. Check the federal overtime rule and the differential rule on the US Department of Labor's own pages before any pay maths beyond the simple estimate.
 6. Widget: read how the current Expo version does home-screen widgets.
