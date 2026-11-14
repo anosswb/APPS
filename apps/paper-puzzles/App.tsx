@@ -263,8 +263,8 @@ function Screens() {
         showLegend={route.level <= 3}
         onKeep={keep}
         onSolved={(ms, hints) => {
-          store.finishBook(puzzle.id, hints);
-          count('puzzle_solved', { kind: 'book', size: puzzle.n, grade: puzzle.grade, level: route.level, seconds: ms / 1000, hints });
+          store.finishBook(puzzle.id, hints, ms);
+          count('puzzle_solved', { kind: 'book', size: puzzle.n, grade: puzzle.grade, level: route.level, seconds: ms / 1000, hints, relief: route.relief });
         }}
         onHint={(kind, what) => count('hint_used', { kind, what })}
         onNext={() => void nextBook(route.level)}

@@ -40,6 +40,7 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **His verdict:** "it's good honestly". Sounds: too loud, cheap, noisy. No ad seen by puzzle 8.
 - **New sounds** (second set): four soft notes for marks, two notes for a tent, a five-second winning tune. All quieter. Made by `scripts/gen-sounds.py`. Waiting for his ears.
 - **Ads:** a status block at the bottom of Settings in test builds (consent, library started, ad loaded or the error, minutes since first opening). A failed load is retried. The cause of "no ad at puzzle 8" is not known yet: it is either the 10-minute quiet start or a load problem; the status block will say.
+- **Difficulty adapts both ways** in the puzzle book: kinder after many hints, harder after two fast clean solves, back toward normal after a hint or a slow solve. Save format version 6. 74 tests green. The time thresholds are a guess; nobody has played with it yet.
 
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 

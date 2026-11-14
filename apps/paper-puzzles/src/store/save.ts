@@ -3,8 +3,8 @@ import { MoneyState } from '../money/rules';
 import { DEFAULT_REMINDER_TIME, REMINDER_HOURS, ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder */
-export const SCHEMA = 5;
+/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative */
+export const SCHEMA = 6;
 
 export interface GameSave {
   marks: number[];
@@ -20,7 +20,8 @@ export interface DailyResult {
 export interface Save {
   schema: number;
   settings: { theme: ThemeChoice; haptics: boolean; sound: boolean };
-  book: { level: number; relief: number; solved: number };
+  /** relief: +1/+2 kinder, -1/-2 harder (game/book.ts). fast: quick clean solves in a row */
+  book: { level: number; relief: number; solved: number; fast: number };
   /** finished daily puzzles, by date */
   daily: Record<string, DailyResult>;
   /** puzzles in progress, by puzzle id */
@@ -43,7 +44,7 @@ export function freshSave(now: number = Date.now()): Save {
   return {
     schema: SCHEMA,
     settings: { theme: 'system', haptics: true, sound: true },
-    book: { level: 1, relief: 0, solved: 0 },
+    book: { level: 1, relief: 0, solved: 0, fast: 0 },
     daily: {},
     games: {},
     seenRules: false,
@@ -71,7 +72,8 @@ export function migrate(raw: unknown, now: number = Date.now()): Save {
   if (isObject(raw.book)) {
     const b = raw.book;
     if (typeof b.level === 'number' && b.level >= 1) out.book.level = Math.floor(b.level);
-    if (typeof b.relief === 'number' && b.relief >= 0) out.book.relief = Math.min(2, Math.floor(b.relief));
+    if (typeof b.relief === 'number' && Number.isFinite(b.relief)) out.book.relief = Math.max(-2, Math.min(2, Math.round(b.relief)));
+    if (typeof b.fast === 'number' && b.fast >= 0) out.book.fast = Math.min(9, Math.floor(b.fast));
     if (typeof b.solved === 'number' && b.solved >= 0) out.book.solved = Math.floor(b.solved);
   }
   if (isObject(raw.daily)) {

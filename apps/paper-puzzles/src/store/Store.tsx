@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { SAVE_KEY } from '../config/app';
-import { nextRelief } from '../game/book';
+import { bookSpec, nextPace } from '../game/book';
 import { ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 import { freshSave, GameSave, migrate, Save } from './save';
@@ -12,7 +12,7 @@ interface StoreApi {
   ready: boolean;
   keepGame: (id: string, game: GameSave) => void;
   finishDaily: (key: string, ms: number, hints: number) => void;
-  finishBook: (id: string, hints: number) => void;
+  finishBook: (id: string, hints: number, ms: number) => void;
   setTheme: (theme: ThemeChoice) => void;
   setHapticsOn: (on: boolean) => void;
   setSoundOn: (on: boolean) => void;
@@ -72,14 +72,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const finishBook = useCallback((id: string, hints: number) => {
+  const finishBook = useCallback((id: string, hints: number, ms: number) => {
     setSave((s) => {
       const games = { ...s.games };
       delete games[id];
       return {
         ...s,
         games,
-        book: { level: s.book.level + 1, relief: nextRelief(s.book.relief, hints), solved: s.book.solved + 1 },
+        book: {
+          level: s.book.level + 1,
+          solved: s.book.solved + 1,
+          ...nextPace({ relief: s.book.relief, fast: s.book.fast }, bookSpec(s.book.level, s.book.relief), hints, ms),
+        },
       };
     });
   }, []);
