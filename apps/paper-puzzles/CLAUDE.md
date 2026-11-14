@@ -32,8 +32,9 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 | `src/stats/` | Anonymous usage counts: the closed event list (tested) and the sender. `docs/numbers.md` |
 | `store/` | Drafts: listing text, privacy policy, terms |
 | `src/ui/` | Board, glyphs, stamp, buttons, text |
-| `src/screens/` | Home (front page), Game, Rules, Archive (past puzzles), Settings |
+| `src/screens/` | Home (front page), Game, Rules, Archive (past puzzles), Settings, FullEdition, Licenses |
 | `scripts/gen-sounds.py` | Makes the three sounds in `assets/sounds/` |
+| `scripts/make-licences.js` | Makes `src/config/licences.json` for the licences page. Run it after adding or updating a package |
 | `scripts/make-icons.js` | Draws the icon and opening-screen art in `assets/` |
 | `docs/builds.md` | How Anass gets a test app on his phone (GitHub builds it) |
 

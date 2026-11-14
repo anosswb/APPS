@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from 'react';
-import { PanResponder, StyleSheet, View } from 'react-native';
+import { PanResponder, Pressable, StyleSheet, View } from 'react-native';
 
 import { Line, Puzzle, TENT, GRASS } from '../game/types';
 import { t } from '../i18n/en';
@@ -7,6 +7,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { font, hairline } from '../theme/tokens';
 import { Grass, Tent, Tree } from './Glyphs';
 import { Type } from './Type';
+import { useScreenReader } from './useScreenReader';
 
 interface Props {
   puzzle: Puzzle;
@@ -35,6 +36,8 @@ export function boardMetrics(n: number, width: number): { cell: number; edge: nu
 /** The puzzle grid with its numbers. It only draws and reports touches; the screen decides what a touch means. */
 export function Board({ puzzle, marks, width, locked, focus, because, line, problems, overLines, onStrokeStart, onStrokeMove }: Props) {
   const { c } = useTheme();
+  // With a screen reader on, every square is its own button and the drag layer is taken away.
+  const reader = useScreenReader();
   const n = puzzle.n;
   const { cell, edge } = boardMetrics(n, width);
   const last = useRef(-1);
@@ -82,6 +85,8 @@ export function Board({ puzzle, marks, width, locked, focus, because, line, prob
     return (
       <View
         key={`${kind}${index}`}
+        accessible={reader}
+        accessibilityLabel={reader ? t.game.lineCount(kind, index + 1, want, have) : undefined}
         style={[
           styles.count,
           kind === 'row' ? { width: edge, height: cell } : { width: cell, height: edge },
@@ -100,7 +105,7 @@ export function Board({ puzzle, marks, width, locked, focus, because, line, prob
   };
 
   return (
-    <View accessible accessibilityLabel={t.game.gridLabel(n)} style={{ width: edge + cell * n + 3 }}>
+    <View accessible={!reader} accessibilityLabel={t.game.gridLabel(n)} style={{ width: edge + cell * n + 3 }}>
       <View style={styles.row}>
         <View style={{ width: edge, height: edge }} />
         {Array.from({ length: n }, (_, col) => count('col', col))}
@@ -114,9 +119,17 @@ export function Board({ puzzle, marks, width, locked, focus, because, line, prob
                 const i = row * n + col;
                 const mark = marks[i];
                 const bg = focusSet.has(i) ? c.highlight : problemSet.has(i) ? c.wash : undefined;
+                const what = puzzle.trees[i] ? 'tree' : mark === TENT ? 'tent' : mark === GRASS ? 'grass' : 'empty';
+                const canChange = reader && !locked && !puzzle.trees[i];
+                const Square = canChange ? Pressable : View;
                 return (
-                  <View
+                  <Square
                     key={col}
+                    accessible={reader}
+                    accessibilityRole={canChange ? 'button' : undefined}
+                    accessibilityLabel={reader ? t.game.square(row + 1, col + 1, what, problemSet.has(i)) : undefined}
+                    accessibilityHint={canChange ? t.game.squareHint : undefined}
+                    onPress={canChange ? () => onStrokeStart?.(i) : undefined}
                     style={[
                       styles.cell,
                       { width: cell, height: cell, borderColor: c.rule },
@@ -133,12 +146,12 @@ export function Board({ puzzle, marks, width, locked, focus, because, line, prob
                       <Grass size={glyph} color={c.muted} />
                     ) : null}
                     {becauseSet.has(i) ? <View pointerEvents="none" style={[styles.ring, { borderColor: c.text }]} /> : null}
-                  </View>
+                  </Square>
                 );
               })}
             </View>
           ))}
-          <View style={StyleSheet.absoluteFill} {...pan.panHandlers} />
+          {reader ? null : <View style={StyleSheet.absoluteFill} {...pan.panHandlers} />}
         </View>
       </View>
     </View>

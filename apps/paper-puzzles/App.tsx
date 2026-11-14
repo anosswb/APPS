@@ -25,6 +25,7 @@ import { Archive } from './src/screens/Archive';
 import { FullEdition } from './src/screens/FullEdition';
 import { Game } from './src/screens/Game';
 import { Home } from './src/screens/Home';
+import { Licenses } from './src/screens/Licenses';
 import { Rules } from './src/screens/Rules';
 import { Settings } from './src/screens/Settings';
 import { configureStats, count } from './src/stats/stats';
@@ -39,6 +40,7 @@ type Route =
   | { name: 'daily'; key: string; back?: Route }
   | { name: 'archive'; month: Month }
   | { name: 'settings' }
+  | { name: 'licenses' }
   | { name: 'full'; back: Route }
   | { name: 'book'; level: number; relief: number }
   | { name: 'rules'; back: Route };
@@ -141,7 +143,7 @@ function Screens() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (route.name === 'home') return false;
-      setRoute(route.name === 'rules' || route.name === 'full' ? route.back : route.name === 'daily' && route.back ? route.back : { name: 'home' });
+      setRoute(route.name === 'licenses' ? { name: 'settings' } : route.name === 'rules' || route.name === 'full' ? route.back : route.name === 'daily' && route.back ? route.back : { name: 'home' });
       return true;
     });
     return () => sub.remove();
@@ -205,7 +207,15 @@ function Screens() {
   } else if (route.name === 'full') {
     screen = <FullEdition onExit={() => setRoute(route.back)} />;
   } else if (route.name === 'settings') {
-    screen = <Settings onExit={() => setRoute({ name: 'home' })} onRules={() => setRoute({ name: 'rules', back: route })} />;
+    screen = (
+      <Settings
+        onExit={() => setRoute({ name: 'home' })}
+        onRules={() => setRoute({ name: 'rules', back: route })}
+        onLicenses={() => setRoute({ name: 'licenses' })}
+      />
+    );
+  } else if (route.name === 'licenses') {
+    screen = <Licenses onExit={() => setRoute({ name: 'settings' })} />;
   } else if (route.name === 'archive') {
     screen = (
       <Archive
