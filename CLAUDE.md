@@ -61,7 +61,7 @@ Follow `CHEATSHEET.md` step by step (`/make-app`). It is the path from the idea 
 | What Gobblo taught us | `playbook/13-gobblo-lessons.md` |
 | Facts with sources and dates | newest file in `research/` |
 | The plan and what is next | `ROADMAP.md`, `PROGRESS.md` |
-| An app being built | `apps/<name>/CLAUDE.md`, then its `PROGRESS.md` (first app: `apps/paper-puzzles/`) |
+| An app being built | `apps/<name>/CLAUDE.md`, then its `PROGRESS.md` (first app: `apps/paper-puzzles/`, Paper Pines; second app: `apps/shift-app/`, a shift calendar, grey box only) |
 
 ## Skills (type the name)
 `/make-app` · `/find-ideas` · `/score-idea` · `/mine-reviews` · `/new-app` · `/app-world` · `/slop-check` · `/retention-plan` · `/money-plan` · `/release-check` · `/wrap-up`
