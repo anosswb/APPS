@@ -7,7 +7,7 @@ Paper Pines is made by [name], [country]. Contact: [support email].
 **The short version:** your puzzles and progress stay on your phone. There is no account. We do not know who you are.
 
 ## What stays on your phone
-Your puzzles, your progress, your settings. Deleting the app deletes them. Your phone's own backup may keep a copy, under your control.
+Your puzzles, your progress, your settings. If you turn on the daily reminder, the notes are made by your phone itself: nothing is sent to us or to anyone else for it, and you can turn it off in Settings at any time. Deleting the app deletes them. Your phone's own backup may keep a copy, under your control.
 
 ## Anonymous numbers
 If this is switched on (Settings › Share anonymous numbers), the app counts a few things, such as puzzles started and solved, hints used and which settings are changed. Each count carries a random code made on your phone, the app version and whether the phone is Android or iPhone. It carries nothing you typed, no name, no email, no location and no advertising ID. We use these numbers only to improve the app. They are stored by PostHog in the European Union. You can switch this off at any time.

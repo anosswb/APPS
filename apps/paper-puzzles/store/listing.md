@@ -37,7 +37,7 @@ The daily puzzle, the last seven days, all hints and the first part of the book 
 3. "A new puzzle every day" — the front page, with the SOLVED stamp
 
 ## Review notes for Apple
-No login. The app works fully without a purchase. The full edition is a one-time non-consumable reached from the front page link "The full edition". Every puzzle is generated on the device and verified to have a single logical solution. The newspaper look, the hint explanations and all drawings and sounds are our own.
+No login. The app works fully without a purchase. Notifications are optional, local only (no push), one a day at most, and asked for in the app before the system prompt. The full edition is a one-time non-consumable reached from the front page link "The full edition". Every puzzle is generated on the device and verified to have a single logical solution. The newspaper look, the hint explanations and all drawings and sounds are our own.
 
 ## Open points
 - Name: only a web search was done.

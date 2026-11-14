@@ -23,6 +23,13 @@ describe('what may be counted', () => {
     expect(clean('setting_changed', { name: 'theme', value: 'someone@example.com' })).toEqual({ name: 'theme' });
   });
 
+  test('the reminder answer is one of three words', () => {
+    expect(clean('reminder_answer', { value: 'yes' })).toEqual({ value: 'yes' });
+    expect(clean('reminder_answer', { value: 'blocked' })).toEqual({ value: 'blocked' });
+    expect(clean('reminder_answer', { value: '8:15 at home' })).toEqual({});
+    expect(clean('setting_changed', { name: 'reminder', value: 'evening' })).toEqual({ name: 'reminder', value: 'evening' });
+  });
+
   test('every event in the list has only short, plain property names', () => {
     for (const [event, props] of Object.entries(EVENTS)) {
       expect(event).toMatch(/^[a-z_]+$/);

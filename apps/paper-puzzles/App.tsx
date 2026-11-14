@@ -18,6 +18,9 @@ import { t } from './src/i18n/en';
 import { ads } from './src/money/ads';
 import { purchases } from './src/money/purchases';
 import { bookLocked, interstitialDue } from './src/money/rules';
+import { planReminders, shouldAsk } from './src/reminder/plan';
+import { ReminderAsk } from './src/reminder/ReminderAsk';
+import { reminders } from './src/reminder/reminders';
 import { Archive } from './src/screens/Archive';
 import { FullEdition } from './src/screens/FullEdition';
 import { Game } from './src/screens/Game';
@@ -46,6 +49,9 @@ function Screens() {
   const { save } = store;
   const [route, setRoute] = useState<Route>({ name: 'home' });
   const [today, setToday] = useState(() => dateKey(new Date()));
+  /** goes up each time the app comes back to the front, so the week of reminders is planned again */
+  const [wakes, setWakes] = useState(0);
+  const [askResult, setAskResult] = useState<'on' | 'blocked' | null>(null);
 
   useEffect(() => setHaptics(save.settings.haptics), [save.settings.haptics]);
   useEffect(() => setSound(save.settings.sound), [save.settings.sound]);
@@ -73,10 +79,63 @@ function Screens() {
   // A new day gives a new puzzle when the app comes back to the front.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
-      if (state === 'active') setToday(dateKey(new Date()));
+      if (state === 'active') {
+        setToday(dateKey(new Date()));
+        setWakes((n) => n + 1);
+      }
     });
     return () => sub.remove();
   }, []);
+
+  // The daily reminder: plan the next week of notes whenever something that matters changes.
+  const { setReminder } = store;
+  const reminderOn = save.reminder.on;
+  const reminderTime = save.reminder.time;
+  const solvedToday = !!save.daily[today];
+  useEffect(() => {
+    if (!store.ready || !reminders.available()) return;
+    const plan = async () => {
+      if (!reminderOn) return reminders.clear();
+      // The player may have switched notes off in the phone's own settings. Then there is nothing to plan.
+      if (!(await reminders.allowed())) return;
+      await reminders.set(planReminders(new Date(), reminderTime, (key) => key === today && solvedToday));
+    };
+    plan().catch((error) => console.warn('Could not plan the reminder', error));
+  }, [store.ready, reminderOn, reminderTime, today, solvedToday, wakes]);
+
+  // A tap on the note opens today's puzzle.
+  useEffect(
+    () =>
+      reminders.onOpen(() => {
+        count('reminder_open');
+        const key = dateKey(new Date());
+        setToday(key);
+        setRoute({ name: 'daily', key });
+      }),
+    [],
+  );
+
+  const answerReminder = useCallback(
+    async (yes: boolean) => {
+      if (!yes) {
+        setReminder({ asked: true, on: false });
+        count('reminder_answer', { value: 'no' });
+        return;
+      }
+      let ok = false;
+      try {
+        ok = await reminders.ask();
+      } catch (error) {
+        console.warn('Could not ask for notes', error);
+      }
+      setAskResult(ok ? 'on' : 'blocked');
+      setReminder({ asked: true, on: ok });
+      count('reminder_answer', { value: ok ? 'yes' : 'blocked' });
+    },
+    [setReminder],
+  );
+  // The thank-you line belongs to the puzzle it was answered on.
+  useEffect(() => setAskResult(null), [route]);
 
   // Android back button: leave a puzzle or the rules, never close the app by surprise.
   useEffect(() => {
@@ -167,6 +226,11 @@ function Screens() {
         initial={save.games[puzzle.id]}
         alreadySolved={!!save.daily[route.key]}
         afterLine={route.key === today ? t.game.dailyDone : undefined}
+        afterExtra={
+          route.key === today && (askResult || shouldAsk(save.reminder, reminders.available(), solvedToday)) ? (
+            <ReminderAsk result={askResult} time={save.reminder.time} onAnswer={(yes) => void answerReminder(yes)} />
+          ) : null
+        }
         nextLabel={bookIsLocked ? t.archive.seeFull : t.game.keepGoing(save.book.level)}
         onNext={openBook}
         onKeep={keep}

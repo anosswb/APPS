@@ -20,7 +20,13 @@ A hint is always free. It first checks for a mistake ("these tents touch"), then
 1. The daily puzzle and the week strip. *(built)*
 2. The puzzle book: the next level number and the strip of five boxes on the front page, with the big fifth puzzle in sight. *(built)*
 3. The archive calendar with a stamp on each solved day. *(built)*
-4. *(planned)* One optional morning notification: "Today's puzzle is ready." Asked after the first daily is solved. Never more than one a day.
+4. One optional note a day: "The Sunday puzzle is out · 10 × 10 · Tricky." *(built, not yet tried on a phone)*
+   - **Asked once**, on the page, right after a solved daily puzzle (the moment the player is happiest). The phone's own permission prompt comes only after a yes.
+   - **Time:** 8 AM by default; Noon or 7 PM in Settings; Off is one tap.
+   - **No note for a day already solved**, and none while the app is open.
+   - **Stops by itself:** notes are planned one week ahead each time the app is opened. A player who stays away for a week hears nothing more. A puzzle page that keeps knocking gets deleted.
+   - **A tap on the note opens today's puzzle** directly.
+   - Rules in `src/reminder/plan.ts` (tested); phone code in `src/reminder/reminders.native.ts`.
 No streak counter that can be "lost".
 
 ## Numbers and events (planned; needs analytics, see PROGRESS)

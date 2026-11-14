@@ -196,6 +196,23 @@ export const t = {
     }
   },
 
+  reminder: {
+    ask: "Want a note when tomorrow's puzzle is out?",
+    askAbout: 'One a day, nothing else. You can turn it off in Settings.',
+    yes: 'Yes, tell me',
+    no: 'No thanks',
+    isOn: (time: string) => `Done. A note will come each day at ${time}.`,
+    blocked: "This phone is not letting us show notes. You can allow them in the phone's settings.",
+    phoneSettings: 'Open phone settings',
+    setting: 'Daily reminder',
+    settingAbout: 'One note a day when the new puzzle is out. If you stay away for a week, the notes stop by themselves.',
+    times: { morning: '8 AM', noon: 'Noon', evening: '7 PM' },
+    noteTitle: (d: Date) => `The ${DAYS[d.getDay()]} puzzle is out`,
+    noteBody: (n: number, g: Grade) => `${n} × ${n} · ${GRADE[g]}. One answer, no guessing.`,
+    channel: 'Daily puzzle',
+    channelAbout: 'One note a day when the new puzzle is out.',
+  },
+
   rules: {
     title: 'How to play',
     intro: 'Pitch one tent for every tree. Three rules decide where.',

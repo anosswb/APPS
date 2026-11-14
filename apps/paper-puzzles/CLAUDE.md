@@ -28,6 +28,7 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 | `src/store/` | What is saved on the phone, with `migrate` for old saves |
 | `src/money/` | `rules.ts` (what is locked, when an ad may show; tested), `ads.ts` + `ads.android.ts`, `purchases.ts` |
 | `src/config/money.ts` | The numbers of the money plan and the preview switch |
+| `src/reminder/` | The daily note: `plan.ts` (which notes, when; tested), `reminders.ts` (web: off) + `reminders.native.ts` (phone), `ReminderAsk.tsx` (the one-time question) |
 | `src/stats/` | Anonymous usage counts: the closed event list (tested) and the sender. `docs/numbers.md` |
 | `store/` | Drafts: listing text, privacy policy, terms |
 | `src/ui/` | Board, glyphs, stamp, buttons, text |

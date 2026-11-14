@@ -3,6 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 
 import { SAVE_KEY } from '../config/app';
 import { nextRelief } from '../game/book';
+import { ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 import { freshSave, GameSave, migrate, Save } from './save';
 
@@ -20,6 +21,7 @@ interface StoreApi {
   setFullEdition: (owned: boolean) => void;
   markAdShown: (now: number) => void;
   setStatsOn: (on: boolean) => void;
+  setReminder: (change: Partial<ReminderState>) => void;
 }
 
 const Ctx = createContext<StoreApi | null>(null);
@@ -110,12 +112,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setSave((s) => ({ ...s, stats: { ...s.stats, on } }));
   }, []);
 
+  const setReminder = useCallback((change: Partial<ReminderState>) => {
+    setSave((s) => ({ ...s, reminder: { ...s.reminder, ...change } }));
+  }, []);
+
   const markAdShown = useCallback((now: number) => {
     setSave((s) => ({ ...s, money: { ...s.money, lastAdAt: now } }));
   }, []);
 
   return (
-    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn, setReminder }}>{children}</Ctx.Provider>
   );
 }
 
