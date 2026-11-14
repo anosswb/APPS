@@ -4,8 +4,6 @@ name: Paper Pines launch test (Android emulator)
 
 on:
   workflow_dispatch:
-  push:
-    branches: ['paper-pines/fix-start-crash']
   pull_request:
     paths:
       - 'apps/paper-puzzles/package.json'

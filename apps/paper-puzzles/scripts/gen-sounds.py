@@ -1,135 +1,130 @@
 #!/usr/bin/env python3
-"""Generate the three sound effects for Paper Puzzles.
+"""Makes the sounds of Paper Pines. Everything is maths: no samples, no downloads, so we own them fully.
 
-Everything is made from maths and random noise: no samples, no downloads.
-Run from the app folder:  python3 scripts/gen-sounds.py
-Output: assets/sounds/pencil.wav, peg.wav, stamp.wav (mono, 44100 Hz, 16-bit).
+Second version (14 Nov 2026). Anass tried the first set on his phone: too loud, noisy, cheap.
+The first set was shaped noise. This set has no noise at all: soft plucked notes, like a small music box
+or a thumb piano, all from one calm scale (C major pentatonic), and all quiet.
+
+  tick1..4.wav  a mark on a square. Four notes of the scale; the app picks one at random, so a row of
+                taps sounds like a little run of notes, never like a machine.
+  tent.wav      a tent goes up: two notes together, a little longer.
+  win.wav       the puzzle is solved: five seconds, a rising run, a soft chord, a long fade.
+
+Run from the app folder:  python3 scripts/gen-sounds.py   (needs numpy)
+Output: assets/sounds/*.wav, mono, 44100 Hz, 16-bit. The script prints the loudness of each file.
 """
 import os
 import wave
 import numpy as np
 
-SR = 44100                       # sample rate
-rng = np.random.default_rng(20261113)   # fixed seed: same files every run
+SR = 44100
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "sounds")
+rng = np.random.default_rng(20261114)  # only used for the echo of the room; fixed, so files never change
+
+# The scale. Phone speakers are weak under 400 Hz, so everything sits above that.
+C5, D5, E5, G5, A5 = 523.25, 587.33, 659.25, 783.99, 880.00
+C6, D6, E6, G6 = 1046.50, 1174.66, 1318.51, 1567.98
+C4, E4, G4 = 261.63, 329.63, 392.00
 
 
-def t_axis(ms):
-    """Time axis in seconds for a sound of the given length in milliseconds."""
-    return np.arange(int(SR * ms / 1000)) / SR
+def db(x):
+    return 10 ** (x / 20)
 
 
-def bandpass_noise(n, lo, hi):
-    """White noise, filtered in the frequency domain to keep only lo..hi Hz."""
-    spec = np.fft.rfft(rng.standard_normal(n))
+def pluck(freq, length, decay, bright=1.0):
+    """One soft plucked note. `decay` = seconds for the note to fall to about a third."""
+    t = np.arange(int(SR * length)) / SR
+    # A main tone and three quiet overtones. The overtones die faster, so the note starts clear and ends round.
+    parts = [(1.0, 1.00, 1.0), (2.0, 0.22 * bright, 0.55), (3.01, 0.07 * bright, 0.35), (5.4, 0.04 * bright, 0.12)]
+    y = np.zeros_like(t)
+    for ratio, level, life in parts:
+        if freq * ratio < 9000:
+            y += level * np.sin(2 * np.pi * freq * ratio * t) * np.exp(-t / (decay * life))
+    attack = 0.006  # six thousandths of a second: no click at the start
+    y *= np.minimum(1.0, t / attack) ** 2
+    fade = int(SR * 0.02)  # and no click at the end
+    y[-fade:] *= np.linspace(1, 0, fade) ** 2
+    return y
+
+
+def place(track, note, at):
+    i = int(SR * at)
+    track[i:i + len(note)] += note[: max(0, len(track) - i)]
+
+
+def room(y, seconds=1.5, wet=0.2):
+    """A small warm room: the sound mixed with a soft, dark echo of itself."""
+    n = int(SR * seconds)
+    t = np.arange(n) / SR
+    tail = rng.standard_normal(n) * np.exp(-t / (seconds / 6.0))
+    spec = np.fft.rfft(tail)
     f = np.fft.rfftfreq(n, 1 / SR)
-    mask = np.ones_like(f)
-    # smooth edges (about 20% wide) so the band is not harsh
-    mask *= np.clip((f - lo * 0.8) / (lo * 0.4), 0, 1)
-    mask *= np.clip((hi * 1.2 - f) / (hi * 0.4), 0, 1)
-    return np.fft.irfft(spec * mask, n)
+    spec *= 1 / (1 + (f / 2500.0) ** 4)  # the echo keeps no sharp highs
+    tail = np.fft.irfft(spec, n)
+    tail[: int(SR * 0.012)] = 0
+    size = len(y) + n
+    echo = np.fft.irfft(np.fft.rfft(y, size) * np.fft.rfft(tail, size), size)[: len(y)]
+    echo *= np.sqrt(np.mean(y ** 2)) / (np.sqrt(np.mean(echo ** 2)) + 1e-12)
+    return y + wet * echo
 
 
-def sine_drop(t, f_start, f_end, drop_tau):
-    """Sine whose pitch glides from f_start to f_end (exponential glide)."""
-    freq = f_end + (f_start - f_end) * np.exp(-t / drop_tau)
-    phase = 2 * np.pi * np.cumsum(freq) / SR
-    return np.sin(phase)
+def finish(y, peak_db):
+    """Set the loudest point to peak_db (0 would be as loud as a file can be)."""
+    return y / np.max(np.abs(y)) * db(peak_db)
 
 
-def env(t, attack, tau):
-    """Fast linear attack then exponential decay."""
-    return np.minimum(t / attack, 1.0) * np.exp(-t / tau)
+def tick(freq):
+    return finish(pluck(freq, 0.22, 0.045, bright=0.8), -20)
 
 
-def finish(x, fade_out_ms, peak_db, fade_in_ms=4):
-    """Remove DC, add fade-in and smooth fade-out to silence, set the peak level."""
-    x = x - np.mean(x)
-    n = len(x)
-    fi = int(SR * fade_in_ms / 1000)
-    fo = int(SR * fade_out_ms / 1000)
-    # first 1 ms is exact silence, then a smooth fade-in (starts after the silence)
-    z = SR // 1000
-    x[:z] = 0.0
-    x[z:z + fi] *= 0.5 - 0.5 * np.cos(np.pi * np.arange(fi) / fi)
-    x[n - fo:] *= 0.5 + 0.5 * np.cos(np.pi * np.arange(fo) / fo)
-    x[-1] = 0.0
-    x *= 10 ** (peak_db / 20) / np.max(np.abs(x))
-    return x
+def tent():
+    y = pluck(C5, 0.5, 0.10) + 0.7 * pluck(G5, 0.5, 0.10)
+    y = room(y, 0.6, 0.12)
+    fade = int(SR * 0.08)
+    y[-fade:] *= np.linspace(1, 0, fade) ** 2
+    return finish(y, -17)
 
 
-def pencil():
-    """Soft dry pencil tick: band-limited noise (1.5-6 kHz), instant attack, quick decay."""
-    t = t_axis(65)
-    noise = bandpass_noise(len(t), 1500, 6000)
-    x = noise * env(t, 0.0008, 0.011)
-    # a little scratchy grain: slow random wobble in the volume
-    grain = 1 + 0.35 * bandpass_noise(len(t), 150, 600)
-    x *= grain / np.max(np.abs(grain))
-    return finish(x, fade_out_ms=15, peak_db=-14, fade_in_ms=4)
+def win():
+    y = np.zeros(int(SR * 5.0))
+    # A rising run, then three notes that come home. Unhurried: about one note every fifth of a second.
+    run = [(0.00, C5, 1.0), (0.20, E5, 0.9), (0.40, G5, 0.9), (0.60, C6, 1.0), (0.95, E6, 0.8), (1.30, D6, 0.7), (1.65, C6, 0.9)]
+    for at, freq, level in run:
+        place(y, level * pluck(freq, 2.4, 0.42), at)
+    # The last chord, rolled from low to high like a strummed harp.
+    for k, freq in enumerate([C5, G5, C6, E6]):
+        place(y, 0.55 * pluck(freq, 2.8, 0.75, bright=0.6), 2.15 + 0.045 * k)
+    # A very soft warm bed under it: pure tones that swell in and fade away.
+    t = np.arange(len(y)) / SR
+    swell = np.clip(t / 1.2, 0, 1) ** 2 * np.clip((4.9 - t) / 2.6, 0, 1) ** 2
+    for freq, level in [(C4, 0.10), (G4, 0.08), (E5, 0.05)]:
+        y += level * swell * np.sin(2 * np.pi * freq * t)
+    y = room(y, 1.8, 0.28)
+    y *= np.clip((5.0 - t) / 1.6, 0, 1) ** 2  # the long fade to silence
+    return finish(y, -13)
 
 
-def peg():
-    """Warm 'tok': damped sine ~480 -> 400 Hz plus a tiny paper-noise click at the start.
-
-    The pitch sits above 300 Hz on purpose: small phone speakers play almost nothing below that.
-    """
-    t = t_axis(110)
-    tok = sine_drop(t, 480, 400, 0.015) * env(t, 0.002, 0.026)
-    # a quiet lower partial keeps it warm on good speakers and headphones
-    tok += 0.35 * sine_drop(t, 250, 200, 0.015) * env(t, 0.002, 0.03)
-    # second, softer upper partial gives a woody feel
-    tok += 0.2 * sine_drop(t, 960, 800, 0.012) * env(t, 0.002, 0.012)
-    paper = bandpass_noise(len(t), 1500, 5000) * env(t, 0.0008, 0.004)
-    x = tok / np.max(np.abs(tok)) + 0.25 * paper / np.max(np.abs(paper))
-    return finish(x, fade_out_ms=25, peak_db=-10, fade_in_ms=4)
-
-
-def stamp():
-    """Rubber stamp on a desk pad: low thud + muffled thump + paper transient + short tail."""
-    t = t_axis(400)
-    # 1. soft heavy thud: low sine, fast pitch drop 110 -> 70 Hz
-    thud = sine_drop(t, 110, 70, 0.025) * env(t, 0.003, 0.055)
-    # 2. muffled mid thump: noise squeezed below ~350 Hz plus a 150 Hz sine
-    body = bandpass_noise(len(t), 60, 350) * env(t, 0.002, 0.035)
-    body = body / np.max(np.abs(body)) * 0.45
-    body += 0.35 * sine_drop(t, 170, 130, 0.02) * env(t, 0.002, 0.04)
-    # 3. brief papery noise transient
-    paper = bandpass_noise(len(t), 1200, 5000) * env(t, 0.0008, 0.006)
-    paper = paper / np.max(np.abs(paper)) * 0.12
-    # 4. very short quiet tail: pad settling at 80 Hz
-    tail = 0.12 * np.sin(2 * np.pi * 80 * t) * env(t, 0.02, 0.07)
-    # 5. what a phone speaker can actually play (it loses almost everything below ~200 Hz):
-    #    a short mid "thump" and a soft rubbery noise burst, so the stamp is still heard on a phone
-    mid = 0.85 * sine_drop(t, 520, 380, 0.018) * env(t, 0.002, 0.045)
-    rubber = bandpass_noise(len(t), 600, 2500) * env(t, 0.0015, 0.022)
-    rubber = rubber / np.max(np.abs(rubber)) * 0.7
-    x = thud + body + paper + tail + mid + rubber
-    return finish(x, fade_out_ms=120, peak_db=-6, fade_in_ms=4)
-
-
-def write_wav(path, x):
-    """Write mono 16-bit PCM WAV."""
-    data = np.round(x * 32767).astype("<i2")
-    with wave.open(path, "wb") as w:
+def save(name, y):
+    data = np.round(np.clip(y, -1, 1) * 32767).astype("<i2")
+    with wave.open(os.path.join(OUT, name), "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)
         w.setframerate(SR)
         w.writeframes(data.tobytes())
-
-
-def main():
-    os.makedirs(OUT, exist_ok=True)
-    print(f"{'file':<12}{'ms':>8}{'peak dBFS':>12}{'RMS dBFS':>11}")
-    for name, fn in (("pencil", pencil), ("peg", peg), ("stamp", stamp)):
-        x = fn()
-        path = os.path.join(OUT, name + ".wav")
-        write_wav(path, x)
-        q = np.round(x * 32767) / 32767
-        peak = 20 * np.log10(np.max(np.abs(q)))
-        rms = 20 * np.log10(np.sqrt(np.mean(q ** 2)))
-        print(f"{name + '.wav':<12}{len(x) / SR * 1000:>8.1f}{peak:>12.2f}{rms:>11.2f}")
+    spec = np.abs(np.fft.rfft(y)) ** 2
+    f = np.fft.rfftfreq(len(y), 1 / SR)
+    centre = float(np.sum(f * spec) / np.sum(spec))
+    high = float(np.sum(spec[f > 6000]) / np.sum(spec)) * 100
+    print(
+        f"{name:10s} {len(y) / SR:5.2f} s   peak {20 * np.log10(np.max(np.abs(y))):6.1f} dB   "
+        f"average {20 * np.log10(np.sqrt(np.mean(y ** 2))):6.1f} dB   centre {centre:5.0f} Hz   "
+        f"above 6 kHz {high:4.1f} %   ends at {abs(data[-1])}   {os.path.getsize(os.path.join(OUT, name)) // 1024} KB"
+    )
 
 
 if __name__ == "__main__":
-    main()
+    os.makedirs(OUT, exist_ok=True)
+    for i, freq in enumerate([C5, D5, E5, G5], start=1):
+        save(f"tick{i}.wav", tick(freq))
+    save("tent.wav", tent())
+    save("win.wav", win())

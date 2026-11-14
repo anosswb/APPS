@@ -70,6 +70,9 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     return () => sub.remove();
   }, []);
 
+  // Leaving the puzzle stops the winning tune.
+  useEffect(() => () => sound.hush(), []);
+
   // What a drag is painting: the mark, and the mark it replaces.
   const stroke = useRef<{ to: number; from: number } | null>(null);
 
@@ -85,7 +88,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
         setFinalMs(ms);
         setHint(null);
         haptic.stamp();
-        sound.stamp();
+        sound.win();
         onSolved(ms, hintCount);
       }
     },
@@ -107,10 +110,10 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       next[i] = to;
       if (to === TENT) {
         haptic.tent();
-        sound.peg();
+        sound.tent();
       } else {
         haptic.mark();
-        sound.pencil();
+        sound.tick();
       }
       commit(next, hints);
     },
@@ -125,7 +128,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       const next = marks.slice();
       next[i] = s.to;
       haptic.mark();
-      sound.pencil();
+      sound.tick();
       commit(next, hints);
     },
     [commit, hints, marks, puzzle.trees, solved],
@@ -157,7 +160,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     else if (hint.kind === 'mistake') for (const i of hint.cells) next[i] = UNKNOWN;
     setUndo((u) => [...u.slice(-199), marks]);
     setHint(null);
-    sound.pencil();
+    sound.tick();
     commit(next, hints);
   }, [commit, hint, hints, marks]);
 
