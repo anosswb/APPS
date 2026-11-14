@@ -241,6 +241,28 @@ export const t = {
     next: { race: 'Next race', ink: 'Next pot' },
   },
 
+  // The compliment after a solve. A puzzle editor's nod, for adults: it names what the player did.
+  // No exclamation marks, no "awesome". Several wordings per kind so it does not repeat.
+  praise: {
+    mark: (seconds: number) => (seconds < 60 ? `${seconds} seconds` : seconds === 60 ? 'a minute' : seconds === 90 ? 'a minute and a half' : `${seconds / 60} minutes`),
+    lines: {
+      under: [
+        (mark: string) => `Under ${mark}. Sharp work.`,
+        (mark: string) => `Under ${mark}, and no hints.`,
+        (mark: string) => `Under ${mark}. That was quick.`,
+      ],
+      newBest: ['A new personal best.', 'Your fastest yet.', 'Faster than you have ever been.'],
+      hardClean: ['A tricky one, with no help. Well played.', 'No hints on a hard page. Impressive.', 'That one stops most people. Not you.'],
+      clean: ['Clean work. Not one hint.', 'Solved on your own.', 'No help needed. Nicely done.', 'A steady hand.'],
+      fewHints: ['Nicely finished.', 'Solved. A hint is fair play.', 'Done, and well reasoned.'],
+      helped: ['Finished. The next one will come easier.', 'Done. Every page teaches the next.', 'Solved. That is how it is learned.'],
+      lastDrop: ['Down to the very last drop.', 'Not a drop wasted.', 'The last drop, and it was enough.'],
+      inkSpare: ['Ink to spare. Careful work.', 'Measured twice, pitched once.', 'Every tent in its place.'],
+      clockHalf: ['Half the clock still standing.', 'Time to spare. Well run.', 'The clock never stood a chance.'],
+      clock: ['Beat the clock.', 'In before the bell.', 'Close, and enough.'],
+    },
+  },
+
   records: {
     kicker: 'Your bests',
     blurb: 'You against yourself. Times count only when you use no hints.',

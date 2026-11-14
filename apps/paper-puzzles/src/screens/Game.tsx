@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { INK_EXTRA, MAX_CONTINUES, raceExtraMs } from '../game/challenge';
 import { getHint, Hint, isSolved, visibleProblems } from '../game/hints';
+import { pick, praiseFor } from '../game/praise';
 import { bestNews } from '../game/records';
 import { GRASS, Puzzle, TENT, UNKNOWN } from '../game/types';
 import { clock, t } from '../i18n/en';
@@ -183,6 +184,23 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
           ? t.records.keep(puzzle.n, clock(bestAtStart.current ?? 0))
           : null;
 
+  // The compliment for a puzzle just solved (not for one that is only being looked at again).
+  let praise: string | null = null;
+  if (solved && freshWin.current) {
+    const p = praiseFor({
+      n: puzzle.n,
+      grade: puzzle.grade,
+      ms: finalMs,
+      hints,
+      bestBefore: bestAtStart.current,
+      challenge: challenge
+        ? { kind: challenge.kind, room, left: challenge.kind === 'ink' ? inkLeft : Math.max(0, room - finalMs), helped: continues > 0 }
+        : undefined,
+    });
+    const line = pick<string | ((mark: string) => string)>(t.praise.lines[p.kind], puzzle.id);
+    praise = typeof line === 'function' ? line(t.praise.mark(p.mark ?? 60)) : line;
+  }
+
   // What a drag is painting: the mark, and the mark it replaces.
   const stroke = useRef<{ to: number; from: number } | null>(null);
 
@@ -342,6 +360,11 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
 
           {solved ? (
             <View style={styles.after}>
+              {praise ? (
+                <Type variant="title" accessibilityRole="header" style={[styles.center, styles.praise]}>
+                  {praise}
+                </Type>
+              ) : null}
               <Type variant="bodyItalic" tone="muted" style={styles.center}>
                 {challenge?.kind === 'race'
                   ? t.challenge.won.race(clock(Math.max(0, room - finalMs)))
@@ -442,4 +465,5 @@ const styles = StyleSheet.create({
   center: { textAlign: 'center' },
   after: { marginTop: space.l },
   afterBtn: { marginTop: space.m },
+  praise: { marginBottom: space.s },
 });
