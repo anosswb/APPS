@@ -16,6 +16,9 @@ interface StoreApi {
   setHapticsOn: (on: boolean) => void;
   setSoundOn: (on: boolean) => void;
   setSeenRules: () => void;
+  unlockDay: (key: string) => void;
+  setFullEdition: (owned: boolean) => void;
+  markAdShown: (now: number) => void;
 }
 
 const Ctx = createContext<StoreApi | null>(null);
@@ -94,8 +97,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setSave((s) => (s.seenRules ? s : { ...s, seenRules: true }));
   }, []);
 
+  const unlockDay = useCallback((key: string) => {
+    setSave((s) => (s.money.unlockedDays.includes(key) ? s : { ...s, money: { ...s.money, unlockedDays: [...s.money.unlockedDays, key] } }));
+  }, []);
+
+  const setFullEdition = useCallback((owned: boolean) => {
+    setSave((s) => (s.money.fullEdition === owned ? s : { ...s, money: { ...s.money, fullEdition: owned } }));
+  }, []);
+
+  const markAdShown = useCallback((now: number) => {
+    setSave((s) => ({ ...s, money: { ...s.money, lastAdAt: now } }));
+  }, []);
+
   return (
-    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown }}>{children}</Ctx.Provider>
   );
 }
 

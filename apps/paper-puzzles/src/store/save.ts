@@ -1,8 +1,9 @@
 /** What is kept on the phone, and how an old save is read safely after an update. */
+import { MoneyState } from '../money/rules';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound */
-export const SCHEMA = 2;
+/** 2: added settings.sound · 3: added money */
+export const SCHEMA = 3;
 
 export interface GameSave {
   marks: number[];
@@ -24,9 +25,10 @@ export interface Save {
   /** puzzles in progress, by puzzle id */
   games: Record<string, GameSave>;
   seenRules: boolean;
+  money: MoneyState;
 }
 
-export function freshSave(): Save {
+export function freshSave(now: number = Date.now()): Save {
   return {
     schema: SCHEMA,
     settings: { theme: 'system', haptics: true, sound: true },
@@ -34,6 +36,7 @@ export function freshSave(): Save {
     daily: {},
     games: {},
     seenRules: false,
+    money: { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: now },
   };
 }
 
@@ -42,10 +45,10 @@ function isObject(x: unknown): x is Record<string, unknown> {
 }
 
 /** Read whatever was stored. Anything missing or broken falls back to the default, nothing is thrown away. */
-export function migrate(raw: unknown): Save {
-  const base = freshSave();
+export function migrate(raw: unknown, now: number = Date.now()): Save {
+  const base = freshSave(now);
   if (!isObject(raw)) return base;
-  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book } };
+  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] } };
   if (isObject(raw.settings)) {
     const s = raw.settings;
     if (s.theme === 'system' || s.theme === 'light' || s.theme === 'dark') out.settings.theme = s.theme;
@@ -71,6 +74,13 @@ export function migrate(raw: unknown): Save {
     }
   }
   if (typeof raw.seenRules === 'boolean') out.seenRules = raw.seenRules;
+  if (isObject(raw.money)) {
+    const m = raw.money;
+    if (typeof m.fullEdition === 'boolean') out.money.fullEdition = m.fullEdition;
+    if (Array.isArray(m.unlockedDays)) out.money.unlockedDays = m.unlockedDays.filter((d): d is string => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d));
+    if (typeof m.lastAdAt === 'number' && m.lastAdAt >= 0) out.money.lastAdAt = m.lastAdAt;
+    if (typeof m.firstOpenAt === 'number' && m.firstOpenAt > 0) out.money.firstOpenAt = m.firstOpenAt;
+  }
   out.schema = SCHEMA;
   return out;
 }
