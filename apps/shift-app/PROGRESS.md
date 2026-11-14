@@ -14,7 +14,8 @@ He saw the grey box. The plain look shocked him until he understood it was a tes
 
 ## Done (14 Nov 2026, second session)
 - **"Version 1 does / does NOT do" rewritten** in `docs/brief.md` from his requirements: the rest-day calendar with no pattern, pay with his own overtime rules, the morning of a shift (alarm button, day line, one evening note).
-- **Step 6, three looks drawn:** `docs/looks/three-looks.png` (A Daybreak, B The Board, C The Dial), details in `docs/looks/README.md`. Recommendation: B. **Waiting for Anass to pick or mix.** ⏸
+- **Step 6, three looks drawn:** `docs/looks/three-looks.png` (A Daybreak, B The Board, C The Dial), details in `docs/looks/README.md`. Recommendation was B.
+- **His answer:** he loves A and C, but too much on one tab; wants each thing in its place and a special font. **Round 2 drawn:** `docs/looks/r2-calmer.png` (sky look for Today, the ring on a My day tab, four tabs) and `docs/looks/r2-fonts.png` (four fonts). **Waiting for his yes on the mix and a font number.** ⏸
 
 ## Done (14 Nov 2026, third block: the rules his requirements need, no screen yet)
 - **The calendar with no pattern** (`src/core/days.ts`): mark a day Work (start, end, break), Rest, or leave it "not known yet". Works out: the next rest day, how many rest days in a row, days worked in a row, days since the last rest. When a day in between is not known, the answer says it is **not sure** (the screen must show that, not hide it). A ready rotation only fills days he has not marked.

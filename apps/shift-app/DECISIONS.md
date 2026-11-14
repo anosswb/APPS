@@ -12,6 +12,8 @@
 | 2026-11-14 | Wake-up alarm button, daily reminder with motivation, day and food planning go into the plan | His list of what a worker needs | Anass |
 | 2026-11-14 | The look: alive and modern, nothing like paper | "They need a live one, like a calendar, something good, not like this, like it's from paper." | Anass |
 | 2026-11-14 | The grey box uses AsyncStorage, one file, no router | It is a test, not the app. The starter's stack applies when the real screens are built | Claude |
+| 2026-11-14 | Look B (the board) is out; the look comes from A (sky) and C (ring) | "I love A and C, hard to choose between." | Anass |
+| 2026-11-14 | One job per tab: Today, Calendar, My day, Pay. Few colours and few words on each | "So much colour and text and things at one tab that feel distracting… put each thing in a place." | Anass |
 | 2026-11-14 | A day nobody marked is "not known yet" and is never guessed; answers that cross such a day carry `sure: false` | His work has no pattern. A wrong "rest in 2 days" at 5 am is worse than "next rest you marked: Monday" | Claude, from Anass's rule |
 | 2026-11-14 | A rule's percentage is the EXTRA on top of the normal rate (50 = pays 1.5 times) | "The percentage they get more when they work overpaid hours" | Claude, from his words; check the wording on the screen with him |
 | 2026-11-14 | Two rules on the same hour: the higher percentage wins; adding them is a setting | A guess about how most employers pay. Not checked with US workers | Claude (guess) |
