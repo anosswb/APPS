@@ -13,6 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MONEY_MODE } from './src/config/money';
 import { bookPuzzle } from './src/game/book';
 import { Month, monthOf } from './src/game/archive';
+import { ChallengeKind, challengePuzzle, inkDrops, raceLimitMs } from './src/game/challenge';
 import { dailyPuzzle, dateKey, keyToDate } from './src/game/daily';
 import { t } from './src/i18n/en';
 import { ads } from './src/money/ads';
@@ -43,6 +44,7 @@ type Route =
   | { name: 'licenses' }
   | { name: 'full'; back: Route }
   | { name: 'book'; level: number; relief: number }
+  | { name: 'challenge'; kind: ChallengeKind; level: number; attempt: number }
   | { name: 'rules'; back: Route };
 
 function Screens() {
@@ -159,6 +161,7 @@ function Screens() {
   const puzzle = useMemo(() => {
     if (route.name === 'daily') return dailyPuzzle(route.key);
     if (route.name === 'book') return bookPuzzle(route.level, route.relief);
+    if (route.name === 'challenge') return challengePuzzle(route.kind, route.level);
     return null;
   }, [route]);
 
@@ -168,6 +171,36 @@ function Screens() {
     },
     [puzzle, store],
   );
+
+  // A challenge: the clock or the pot is fixed when the attempt starts, from what the algorithm allows this player.
+  const challengeRoom = useMemo(() => {
+    if (route.name !== 'challenge' || !puzzle) return 0;
+    return route.kind === 'race'
+      ? raceLimitMs(puzzle.n, puzzle.grade, save.challenge.race.factor)
+      : inkDrops(puzzle.solution.filter(Boolean).length, save.challenge.ink.slack);
+  }, [route]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const openChallenge = useCallback(
+    (kind: ChallengeKind, attempt = 0) => {
+      const next: Route = { name: 'challenge', kind, level: save.challenge[kind].level, attempt };
+      if (!save.seenRules) {
+        store.setSeenRules();
+        setRoute({ name: 'rules', back: next });
+      } else setRoute(next);
+    },
+    [save.challenge, save.seenRules, store],
+  );
+  useEffect(() => {
+    if (route.name === 'challenge' && puzzle) count('challenge_start', { kind: route.kind, level: route.level, size: puzzle.n, grade: puzzle.grade, room: route.kind === 'race' ? challengeRoom / 1000 : challengeRoom });
+  }, [route]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // "Keep playing" in a challenge: one optional video. If no video is ready the player keeps going anyway:
+  // nobody is left waiting for an ad that is not there.
+  const keepPlaying = useCallback(async () => {
+    const result = await ads.showRewarded();
+    count('video_result', { result });
+    return result !== 'dismissed';
+  }, []);
 
   const openBook = useCallback(() => {
     if (bookIsLocked) {
@@ -274,12 +307,39 @@ function Screens() {
         onRules={() => setRoute({ name: 'rules', back: route })}
       />
     );
+  } else if (route.name === 'challenge' && puzzle) {
+    const kind = route.kind;
+    screen = (
+      <Game
+        key={`${puzzle.id}-${route.attempt}`}
+        puzzle={puzzle}
+        title={t.challenge.title[kind](route.level)}
+        challenge={{ kind, room: challengeRoom }}
+        canContinue={MONEY_MODE === 'ads'}
+        onContinue={keepPlaying}
+        onRetry={() => setRoute({ ...route, attempt: route.attempt + 1 })}
+        onLost={(right, total, ms) => {
+          store.finishChallenge(kind, false, false);
+          count('challenge_end', { kind, result: 'lost', level: route.level, size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, closeness: Math.round((right / total) * 100) });
+        }}
+        nextLabel={t.challenge.next[kind]}
+        onKeep={() => {}}
+        onSolved={(ms, _hints, helped) => {
+          store.finishChallenge(kind, true, helped);
+          count('challenge_end', { kind, result: 'won', level: route.level, size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, closeness: 100, helped });
+        }}
+        onNext={() => openChallenge(kind)}
+        onExit={() => setRoute({ name: 'home' })}
+        onRules={() => setRoute({ name: 'rules', back: route })}
+      />
+    );
   } else {
     screen = (
       <Home
         today={today}
         onDaily={() => setRoute({ name: 'daily', key: today })}
         onBook={openBook}
+        onChallenge={openChallenge}
         onRules={() => setRoute({ name: 'rules', back: { name: 'home' } })}
         onArchive={() => setRoute({ name: 'archive', month: monthOf(today) })}
         onSettings={() => setRoute({ name: 'settings' })}

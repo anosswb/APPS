@@ -20,6 +20,7 @@ interface Props {
   today: string;
   onDaily: () => void;
   onBook: () => void;
+  onChallenge: (kind: 'race' | 'ink') => void;
   onRules: () => void;
   onArchive: () => void;
   onSettings: () => void;
@@ -29,7 +30,7 @@ interface Props {
 }
 
 /** The front page: masthead, today's puzzle, the week, the book. */
-export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings, onFullEdition, bookIsLocked }: Props) {
+export function Home({ today, onDaily, onBook, onChallenge, onRules, onArchive, onSettings, onFullEdition, bookIsLocked }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { save } = useStore();
@@ -129,6 +130,15 @@ export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings, o
 
         <View style={styles.gap} />
         <Rule />
+        <Type variant="label" tone="muted" style={styles.kicker}>
+          {t.challenge.kicker}
+        </Type>
+        <Type tone="muted">{t.challenge.blurb}</Type>
+        <Btn label={t.challenge.open.race(save.challenge.race.level)} kind="outline" onPress={() => onChallenge('race')} style={styles.wide} />
+        <Btn label={t.challenge.open.ink(save.challenge.ink.level)} kind="outline" onPress={() => onChallenge('ink')} style={styles.challenge} />
+
+        <View style={styles.gap} />
+        <Rule />
         <View style={styles.footer}>
           <Btn label={t.home.rules} kind="quiet" onPress={onRules} />
           <Btn label={t.home.settings} kind="quiet" onPress={onSettings} />
@@ -151,6 +161,7 @@ const styles = StyleSheet.create({
   meta: { marginTop: space.xs, marginBottom: space.s },
   stampOver: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   wide: { marginTop: space.l },
+  challenge: { marginTop: space.m },
   week: { flexDirection: 'row', justifyContent: 'space-between' },
   day: { alignItems: 'center', gap: space.xs },
   dayBox: { width: 30, height: 30 },

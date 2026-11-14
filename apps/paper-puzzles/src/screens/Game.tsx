@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { INK_EXTRA, MAX_CONTINUES, raceExtraMs } from '../game/challenge';
 import { getHint, Hint, isSolved, visibleProblems } from '../game/hints';
 import { GRASS, Puzzle, TENT, UNKNOWN } from '../game/types';
 import { clock, t } from '../i18n/en';
@@ -33,8 +34,18 @@ interface Props {
   afterLine?: string;
   /** a small notice under that line (the daily-reminder question) */
   afterExtra?: React.ReactNode;
+  /** a challenge: this puzzle can be lost. `room` is the clock in ms (race) or the drops of ink (ink) */
+  challenge?: { kind: 'race' | 'ink'; room: number };
+  /** can a video give more time or ink? */
+  canContinue?: boolean;
+  /** shows the video; true when the player may keep going */
+  onContinue?: () => Promise<boolean>;
+  onRetry?: () => void;
+  /** the attempt ended without a win. right/total = tents in the right place */
+  onLost?: (right: number, total: number, ms: number) => void;
   onKeep: (game: GameSave) => void;
-  onSolved: (ms: number, hints: number) => void;
+  /** helped = solved only after extra time or ink (challenges) */
+  onSolved: (ms: number, hints: number, helped: boolean) => void;
   /** called once when the player has been stuck long enough for the Hint button to light up */
   onStuck?: () => void;
   /** for the anonymous numbers: which kind of hint was shown */
@@ -44,7 +55,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, challenge, canContinue, onContinue, onRetry, onLost, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -81,7 +92,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
   const stuckTold = useRef(false);
   useEffect(() => {
     setStuck(false);
-    if (solved || hint) return;
+    if (solved || hint || challenge) return;
     const timer = setTimeout(() => {
       setStuck(true);
       if (!stuckTold.current) {
@@ -94,6 +105,68 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
 
   // Leaving the puzzle stops the winning tune.
   useEffect(() => () => sound.hush(), []);
+
+  // ---- Challenges: a clock or a pot of ink, and a way to lose ----
+  const [failed, setFailed] = useState(false);
+  const [extra, setExtra] = useState(0); // ms or drops added by "keep playing"
+  const [continues, setContinues] = useState(0);
+  const [used, setUsed] = useState(0); // drops of ink used
+  const [leftMs, setLeftMs] = useState(challenge?.kind === 'race' ? challenge.room : 0);
+  const [busy, setBusy] = useState(false);
+  const room = (challenge?.room ?? 0) + extra;
+  const inkLeft = Math.max(0, room - used);
+
+  // The race clock. It only runs while the puzzle is open and still being played.
+  useEffect(() => {
+    if (challenge?.kind !== 'race' || solved || failed) return;
+    const tick = () => {
+      const left = room - elapsed();
+      setLeftMs(Math.max(0, left));
+      if (left <= 0) setFailed(true);
+    };
+    tick();
+    const timer = setInterval(tick, 250);
+    return () => clearInterval(timer);
+  }, [challenge?.kind, room, solved, failed, elapsed]);
+
+  // A lost attempt is reported once, when the player leaves it or starts again.
+  const lostRef = useRef<(() => void) | null>(null);
+  lostRef.current =
+    failed && !solved && onLost
+      ? () => {
+          let right = 0;
+          for (let i = 0; i < size; i++) if (puzzle.solution[i] && marks[i] === TENT) right++;
+          onLost(right, tentsWanted, elapsed());
+        }
+      : null;
+  const lostTold = useRef(false);
+  const reportLost = useCallback(() => {
+    if (lostTold.current) return;
+    lostTold.current = true;
+    lostRef.current?.();
+  }, []);
+  useEffect(() => () => reportLost(), [reportLost]);
+  // "Try again" reports the loss first, so the next attempt already has the extra room the algorithm gives.
+  const tryAgain = useCallback(() => {
+    reportLost();
+    onRetry?.();
+  }, [onRetry, reportLost]);
+
+  const keepPlaying = useCallback(async () => {
+    if (!challenge || !onContinue || busy) return;
+    setBusy(true);
+    const ok = await onContinue().catch(() => false);
+    setBusy(false);
+    if (!ok) return;
+    if (challenge.kind === 'race') {
+      // The old time is spent; the clock starts again with exactly the extra time.
+      banked.current = room;
+      since.current = Date.now();
+      setExtra((e) => e + raceExtraMs(challenge.room));
+    } else setExtra((e) => e + INK_EXTRA);
+    setContinues((n) => n + 1);
+    setFailed(false);
+  }, [busy, challenge, onContinue, room]);
 
   // What a drag is painting: the mark, and the mark it replaces.
   const stroke = useRef<{ to: number; from: number } | null>(null);
@@ -111,15 +184,15 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
         setHint(null);
         haptic.stamp();
         sound.win();
-        onSolved(ms, hintCount);
+        onSolved(ms, hintCount, continues > 0);
       }
     },
-    [elapsed, onKeep, onSolved, puzzle, solved],
+    [continues, elapsed, onKeep, onSolved, puzzle, solved],
   );
 
   const onStrokeStart = useCallback(
     (i: number) => {
-      if (solved || puzzle.trees[i]) {
+      if (solved || failed || puzzle.trees[i]) {
         stroke.current = null;
         return;
       }
@@ -133,20 +206,25 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       if (to === TENT) {
         haptic.tent();
         sound.tent();
+        if (challenge?.kind === 'ink') {
+          // One drop of ink per tent. The pot is empty and the puzzle is not solved: lost.
+          setUsed(used + 1);
+          if (used + 1 >= room && !isSolved(puzzle, next)) setFailed(true);
+        }
       } else {
         haptic.mark();
         sound.tick();
       }
       commit(next, hints);
     },
-    [commit, hints, marks, puzzle.trees, solved],
+    [challenge?.kind, commit, failed, hints, marks, puzzle, room, solved, used],
   );
 
   const onStrokeMove = useCallback(
     (i: number) => {
       const s = stroke.current;
       // Dragging paints grass or clears. Tents are placed one deliberate tap at a time.
-      if (!s || s.to === TENT || solved || puzzle.trees[i] || marks[i] !== s.from) return;
+      if (!s || s.to === TENT || solved || failed || puzzle.trees[i] || marks[i] !== s.from) return;
       const next = marks.slice();
       next[i] = s.to;
       haptic.mark();
@@ -157,7 +235,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
   );
 
   const onUndo = useCallback(() => {
-    if (!undo.length || solved) return;
+    if (!undo.length || solved || failed) return;
     const previous = undo[undo.length - 1];
     setUndo((u) => u.slice(0, -1));
     setHint(null);
@@ -201,8 +279,8 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     <View style={[styles.screen, { backgroundColor: c.bg }]}>
       <ScrollView
         style={styles.screen}
-        contentContainerStyle={[styles.page, { paddingTop: insets.top + space.s, paddingBottom: space.xl + (solved ? insets.bottom : 0) }]}
-        scrollEnabled={solved || !!hint}
+        contentContainerStyle={[styles.page, { paddingTop: insets.top + space.s, paddingBottom: space.xl + (solved || failed ? insets.bottom : 0) }]}
+        scrollEnabled={solved || failed || !!hint}
       >
         <View style={[styles.column, { width: boardWidth }]}>
           <View style={styles.bar}>
@@ -220,8 +298,9 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
             <Type variant="label" tone="muted">
               {t.sizeLine(puzzle.n, puzzle.grade)}
             </Type>
-            <Type variant="label" tone={tentsPlaced > tentsWanted ? 'accent' : 'muted'}>
+            <Type variant="label" tone={tentsPlaced > tentsWanted || (challenge?.kind === 'race' && leftMs < 20000) || (challenge?.kind === 'ink' && inkLeft <= 1) ? 'accent' : 'muted'}>
               {t.game.tents(tentsPlaced, tentsWanted)}
+              {challenge?.kind === 'race' ? ` · ${t.challenge.clock(clock(leftMs))}` : challenge?.kind === 'ink' ? ` · ${t.challenge.ink(inkLeft)}` : ''}
             </Type>
           </View>
 
@@ -230,7 +309,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
               puzzle={puzzle}
               marks={marks}
               width={boardWidth}
-              locked={solved}
+              locked={solved || failed}
               focus={focus}
               because={because}
               line={line}
@@ -249,7 +328,11 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
           {solved ? (
             <View style={styles.after}>
               <Type variant="bodyItalic" tone="muted" style={styles.center}>
-                {t.game.solvedLine(clock(finalMs), hints)}
+                {challenge?.kind === 'race'
+                  ? t.challenge.won.race(clock(Math.max(0, room - finalMs)))
+                  : challenge?.kind === 'ink'
+                    ? t.challenge.won.ink(inkLeft)
+                    : t.game.solvedLine(clock(finalMs), hints)}
               </Type>
               {afterLine ? (
                 <Type tone="muted" style={[styles.center, styles.afterBtn]}>
@@ -258,6 +341,28 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
               ) : null}
               {afterExtra}
               {onNext ? <Btn label={nextLabel ?? t.game.next} onPress={onNext} style={styles.afterBtn} /> : null}
+              <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
+            </View>
+          ) : failed && challenge ? (
+            <View style={styles.after} accessibilityLiveRegion="polite">
+              <Type variant="title" style={styles.center}>
+                {t.challenge.lost[challenge.kind]}
+              </Type>
+              <Type tone="muted" style={[styles.center, styles.afterBtn]}>
+                {t.challenge.closeness(
+                  marks.filter((m, i) => m === TENT && puzzle.solution[i]).length,
+                  tentsWanted,
+                )}
+              </Type>
+              {canContinue && onContinue && continues < MAX_CONTINUES ? (
+                <Btn
+                  label={challenge.kind === 'race' ? t.challenge.more.race(raceExtraMs(challenge.room) / 1000) : t.challenge.more.ink(INK_EXTRA)}
+                  onPress={() => void keepPlaying()}
+                  disabled={busy}
+                  style={styles.afterBtn}
+                />
+              ) : null}
+              {onRetry ? <Btn label={t.challenge.again} kind={canContinue && continues < MAX_CONTINUES ? 'outline' : 'ink'} onPress={tryAgain} style={styles.afterBtn} /> : null}
               <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
             </View>
           ) : hint ? (
@@ -274,6 +379,10 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
               </View>
               <Rule />
             </View>
+          ) : challenge && empty ? (
+            <Type tone="muted" style={[styles.center, styles.legend]}>
+              {challenge.kind === 'race' ? t.challenge.intro.race(clock(challenge.room)) : t.challenge.intro.ink(challenge.room, tentsWanted)}
+            </Type>
           ) : showLegend || empty ? (
             <Type tone="muted" style={[styles.center, styles.legend]}>
               {t.game.legend}
@@ -282,11 +391,11 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
         </View>
       </ScrollView>
 
-      {solved ? null : (
+      {solved || failed ? null : (
         <View style={[styles.dock, { borderTopColor: c.rule, backgroundColor: c.bg, paddingBottom: insets.bottom + space.m }]}>
           <View style={[styles.tools, { width: boardWidth }]}>
             <Btn label={t.game.undo} kind="outline" onPress={onUndo} disabled={!undo.length} style={styles.tool} />
-            <Btn label={stuck ? t.game.hintNudge : t.game.hint} kind={stuck ? 'ink' : 'outline'} onPress={onHint} style={styles.tool} />
+            {challenge ? null : <Btn label={stuck ? t.game.hintNudge : t.game.hint} kind={stuck ? 'ink' : 'outline'} onPress={onHint} style={styles.tool} />}
           </View>
         </View>
       )}

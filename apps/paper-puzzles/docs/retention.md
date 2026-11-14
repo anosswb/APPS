@@ -19,6 +19,16 @@ Built means it is in the code today; planned means not yet.
   - **Inside a puzzle** *(built)*: after 45 seconds with no mark, the Hint button lights up and reads "Stuck? Hint". Any mark puts it out. This is the "falling behind → make it easier" step of the Candy Crush system (`playbook/06`, A3b), done the only way a one-answer puzzle allows: the board never changes, the help comes forward. Counted as `stuck_nudge`.
   - This is our version of the Candy Crush idea. There, the game tunes how often you fail. Here nobody can fail, so we tune how hard the thinking is, to keep each player near the edge of their own skill. It never changes to sell anything.
 
+## The two challenge modes (Anass, 14 Nov 2026) *(built, `src/game/challenge.ts`, tested)*
+The daily puzzle and the book stay calm: no clock, nobody loses. The challenges are a separate part of the front page, and they **can be lost**.
+- **Beat the clock:** solve the puzzle before the time runs out. Time = usual time × a factor that belongs to the player (starts at 3, between 1 and 4).
+- **One pot of ink:** each tent pitched uses one drop. The puzzle needs T tents; the pot holds T + N drops (N starts at 4, between 1 and 6). A wrong tent wastes a drop; grass is free. This is the "limit of clicks": think before you pitch.
+- **The algorithm:** a win tightens the room a little (time × 0.92, N − 1); a loss loosens it more (time × 1.2, N + 2). A test shows this settles at about two wins in three for any player. It changes only between attempts; inside an attempt the clock and the pot are what the page says.
+- **The lose screen** says how close it was ("3 of 5 tents were in the right place") and offers: one video for more time or 3 more drops (Android, at most twice per puzzle), try again (free, with the extra room the loss just earned), or the front page.
+- A win after a video moves the player on but does not tighten the room.
+- No hints in challenges. Each mode has its own row of puzzles, growing like the book.
+- Not built yet: steering inside an attempt, and a smaller reward when the player was close (both from the Candy Crush notes in `playbook/06`, A3b). First see the real numbers: `challenge_start`, `challenge_end` (with closeness).
+
 ## The stuck moment (our version of the fail moment)
 A hint is always free. It first checks for a mistake ("these tents touch"), then explains the next forced step and highlights the squares; "Mark it for me" applies it. *(built)* After several hints on one puzzle the next puzzles get kinder. No ad is ever shown here.
 

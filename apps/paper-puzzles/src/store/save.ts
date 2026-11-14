@@ -1,10 +1,11 @@
 /** What is kept on the phone, and how an old save is read safely after an update. */
+import { ChallengeSave, freshChallenges, INK, RACE } from '../game/challenge';
 import { MoneyState } from '../money/rules';
 import { DEFAULT_REMINDER_TIME, REMINDER_HOURS, ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative */
-export const SCHEMA = 6;
+/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative · 7: challenge */
+export const SCHEMA = 7;
 
 export interface GameSave {
   marks: number[];
@@ -30,6 +31,8 @@ export interface Save {
   money: MoneyState;
   /** anonymous usage numbers: the switch, and a random id that names nobody */
   stats: { on: boolean; id: string };
+  /** the two challenge modes: where the player is, and how much room the algorithm gives them */
+  challenge: ChallengeSave;
   /** the daily note: off until the player says yes */
   reminder: ReminderState;
 }
@@ -51,6 +54,7 @@ export function freshSave(now: number = Date.now()): Save {
     money: { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: now },
     stats: { on: true, id: randomId() },
     reminder: { on: false, time: DEFAULT_REMINDER_TIME, asked: false },
+    challenge: freshChallenges(),
   };
 }
 
@@ -62,7 +66,7 @@ function isObject(x: unknown): x is Record<string, unknown> {
 export function migrate(raw: unknown, now: number = Date.now()): Save {
   const base = freshSave(now);
   if (!isObject(raw)) return base;
-  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats }, reminder: { ...base.reminder } };
+  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats }, reminder: { ...base.reminder }, challenge: { race: { ...base.challenge.race }, ink: { ...base.challenge.ink } } };
   if (isObject(raw.settings)) {
     const s = raw.settings;
     if (s.theme === 'system' || s.theme === 'light' || s.theme === 'dark') out.settings.theme = s.theme;
@@ -105,6 +109,17 @@ export function migrate(raw: unknown, now: number = Date.now()): Save {
     if (typeof r.on === 'boolean') out.reminder.on = r.on;
     if (typeof r.time === 'string' && Object.prototype.hasOwnProperty.call(REMINDER_HOURS, r.time)) out.reminder.time = r.time as ReminderState['time'];
     if (typeof r.asked === 'boolean') out.reminder.asked = r.asked;
+  }
+  if (isObject(raw.challenge)) {
+    const { race, ink } = raw.challenge;
+    if (isObject(race)) {
+      if (typeof race.level === 'number' && race.level >= 1) out.challenge.race.level = Math.floor(race.level);
+      if (typeof race.factor === 'number' && Number.isFinite(race.factor)) out.challenge.race.factor = Math.min(RACE.max, Math.max(RACE.min, race.factor));
+    }
+    if (isObject(ink)) {
+      if (typeof ink.level === 'number' && ink.level >= 1) out.challenge.ink.level = Math.floor(ink.level);
+      if (typeof ink.slack === 'number' && Number.isFinite(ink.slack)) out.challenge.ink.slack = Math.min(INK.max, Math.max(INK.min, Math.round(ink.slack)));
+    }
   }
   out.schema = SCHEMA;
   return out;
