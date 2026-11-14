@@ -218,6 +218,29 @@ export const t = {
     }
   },
 
+  challenge: {
+    kicker: 'Challenges',
+    blurb: 'Two ways to test yourself. These can be lost, and you can always try again.',
+    open: { race: (n: number) => `Beat the clock · No. ${n}`, ink: (n: number) => `One pot of ink · No. ${n}` },
+    title: { race: (n: number) => `Beat the clock No. ${n}`, ink: (n: number) => `One pot of ink No. ${n}` },
+    intro: {
+      race: (time: string) => `Solve it before the clock runs out. You have ${time}. No hints here.`,
+      ink: (drops: number, tents: number) =>
+        `Every tent you pitch uses one drop of ink. This puzzle needs ${tents} tents and the pot holds ${drops} drops. Grass is free. Think before you pitch. No hints here.`,
+    },
+    clock: (time: string) => `Time ${time}`,
+    ink: (left: number) => `Ink ${left}`,
+    lost: { race: 'Time is up.', ink: 'The ink ran dry.' },
+    closeness: (right: number, total: number) => `${right} of ${total} tents were in the right place.`,
+    more: { race: (seconds: number) => `Watch a video: ${seconds} more seconds`, ink: (drops: number) => `Watch a video: ${drops} more drops` },
+    again: 'Try again',
+    won: {
+      race: (time: string) => `Solved with ${time} left on the clock.`,
+      ink: (left: number) => (left === 0 ? 'Solved with the very last drop.' : `Solved with ${left === 1 ? '1 drop' : `${left} drops`} of ink to spare.`),
+    },
+    next: { race: 'Next race', ink: 'Next pot' },
+  },
+
   reminder: {
     ask: "Want a note when tomorrow's puzzle is out?",
     askAbout: 'One a day, nothing else. You can turn it off in Settings.',

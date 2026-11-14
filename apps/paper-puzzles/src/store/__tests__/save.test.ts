@@ -104,6 +104,16 @@ describe('reading a save', () => {
     expect(migrate(v5, NOW).book).toEqual({ level: 31, relief: 2, solved: 30, fast: 0 });
   });
 
+  test('a version 6 save gets fresh challenges; saved ones survive a reload; broken ones are pulled into range', () => {
+    const fresh = freshSave(NOW).challenge;
+    expect(migrate({ schema: 6, book: { level: 20, relief: -1, solved: 19, fast: 1 } }, NOW).challenge).toEqual(fresh);
+    const s = freshSave(NOW);
+    s.challenge = { race: { level: 9, factor: 1.61 }, ink: { level: 4, slack: 2 } };
+    expect(migrate(JSON.parse(JSON.stringify(s)), NOW).challenge).toEqual(s.challenge);
+    const broken = { challenge: { race: { level: 0, factor: 99 }, ink: { level: 3.7, slack: -4 } } };
+    expect(migrate(broken, NOW).challenge).toEqual({ race: { level: 1, factor: 4 }, ink: { level: 3, slack: 1 } });
+  });
+
   test('the reminder choice survives a reload, and a broken time falls back to the morning', () => {
     const s = freshSave(NOW);
     s.reminder = { on: true, time: 'evening', asked: true };

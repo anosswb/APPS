@@ -10,6 +10,7 @@ The daily puzzle · the last seven days in the calendar · every puzzle already 
 |---|---|
 | Full-screen ad | Only after the "Next puzzle" tap in the Book. Never before Book puzzle 6 is finished, never in the first 10 minutes after the first opening, at most one every 4 minutes. Never around the daily puzzle, never over an open puzzle. |
 | Optional video | Opens one past day older than a week, for good. If no video is ready, the day opens anyway ("this one is on us"). |
+| Optional video on a lost challenge | "Watch a video: 3 more drops" or more seconds, at most twice per puzzle. Try again is always free. If no video is ready, the player keeps going anyway. |
 | Consent | Google's consent form runs first where the law asks for it; Settings shows "Ad privacy choices" when required. |
 | The Book | Never locked on Android. |
 Today the app shows **Google's test ads**. That is on purpose: tapping your own real ads can close an AdMob account.

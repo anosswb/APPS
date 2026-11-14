@@ -18,6 +18,8 @@ export const EVENTS = {
   reminder_answer: ['value'],
   reminder_open: [],
   stuck_nudge: ['kind', 'size', 'grade'],
+  challenge_start: ['kind', 'level', 'size', 'grade', 'room'],
+  challenge_end: ['kind', 'result', 'level', 'size', 'grade', 'seconds', 'closeness', 'helped'],
 } as const;
 
 export type EventName = keyof typeof EVENTS;
@@ -34,6 +36,7 @@ const WORDS = new Set([
   'theme', 'sound', 'haptics', 'stats',
   'system', 'light', 'dark', 'on', 'off',
   'reminder', 'morning', 'noon', 'evening', 'yes', 'no', 'blocked',
+  'race', 'ink', 'won', 'lost',
 ]);
 
 export type Props = Record<string, string | number | boolean | undefined>;

@@ -43,6 +43,7 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Difficulty adapts both ways** in the puzzle book: kinder after many hints, harder after two fast clean solves, back toward normal after a hint or a slow solve. Save format version 6. 74 tests green. The time thresholds are a guess; nobody has played with it yet.
 - **Second phone test (Anass):** "a good game, I love it", the new sounds are good, ads are working, the app never closed.
 - **Stuck help:** the Hint button lights up after 45 seconds with no mark. Seen working in the browser. The Candy Crush system from Anass's video is written up in `playbook/06` (A3b).
+- **Two challenge modes** on the front page: "Beat the clock" and "One pot of ink". Both can be lost; the algorithm sets each player's time and ink. Lose screen with a video for more (Android), try again, closeness line. Save format version 7. 84 tests green. Played in the browser with pretend ads: lose, video, second video, try again with more room, win, next level. Not yet played on a phone, and the starting numbers (time × 3, N = 4) are guesses.
 
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
