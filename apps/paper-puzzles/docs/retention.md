@@ -11,7 +11,12 @@ Built means it is in the code today; planned means not yet.
 - Three grades, measured by the solver, never guessed: **Gentle** (simple rules only), **Steady** (needs line-fitting or tree bookkeeping), **Tricky** (needs "picture a tent here: then…" reasoning).
 - **Daily:** Mon 6×6 gentle, Tue 7×7 gentle, Wed 7×7 steady, Thu 8×8 steady, Fri 8×8 tricky, Sat 9×9 steady, Sun 10×10 tricky. *(built, `src/game/daily.ts`)*
 - **The Book:** puzzles 1–3 are 5×5, 4–10 are 6×6, all gentle. Then waves of five: gentle, gentle, steady, gentle, then a bigger tricky one, then a breath. Sizes grow slowly to 9×9 (10×10 for the big ones). *(built, `src/game/book.ts`)*
-- **Relief:** three or more hints on a puzzle lowers the next ones a step (grade first, then size). A puzzle solved with no hints resets it. Help is always in the player's favour. *(built)*
+- **The path bends to the player, both ways** *(built, `nextPace` in `src/game/book.ts`, tested)*. One number, `relief`, from −2 to +2:
+  - **Kinder (+1, +2):** three or more hints on a puzzle lowers the next ones a step (grade first, then one size smaller). A puzzle solved with no hints ends the kinder stretch.
+  - **Harder (−1, −2):** two fast, clean solves in a row (no hint, under 60% of the usual time) raise the next ones a step (grade first, then one size bigger, never above 10 × 10). A hint or a slow solve brings it one step back.
+  - The first ten puzzles are the same for everyone.
+  - "Usual time" is a **guess** today: 2, 3 and 4.5 seconds per square for gentle, steady and tricky. Tune it from the real numbers (`puzzle_solved` now carries `relief`).
+  - This is our version of the Candy Crush idea. There, the game tunes how often you fail. Here nobody can fail, so we tune how hard the thinking is, to keep each player near the edge of their own skill. It never changes to sell anything.
 
 ## The stuck moment (our version of the fail moment)
 A hint is always free. It first checks for a mistake ("these tents touch"), then explains the next forced step and highlights the squares; "Mark it for me" applies it. *(built)* After several hints on one puzzle the next puzzles get kinder. No ad is ever shown here.

@@ -1,4 +1,4 @@
-import { bookPuzzle, bookSpec, nextRelief } from '../book';
+import { bookPuzzle, bookSpec, nextPace, parMs } from '../book';
 import { dailyPuzzle, dailySpec, dateKey, weekOf } from '../daily';
 import { generate } from '../generator';
 import { geo } from '../grid';
@@ -97,13 +97,61 @@ describe('the book', () => {
     expect(bookSpec(200).n).toBeLessThanOrEqual(10);
   });
 
-  test('relief makes the next puzzle easier, never harder', () => {
+  test('a player who needs help gets kinder puzzles, then smaller ones', () => {
     expect(bookSpec(15, 1).grade).toBe('medium');
     expect(bookSpec(15, 2).n).toBe(6);
-    expect(nextRelief(0, 4)).toBe(1);
-    expect(nextRelief(2, 5)).toBe(2);
-    expect(nextRelief(2, 0)).toBe(0);
-    expect(nextRelief(1, 1)).toBe(1);
+    const spec = bookSpec(15);
+    expect(nextPace({ relief: 0, fast: 0 }, spec, 4, 600000)).toEqual({ relief: 1, fast: 0 });
+    expect(nextPace({ relief: 2, fast: 0 }, spec, 5, 600000)).toEqual({ relief: 2, fast: 0 });
+    // one or two hints: stay where you are
+    expect(nextPace({ relief: 1, fast: 0 }, spec, 1, 300000)).toEqual({ relief: 1, fast: 0 });
+    // a clean solve ends the kinder stretch
+    expect(nextPace({ relief: 2, fast: 0 }, spec, 0, 300000)).toEqual({ relief: 0, fast: 0 });
+  });
+
+  test('a player who is fast and clean gets harder puzzles, then bigger ones', () => {
+    expect(bookSpec(16, -1)).toMatchObject({ grade: 'medium', n: 6 });
+    expect(bookSpec(16, -2)).toMatchObject({ grade: 'medium', n: 7 });
+    expect(bookSpec(200, -2).n).toBeLessThanOrEqual(10);
+    const spec = bookSpec(16);
+    const quick = parMs(spec.n, spec.grade) * 0.5;
+    // one fast solve is not enough, two in a row are
+    const one = nextPace({ relief: 0, fast: 0 }, spec, 0, quick);
+    expect(one).toEqual({ relief: 0, fast: 1 });
+    const two = nextPace(one, spec, 0, quick);
+    expect(two).toEqual({ relief: -1, fast: 0 });
+    // and it never goes past two steps
+    expect(nextPace({ relief: -2, fast: 1 }, spec, 0, quick)).toEqual({ relief: -2, fast: 0 });
+    // a normal-speed clean solve breaks the run but keeps the level
+    expect(nextPace({ relief: -1, fast: 1 }, spec, 0, parMs(spec.n, spec.grade))).toEqual({ relief: -1, fast: 0 });
+  });
+
+  test('on a harder path, a hint or a slow solve steps back toward normal', () => {
+    const spec = bookSpec(16, -2);
+    const par = parMs(spec.n, spec.grade);
+    expect(nextPace({ relief: -2, fast: 0 }, spec, 1, par)).toEqual({ relief: -1, fast: 0 });
+    expect(nextPace({ relief: -1, fast: 0 }, spec, 0, par * 2)).toEqual({ relief: 0, fast: 0 });
+    expect(nextPace({ relief: -1, fast: 0 }, spec, 3, par)).toEqual({ relief: 0, fast: 0 });
+  });
+
+  test('the first ten puzzles are the same for everyone', () => {
+    for (let level = 1; level <= 10; level++) {
+      expect(bookSpec(level, -2)).toEqual(bookSpec(level, 0));
+    }
+    const spec = bookSpec(5);
+    const quick = parMs(spec.n, spec.grade) * 0.3;
+    expect(nextPace({ relief: 0, fast: 1 }, spec, 0, quick).relief).toBe(0);
+    // from puzzle 10 on, two fast solves do step up (the next puzzle is 11)
+    expect(nextPace({ relief: 0, fast: 1 }, bookSpec(10), 0, quick).relief).toBe(-1);
+  });
+
+  test('every harder or kinder puzzle can still be made, with one answer', () => {
+    for (const relief of [-2, -1, 1, 2]) {
+      for (const level of [11, 15, 20, 45]) {
+        const p = bookPuzzle(level, relief);
+        expect(p.solution.filter(Boolean).length).toBeGreaterThan(0);
+      }
+    }
   });
 
   test('a level is always the same puzzle', () => {

@@ -7,7 +7,7 @@ export const EVENTS = {
   app_open: [],
   rules_seen: [],
   puzzle_start: ['kind', 'size', 'grade', 'level'],
-  puzzle_solved: ['kind', 'size', 'grade', 'level', 'seconds', 'hints'],
+  puzzle_solved: ['kind', 'size', 'grade', 'level', 'seconds', 'hints', 'relief'],
   hint_used: ['kind', 'what'],
   past_puzzles_open: [],
   video_result: ['result'],

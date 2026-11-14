@@ -17,7 +17,7 @@ describe('reading a save', () => {
 
   test('a good save comes back unchanged', () => {
     const s = freshSave(NOW);
-    s.book = { level: 14, relief: 1, solved: 13 };
+    s.book = { level: 14, relief: -2, solved: 13, fast: 1 };
     s.daily['2026-11-13'] = { ms: 200000, hints: 1 };
     s.games['book-14-1'] = { marks: [0, 1, 2, 0], ms: 5000, hints: 0 };
     s.settings.theme = 'dark';
@@ -27,7 +27,7 @@ describe('reading a save', () => {
 
   test('missing parts are filled in and progress is kept', () => {
     const out = migrate({ book: { level: 7 } }, NOW);
-    expect(out.book).toEqual({ level: 7, relief: 0, solved: 0 });
+    expect(out.book).toEqual({ level: 7, relief: 0, solved: 0, fast: 0 });
     expect(out.settings).toEqual(freshSave(NOW).settings);
     expect(out.schema).toBe(SCHEMA);
   });
@@ -66,7 +66,7 @@ describe('reading a save', () => {
       },
       NOW,
     );
-    expect(out.book).toEqual({ level: 1, relief: 2, solved: 4 });
+    expect(out.book).toEqual({ level: 1, relief: 2, solved: 4, fast: 0 });
     expect(out.settings).toEqual(freshSave(NOW).settings);
     expect(Object.keys(out.games)).toEqual(['b']);
     expect(Object.keys(out.daily)).toEqual(['2026-11-12']);
@@ -97,6 +97,11 @@ describe('reading a save', () => {
     expect(out.book.level).toBe(9);
     expect(out.daily['2026-11-13']).toEqual({ ms: 90000, hints: 1 });
     expect(out.stats).toEqual({ on: false, id: 'a'.repeat(32) });
+  });
+
+  test('a version 5 save keeps its place in the book and starts with no fast run', () => {
+    const v5 = { schema: 5, book: { level: 31, relief: 2, solved: 30 } };
+    expect(migrate(v5, NOW).book).toEqual({ level: 31, relief: 2, solved: 30, fast: 0 });
   });
 
   test('the reminder choice survives a reload, and a broken time falls back to the morning', () => {
