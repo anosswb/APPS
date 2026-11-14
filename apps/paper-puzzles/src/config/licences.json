@@ -145,6 +145,12 @@
    "copyright": "Copyright (c) 2015-present 650 Industries, Inc. (aka Expo)"
   },
   {
+   "name": "expo-build-properties",
+   "version": "58.0.12",
+   "licence": "MIT",
+   "copyright": "Copyright (c) 2015-present 650 Industries, Inc. (aka Expo)"
+  },
+  {
    "name": "expo-constants",
    "version": "58.0.16",
    "licence": "MIT",

@@ -25,8 +25,10 @@ If the run shows a red cross: tap it, tap the red step, copy the last 30 lines a
 5. Tap the note: the app should open on today's puzzle.
 6. Tell me: did it come, how late, did it make a sound, and does the small red tent show beside it?
 
-## The other workflow
+## The other workflows
+**Paper Pines launch test (Android emulator)** builds the app, opens it on an emulator and fails if the app closes by itself or the front page is not on the screen. It prints the phone's crash log. It runs by itself on pull requests that change packages, `app.json` or the workflows, and can be started by hand. It exists because the first test app (14 Nov 2026) closed one second after opening: code shrinking had removed a part the ads library needs. Read its log with `gh run view <run id> --log`.
+
 **Paper Pines checks** runs the type check and the tests on every pull request that touches the app. A green tick on the pull request means they passed.
 
 ## Status
-Written on 14 Nov 2026. The Android project was generated once in a cloud session and came out valid (icons, opening screen, app ID). **The full build has not run yet:** the first run on GitHub is the real test. Since then two native libraries were added (ads, notifications); both generate cleanly, neither has been built.
+14 Nov 2026: the build works on GitHub (12 minutes). The first test app closed at opening (code shrinking, see above); that is fixed and guarded by the launch test.
