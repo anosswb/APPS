@@ -24,6 +24,7 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 |---|---|
 | `src/game/` | The engine, pure TypeScript, no UI: `generator`, `solver` (logic only, also finds hint steps), `hints`, `daily`, `book`, `bruteforce` (tests only) |
 | `src/game/challenge.ts` | The two modes that can be lost (clock, ink pot) and the algorithm that sets each player's room |
+| `src/game/records.ts` | Personal bests: best clean time per grid size, win runs in the challenges |
 | `src/theme/tokens.ts` | Every colour, size and font name. Nowhere else |
 | `src/i18n/en.ts` | Every word the app shows |
 | `src/store/` | What is saved on the phone, with `migrate` for old saves |

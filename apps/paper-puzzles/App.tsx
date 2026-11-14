@@ -267,6 +267,7 @@ function Screens() {
         puzzle={puzzle}
         title={route.key === today ? t.home.dailyTitle(keyToDate(route.key)) : t.archive.dayTitle(keyToDate(route.key))}
         initial={save.games[puzzle.id]}
+        bestBefore={save.records.best[String(puzzle.n)]}
         alreadySolved={!!save.daily[route.key]}
         afterLine={route.key === today ? t.game.dailyDone : undefined}
         afterExtra={
@@ -294,6 +295,7 @@ function Screens() {
         puzzle={puzzle}
         title={t.home.bookTitle(route.level)}
         initial={save.games[puzzle.id]}
+        bestBefore={save.records.best[String(puzzle.n)]}
         showLegend={route.level <= 3}
         onKeep={keep}
         onSolved={(ms, hints) => {
@@ -315,6 +317,8 @@ function Screens() {
         puzzle={puzzle}
         title={t.challenge.title[kind](route.level)}
         challenge={{ kind, room: challengeRoom }}
+        bestBefore={save.records.best[String(puzzle.n)]}
+        afterLine={save.records[kind].streak >= 2 ? t.records.run(save.records[kind].streak, save.records[kind].best) : undefined}
         canContinue={MONEY_MODE === 'ads'}
         onContinue={keepPlaying}
         onRetry={() => setRoute({ ...route, attempt: route.attempt + 1 })}
@@ -325,7 +329,7 @@ function Screens() {
         nextLabel={t.challenge.next[kind]}
         onKeep={() => {}}
         onSolved={(ms, _hints, helped) => {
-          store.finishChallenge(kind, true, helped);
+          store.finishChallenge(kind, true, helped, kind === 'race' ? { n: puzzle.n, ms } : undefined);
           count('challenge_end', { kind, result: 'won', level: route.level, size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, closeness: 100, helped });
         }}
         onNext={() => openChallenge(kind)}

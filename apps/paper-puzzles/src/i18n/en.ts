@@ -241,6 +241,18 @@ export const t = {
     next: { race: 'Next race', ink: 'Next pot' },
   },
 
+  records: {
+    kicker: 'Your bests',
+    blurb: 'You against yourself. Times count only when you use no hints.',
+    time: (n: number, time: string) => `${n} × ${n} in ${time}`,
+    first: (n: number, time: string) => `Your first ${n} × ${n} with no hints: ${time}. That is your time to beat.`,
+    fresh: (n: number, time: string, was: string) => `A new best for a ${n} × ${n}: ${time}. It was ${was}.`,
+    keep: (n: number, best: string) => `Your best for a ${n} × ${n} is ${best}.`,
+    run: (now: number, best: number) => (now >= best ? `${now} wins in a row. Your best run yet.` : `${now} wins in a row. Your best is ${best}.`),
+    runLine: { race: 'Beat the clock', ink: 'One pot of ink' },
+    runNow: (now: number, best: number) => (now > 0 ? `${now} in a row now, best ${best}` : `best run ${best}`),
+  },
+
   reminder: {
     ask: "Want a note when tomorrow's puzzle is out?",
     askAbout: 'One a day, nothing else. You can turn it off in Settings.',

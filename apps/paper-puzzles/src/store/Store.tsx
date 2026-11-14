@@ -4,6 +4,8 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { SAVE_KEY } from '../config/app';
 import { bookSpec, nextPace } from '../game/book';
 import { afterInk, afterRace, ChallengeKind } from '../game/challenge';
+import { dailySpec } from '../game/daily';
+import { recordChallenge, recordSolve } from '../game/records';
 import { ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 import { freshSave, GameSave, migrate, Save } from './save';
@@ -24,7 +26,7 @@ interface StoreApi {
   setStatsOn: (on: boolean) => void;
   setReminder: (change: Partial<ReminderState>) => void;
   /** a challenge attempt ended. helped = won only after extra time or ink */
-  finishChallenge: (kind: ChallengeKind, won: boolean, helped: boolean) => void;
+  finishChallenge: (kind: ChallengeKind, won: boolean, helped: boolean, raceSolve?: { n: number; ms: number }) => void;
 }
 
 const Ctx = createContext<StoreApi | null>(null);
@@ -71,7 +73,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const finishDaily = useCallback((key: string, ms: number, hints: number) => {
     setSave((s) => {
       if (s.daily[key]) return s;
-      return { ...s, daily: { ...s.daily, [key]: { ms, hints } } };
+      return { ...s, daily: { ...s.daily, [key]: { ms, hints } }, records: recordSolve(s.records, dailySpec(key).n, ms, hints) };
     });
   }, []);
 
@@ -82,6 +84,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       return {
         ...s,
         games,
+        records: recordSolve(s.records, bookSpec(s.book.level, s.book.relief).n, ms, hints),
         book: {
           level: s.book.level + 1,
           solved: s.book.solved + 1,
@@ -123,9 +126,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setSave((s) => ({ ...s, reminder: { ...s.reminder, ...change } }));
   }, []);
 
-  const finishChallenge = useCallback((kind: ChallengeKind, won: boolean, helped: boolean) => {
+  const finishChallenge = useCallback((kind: ChallengeKind, won: boolean, helped: boolean, raceSolve?: { n: number; ms: number }) => {
     setSave((s) => ({
       ...s,
+      // a race won without extra time also counts for the best-time list
+      records: recordChallenge(raceSolve && !helped ? recordSolve(s.records, raceSolve.n, raceSolve.ms, 0) : s.records, kind, won, helped),
       challenge:
         kind === 'race'
           ? { ...s.challenge, race: afterRace(s.challenge.race, won, helped) }
