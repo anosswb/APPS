@@ -17,7 +17,7 @@ A quiet puzzle page on your phone: one puzzle a day that everyone shares, plus a
 Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md` first: Expo changes every release, so read the versioned docs before using any Expo API.
 - Add packages with `EXPO_OFFLINE=1 npx expo install <pkg>` in cloud sessions (Expo's online service is blocked there; the offline flag uses the version list shipped inside Expo). On Anass's own machine plain `npx expo install` is fine.
 - Everything so far runs in **Expo Go** (no native build needed). Keep it that way until ads and purchases go in.
-- No Expo Router yet: three screens switch in `App.tsx`. Move to Expo Router when a fourth screen arrives.
+- No Expo Router yet: five screens switch in `App.tsx` with a small route object. It is enough for now; move to Expo Router when deep links or tabs are needed.
 
 ## Where the code is
 | Folder | What |
@@ -27,7 +27,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 | `src/i18n/en.ts` | Every word the app shows |
 | `src/store/` | What is saved on the phone, with `migrate` for old saves |
 | `src/ui/` | Board, glyphs, stamp, buttons, text |
-| `src/screens/` | Home (front page), Game, Rules |
+| `src/screens/` | Home (front page), Game, Rules, Archive (past puzzles), Settings |
+| `scripts/gen-sounds.py` | Makes the three sounds in `assets/sounds/` |
 
 ## Hard rules for this app
 - **Every puzzle has exactly one answer and can be finished by logic.** A puzzle is kept only if `solveLogic` finishes it. `engine.test.ts` proves it by brute force. Never weaken these tests.
@@ -38,6 +39,7 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 - Storage changes: bump `SCHEMA`, extend `migrate`, add a test. Never drop a player's progress.
 - Daily and Book seeds (`daily-YYYY-MM-DD`, `book-<level>-<relief>`) must not change after launch, or everyone's puzzles change.
 - The name is in `src/config/app.ts` only.
+- `FIRST_EDITION` in `src/game/archive.ts` (the first day with a daily puzzle) must not change after launch.
 
 ## Checks before saying "done"
 ```bash

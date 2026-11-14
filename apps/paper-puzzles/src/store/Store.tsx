@@ -13,6 +13,8 @@ interface StoreApi {
   finishDaily: (key: string, ms: number, hints: number) => void;
   finishBook: (id: string, hints: number) => void;
   setTheme: (theme: ThemeChoice) => void;
+  setHapticsOn: (on: boolean) => void;
+  setSoundOn: (on: boolean) => void;
   setSeenRules: () => void;
 }
 
@@ -80,12 +82,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setSave((s) => ({ ...s, settings: { ...s.settings, theme } }));
   }, []);
 
+  const setHapticsOn = useCallback((on: boolean) => {
+    setSave((s) => ({ ...s, settings: { ...s.settings, haptics: on } }));
+  }, []);
+
+  const setSoundOn = useCallback((on: boolean) => {
+    setSave((s) => ({ ...s, settings: { ...s.settings, sound: on } }));
+  }, []);
+
   const setSeenRules = useCallback(() => {
     setSave((s) => (s.seenRules ? s : { ...s, seenRules: true }));
   }, []);
 
   return (
-    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setSeenRules }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules }}>{children}</Ctx.Provider>
   );
 }
 
