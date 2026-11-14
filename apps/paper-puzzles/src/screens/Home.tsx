@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { APP_NAME } from '../config/app';
 import { bookSpec } from '../game/book';
 import { dailyPuzzle, keyToDate, weekOf } from '../game/daily';
-import { t } from '../i18n/en';
+import { clock, t } from '../i18n/en';
 import { useStore } from '../store/Store';
 import { useTheme } from '../theme/ThemeContext';
 import { hairline, space } from '../theme/tokens';
@@ -40,6 +40,9 @@ export function Home({ today, onDaily, onBook, onChallenge, onRules, onArchive, 
   const started = !!save.games[puzzle.id]?.marks.some((m) => m !== 0);
   const spec = bookSpec(save.book.level, save.book.relief);
   const week = weekOf(today);
+  const bestSizes = Object.keys(save.records.best)
+    .map(Number)
+    .sort((a, b) => a - b);
 
   return (
     <ScrollView
@@ -136,6 +139,29 @@ export function Home({ today, onDaily, onBook, onChallenge, onRules, onArchive, 
         <Type tone="muted">{t.challenge.blurb}</Type>
         <Btn label={t.challenge.open.race(save.challenge.race.level)} kind="outline" onPress={() => onChallenge('race')} style={styles.wide} />
         <Btn label={t.challenge.open.ink(save.challenge.ink.level)} kind="outline" onPress={() => onChallenge('ink')} style={styles.challenge} />
+
+        {bestSizes.length || save.records.race.best || save.records.ink.best ? (
+          <>
+            <View style={styles.gap} />
+            <Rule />
+            <Type variant="label" tone="muted" style={styles.kicker}>
+              {t.records.kicker}
+            </Type>
+            <Type tone="muted">{t.records.blurb}</Type>
+            {bestSizes.length ? (
+              <Type variant="number" style={styles.challenge}>
+                {bestSizes.map((n) => t.records.time(n, clock(save.records.best[String(n)]))).join('  ·  ')}
+              </Type>
+            ) : null}
+            {(['race', 'ink'] as const).map((kind) =>
+              save.records[kind].best ? (
+                <Type key={kind} style={styles.challenge}>
+                  {`${t.records.runLine[kind]}: ${t.records.runNow(save.records[kind].streak, save.records[kind].best)}`}
+                </Type>
+              ) : null,
+            )}
+          </>
+        ) : null}
 
         <View style={styles.gap} />
         <Rule />

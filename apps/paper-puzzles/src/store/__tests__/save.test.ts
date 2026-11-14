@@ -114,6 +114,15 @@ describe('reading a save', () => {
     expect(migrate(broken, NOW).challenge).toEqual({ race: { level: 1, factor: 4 }, ink: { level: 3, slack: 1 } });
   });
 
+  test('a version 7 save gets empty bests; saved ones survive; broken ones are dropped', () => {
+    expect(migrate({ schema: 7 }, NOW).records).toEqual({ best: {}, race: { streak: 0, best: 0 }, ink: { streak: 0, best: 0 } });
+    const s = freshSave(NOW);
+    s.records = { best: { '6': 71000, '10': 480000 }, race: { streak: 2, best: 5 }, ink: { streak: 0, best: 3 } };
+    expect(migrate(JSON.parse(JSON.stringify(s)), NOW).records).toEqual(s.records);
+    const broken = { records: { best: { '6': -4, big: 9, '7': 1000.4 }, race: { streak: 4, best: 1 }, ink: 'lots' } };
+    expect(migrate(broken, NOW).records).toEqual({ best: { '7': 1000 }, race: { streak: 4, best: 4 }, ink: { streak: 0, best: 0 } });
+  });
+
   test('the reminder choice survives a reload, and a broken time falls back to the morning', () => {
     const s = freshSave(NOW);
     s.reminder = { on: true, time: 'evening', asked: true };

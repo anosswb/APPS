@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { INK_EXTRA, MAX_CONTINUES, raceExtraMs } from '../game/challenge';
 import { getHint, Hint, isSolved, visibleProblems } from '../game/hints';
+import { bestNews } from '../game/records';
 import { GRASS, Puzzle, TENT, UNKNOWN } from '../game/types';
 import { clock, t } from '../i18n/en';
 import { GameSave } from '../store/save';
@@ -34,6 +35,8 @@ interface Props {
   afterLine?: string;
   /** a small notice under that line (the daily-reminder question) */
   afterExtra?: React.ReactNode;
+  /** the player's best clean time for this grid size, before this puzzle */
+  bestBefore?: number;
   /** a challenge: this puzzle can be lost. `room` is the clock in ms (race) or the drops of ink (ink) */
   challenge?: { kind: 'race' | 'ink'; room: number };
   /** can a video give more time or ink? */
@@ -55,7 +58,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, challenge, canContinue, onContinue, onRetry, onLost, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, bestBefore, challenge, canContinue, onContinue, onRetry, onLost, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -167,6 +170,18 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     setContinues((n) => n + 1);
     setFailed(false);
   }, [busy, challenge, onContinue, room]);
+
+  // Personal best: compared with the best time the player had when this puzzle was opened.
+  const bestAtStart = useRef(bestBefore);
+  const news = freshWin.current && challenge?.kind !== 'ink' && !(challenge && continues > 0) ? bestNews(bestAtStart.current, finalMs, hints) : null;
+  const bestLine =
+    news === 'first'
+      ? t.records.first(puzzle.n, clock(finalMs))
+      : news === 'new'
+        ? t.records.fresh(puzzle.n, clock(finalMs), clock(bestAtStart.current ?? 0))
+        : news === 'keep'
+          ? t.records.keep(puzzle.n, clock(bestAtStart.current ?? 0))
+          : null;
 
   // What a drag is painting: the mark, and the mark it replaces.
   const stroke = useRef<{ to: number; from: number } | null>(null);
@@ -334,6 +349,11 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
                     ? t.challenge.won.ink(inkLeft)
                     : t.game.solvedLine(clock(finalMs), hints)}
               </Type>
+              {bestLine ? (
+                <Type tone={news === 'new' ? 'accent' : 'muted'} style={[styles.center, styles.afterBtn]}>
+                  {bestLine}
+                </Type>
+              ) : null}
               {afterLine ? (
                 <Type tone="muted" style={[styles.center, styles.afterBtn]}>
                   {afterLine}

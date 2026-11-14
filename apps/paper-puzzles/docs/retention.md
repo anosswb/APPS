@@ -29,6 +29,13 @@ The daily puzzle and the book stay calm: no clock, nobody loses. The challenges 
 - No hints in challenges. Each mode has its own row of puzzles, growing like the book.
 - Not built yet: steering inside an attempt, and a smaller reward when the player was close (both from the Candy Crush notes in `playbook/06`, A3b). First see the real numbers: `challenge_start`, `challenge_end` (with closeness).
 
+## Personal bests (Anass, 14 Nov 2026) *(built, `src/game/records.ts`, tested)*
+The player against themselves. Nothing is compared with other people and nothing leaves the phone.
+- **Best time per grid size,** counted only for a solve with no hints (daily, book and races). The solved screen says "A new best for a 6 × 6: 1:12. It was 1:40.", or the time to beat.
+- **Wins in a row** in each challenge, now and best ever. A win with a video keeps the run but does not add to it; a loss ends the run, never the best.
+- A "Your bests" block on the front page, shown once there is something in it.
+- There is still no daily streak that can be lost in the calm modes.
+
 ## The stuck moment (our version of the fail moment)
 A hint is always free. It first checks for a mistake ("these tents touch"), then explains the next forced step and highlights the squares; "Mark it for me" applies it. *(built)* After several hints on one puzzle the next puzzles get kinder. No ad is ever shown here.
 
