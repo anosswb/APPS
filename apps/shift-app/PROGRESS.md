@@ -16,9 +16,16 @@ He saw the grey box. The plain look shocked him until he understood it was a tes
 - **"Version 1 does / does NOT do" rewritten** in `docs/brief.md` from his requirements: the rest-day calendar with no pattern, pay with his own overtime rules, the morning of a shift (alarm button, day line, one evening note).
 - **Step 6, three looks drawn:** `docs/looks/three-looks.png` (A Daybreak, B The Board, C The Dial), details in `docs/looks/README.md`. Recommendation: B. **Waiting for Anass to pick or mix.** ⏸
 
+## Done (14 Nov 2026, third block: the rules his requirements need, no screen yet)
+- **The calendar with no pattern** (`src/core/days.ts`): mark a day Work (start, end, break), Rest, or leave it "not known yet". Works out: the next rest day, how many rest days in a row, days worked in a row, days since the last rest. When a day in between is not known, the answer says it is **not sure** (the screen must show that, not hide it). A ready rotation only fills days he has not marked.
+- **Pay with his own rules** (`src/core/payrules.ts`): the hourly rate and any number of rules, each with a name, an extra percentage and one condition (hours over N in a day · over N in a week · a weekday · a day he marks by hand). One day can be set by hand. Shows hours by percentage, the estimate, and how many days of the period are still open. The fixed federal rule in `pay.ts` (`periodPay`) is now only the old grey box's; `periodOf` and `nextPayday` stay in use.
+- **The day around a shift** (`src/core/dayline.ts`): sleep by, wake, leave, eat, clock out, home, from three numbers.
+- 30 tests pass (15 new). **The grey-box screen still uses the old rotation setup; these rules get their screen after the look is picked.**
+- **Guesses in the pay rules, to check with US workers:** two rules on the same hour → the higher percentage wins (adding is an option) · every worked hour counts toward the daily and weekly limits · a shift belongs to the day it starts on.
+
 ## Next (in order)
 0. After his pick: write `docs/world.md`, the token file, `tools/contrast.py`, the row in `WORLDS.md`, the decision in `DECISIONS.md`. Then the real first screen.
-0b. Engine work his requirements need: a mode with no rotation (days marked one by one, rest days first), and overtime rules with the user's own percentages (`src/core/pay.ts` has only the fixed federal rule today).
+0b. Done (see above). Left: the saved-data shape with a schema version and a migration from the grey box's `shift-app/grey-box-v1`.
 1. His answers → fix the brief.
 2. Name: 5 candidates, check stores, trademark, domain (needs a session that can open the stores).
 4. Read blue-collar forum threads (needs reddit.com allowed) or ask 10 US workers, before building differential and attendance points.
