@@ -16,7 +16,7 @@ A quiet puzzle page on your phone: one puzzle a day that everyone shares, plus a
 ## Stack
 Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md` first: Expo changes every release, so read the versioned docs before using any Expo API.
 - Add packages with `EXPO_OFFLINE=1 npx expo install <pkg>` in cloud sessions (Expo's online service is blocked there; the offline flag uses the version list shipped inside Expo). On Anass's own machine plain `npx expo install` is fine.
-- Everything so far runs in **Expo Go** (no native build needed). Keep it that way until ads and purchases go in.
+- Test builds come from the GitHub workflow in `docs/builds.md`. A generated `android/` or `ios/` folder is never committed (it is in `.gitignore`).
 - No Expo Router yet: five screens switch in `App.tsx` with a small route object. It is enough for now; move to Expo Router when deep links or tabs are needed.
 
 ## Where the code is
@@ -29,6 +29,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 | `src/ui/` | Board, glyphs, stamp, buttons, text |
 | `src/screens/` | Home (front page), Game, Rules, Archive (past puzzles), Settings |
 | `scripts/gen-sounds.py` | Makes the three sounds in `assets/sounds/` |
+| `scripts/make-icons.js` | Draws the icon and opening-screen art in `assets/` |
+| `docs/builds.md` | How Anass gets a test app on his phone (GitHub builds it) |
 
 ## Hard rules for this app
 - **Every puzzle has exactly one answer and can be finished by logic.** A puzzle is kept only if `solveLogic` finishes it. `engine.test.ts` proves it by brute force. Never weaken these tests.

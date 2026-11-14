@@ -1,0 +1,58 @@
+# Builds an Android test app (APK) of Paper Pines that installs on a real phone.
+# How to use it: docs/builds.md in apps/paper-puzzles. It runs only when someone presses "Run workflow".
+name: Paper Pines test build (Android APK)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: paper-pines-test-build
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    defaults:
+      run:
+        working-directory: apps/paper-puzzles
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/paper-puzzles/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install
+        run: npm ci
+
+      - name: Type check and tests
+        run: |
+          npx tsc --noEmit
+          npx jest
+
+      - name: Generate the Android project
+        run: npx expo prebuild --platform android --no-install --clean
+
+      # Release mode so it runs at real speed. Signed with the debug key: for testing only, never for the store.
+      # arm64 only: every phone from the last years, and a faster, smaller build.
+      - name: Build the APK
+        working-directory: apps/paper-puzzles/android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace -PreactNativeArchitectures=arm64-v8a
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paper-pines-test-apk
+          path: apps/paper-puzzles/android/app/build/outputs/apk/release/*.apk
+          retention-days: 14
