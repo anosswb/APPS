@@ -17,7 +17,8 @@ Chosen on 13 Nov 2026 so that building could start, and **approved by Anass the 
 | **Signature** | The red rubber stamp, SOLVED, slightly crooked, landing on the grid. It also marks solved days on the front page |
 
 ## What the first screens look like
-- **Front page:** date line, masthead, double rule, today's puzzle as the lead story with a small picture of the grid, the week as seven boxes, then the Book.
+- **Front page:** date line, masthead, double rule, today's puzzle as the lead story with a small picture of the grid, the week as seven boxes, then the puzzle book with a strip of five level boxes.
+- **Icon:** a corner of the puzzle page: masthead rule, a two-by-two grid, one tree, one tent, a folded corner.
 - **Puzzle:** numbers on the edges like a printed grid, two word-buttons under it, the hint as an italic editor's note between two rules.
 
 ## Slop check (done by Claude on the first screens)

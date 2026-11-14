@@ -26,6 +26,8 @@ interface Props {
   /** show the short "how to mark" line */
   showLegend?: boolean;
   nextLabel?: string;
+  /** a quiet line above the buttons once the puzzle is solved */
+  afterLine?: string;
   onKeep: (game: GameSave) => void;
   onSolved: (ms: number, hints: number) => void;
   /** for the anonymous numbers: which kind of hint was shown */
@@ -35,7 +37,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, onKeep, onSolved, onHint: reportHint, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, onKeep, onSolved, onHint: reportHint, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -222,13 +224,12 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
               <Type variant="bodyItalic" tone="muted" style={styles.center}>
                 {t.game.solvedLine(clock(finalMs), hints)}
               </Type>
-              {onNext ? (
-                <Btn label={nextLabel ?? t.game.next} onPress={onNext} style={styles.afterBtn} />
-              ) : (
+              {afterLine ? (
                 <Type tone="muted" style={[styles.center, styles.afterBtn]}>
-                  {t.game.seeYou}
+                  {afterLine}
                 </Type>
-              )}
+              ) : null}
+              {onNext ? <Btn label={nextLabel ?? t.game.next} onPress={onNext} style={styles.afterBtn} /> : null}
               <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
             </View>
           ) : hint ? (

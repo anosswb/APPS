@@ -26,6 +26,9 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Anonymous numbers:** a closed, tested event list and a tiny sender. Off until a PostHog key exists (`docs/numbers.md`). Save format version 4.
 - **Store page drafts** in `store/`: listing text, privacy policy, terms.
 
+- **Two modes, made obvious** (Anass, 14 Nov): the front page shows "Today's puzzle" (one per day, same for everyone) and "The puzzle book · level by level" with a strip of five level boxes: solved ones in red, the current one outlined, the big fifth one with a heavy border. After the daily puzzle, a button leads straight to the next level ("Keep going: Puzzle No. 13"), so nobody hits a dead end.
+- **New icon** (Anass asked for something about paper): a corner of the puzzle page with a masthead rule, a small grid, one tree and one tent. Picked from three options.
+
 ## Not checked (needs a real phone)
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 
 **The sounds: nobody has heard them yet.** Listen for: the pencil tick 20 times in a row (annoying?), the tent tap (hollow?), the stamp (does it sound like a stamp on a phone speaker?). · 

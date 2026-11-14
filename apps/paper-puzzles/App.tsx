@@ -166,6 +166,9 @@ function Screens() {
         title={route.key === today ? t.home.dailyTitle(keyToDate(route.key)) : t.archive.dayTitle(keyToDate(route.key))}
         initial={save.games[puzzle.id]}
         alreadySolved={!!save.daily[route.key]}
+        afterLine={route.key === today ? t.game.dailyDone : undefined}
+        nextLabel={bookIsLocked ? t.archive.seeFull : t.game.keepGoing(save.book.level)}
+        onNext={openBook}
         onKeep={keep}
         onSolved={(ms, hints) => {
           store.finishDaily(route.key, ms, hints);

@@ -10,6 +10,7 @@ import { useStore } from '../store/Store';
 import { useTheme } from '../theme/ThemeContext';
 import { hairline, space } from '../theme/tokens';
 import { Btn } from '../ui/Btn';
+import { LevelStrip } from '../ui/LevelStrip';
 import { MiniGrid } from '../ui/MiniGrid';
 import { Rule } from '../ui/Rule';
 import { Stamp } from '../ui/Stamp';
@@ -123,7 +124,8 @@ export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings, o
             <Type tone="muted">{bookIsLocked ? t.full.bookEnd : t.home.bookBlurb(save.book.solved)}</Type>
           </View>
         </View>
-        <Btn label={bookIsLocked ? t.archive.seeFull : t.home.open} kind={done ? 'ink' : 'outline'} onPress={onBook} style={styles.wide} />
+        <LevelStrip level={save.book.level} relief={save.book.relief} />
+        <Btn label={bookIsLocked ? t.archive.seeFull : t.home.play(save.book.level)} kind={done ? 'ink' : 'outline'} onPress={onBook} style={styles.wide} />
 
         <View style={styles.gap} />
         <Rule />

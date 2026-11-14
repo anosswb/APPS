@@ -82,10 +82,15 @@ export const t = {
     solved: 'Solved',
     look: 'Look again',
     week: 'This week',
-    book: 'The book',
+    book: 'The puzzle book · level by level',
     bookTitle: (n: number) => `Puzzle No. ${n}`,
-    bookBlurb: (done: number) => (done === 0 ? 'Start here. The first few teach you the game.' : `${done} ${done === 1 ? 'puzzle' : 'puzzles'} solved so far. They get bigger as you go.`),
+    bookBlurb: (done: number) => (done === 0
+        ? 'Start here. One puzzle after another, each a little harder. The first few teach you the game.'
+        : `${done} ${done === 1 ? 'puzzle' : 'puzzles'} solved. They get bigger and trickier as you go, and every fifth one is a big one.`),
     open: 'Open',
+    play: (n: number) => `Play No. ${n}`,
+    big: 'Big one',
+    stripLabel: (n: number) => `You are on puzzle number ${n} of the book`,
     rules: 'How to play',
     past: 'Past puzzles',
     settings: 'Settings',
@@ -172,6 +177,8 @@ export const t = {
     next: 'Next puzzle',
     home: 'Back to the front page',
     seeYou: 'Come back tomorrow for a new one.',
+    keepGoing: (n: number) => `Keep going: Puzzle No. ${n}`,
+    dailyDone: "That was today's puzzle. A new one comes tomorrow. The puzzle book never runs out.",
   },
 
   hint: (h: Hint): string => {
