@@ -24,6 +24,14 @@ He saw the grey box. The plain look shocked him until he understood it was a tes
 - 30 tests pass (15 new). **The grey-box screen still uses the old rotation setup; these rules get their screen after the look is picked.**
 - **Guesses in the pay rules, to check with US workers:** two rules on the same hour → the higher percentage wins (adding is an option) · every worked hour counts toward the daily and weekly limits · a shift belongs to the day it starts on.
 
+## Done (14 Nov 2026, evening)
+- **His pick:** screens 1 + 2 together (sky for Today, ring on My day), font 1. Written in `docs/world.md`; tokens in `src/theme/tokens.ts`; contrast passes; row added to `WORLDS.md`.
+- **Real screens built** (the grey box is gone from `App.tsx`): Today (rest count, week strip, alarm button that opens the Android clock), Calendar (month, tap to mark), My day (ring, day line, "My numbers"), Pay (a note only). Saved on the phone with a schema version (`src/store.ts`). Seen working in a phone-sized browser (`npx expo export --platform web`). 30 tests pass.
+- **Android test build workflow:** `.github/workflows/shift-app-test-build.yml`, how to use it in `docs/builds.md`.
+
+## Not done on these screens yet (be honest in the next session)
+`/slop-check` not run · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
+
 ## Next (in order)
 0. After his pick: write `docs/world.md`, the token file, `tools/contrast.py`, the row in `WORLDS.md`, the decision in `DECISIONS.md`. Then the real first screen.
 0b. Done (see above). Left: the saved-data shape with a schema version and a migration from the grey box's `shift-app/grey-box-v1`.
