@@ -167,6 +167,12 @@ export const t = {
     rules: 'Rules',
     legend: 'Tap once for grass, twice for a tent. Drag to mark several squares.',
     gridLabel: (n: number) => `Puzzle grid, ${n} by ${n}`,
+    // Read aloud by VoiceOver and TalkBack, one square at a time.
+    square: (row: number, col: number, what: 'tree' | 'tent' | 'grass' | 'empty', problem: boolean) =>
+      `Row ${row}, column ${col}, ${what}${problem ? ', breaks a rule' : ''}`,
+    squareHint: 'Double tap to change: grass, then tent, then empty.',
+    lineCount: (kind: 'row' | 'col', index: number, want: number, have: number) =>
+      `${kind === 'row' ? 'Row' : 'Column'} ${index}: ${want === 1 ? '1 tent' : `${want} tents`} wanted, ${have} placed`,
     tents: (have: number, want: number) => `Tents ${have} of ${want}`,
     markIt: 'Mark it for me',
     clearThem: 'Clear it',
@@ -211,6 +217,24 @@ export const t = {
     noteBody: (n: number, g: Grade) => `${n} × ${n} · ${GRADE[g]}. One answer, no guessing.`,
     channel: 'Daily puzzle',
     channelAbout: 'One note a day when the new puzzle is out.',
+  },
+
+  licenses: {
+    title: 'Open-source licenses',
+    back: 'Settings',
+    open: 'Open-source licenses',
+    intro: (name: string) => `${name} is built with the work of other people, shared under the licenses below. Thank you to all of them.`,
+    names: {
+      MIT: 'MIT License',
+      'Apache-2.0': 'Apache License 2.0',
+      'BSD-3-Clause': 'BSD 3-Clause License',
+      ISC: 'ISC License',
+      'OFL-1.1': 'SIL Open Font License 1.1',
+    },
+    font: (name: string) => `${name} (typeface)`,
+    read: 'Read the license',
+    hide: 'Hide the license',
+    android: 'The Android app also contains the AndroidX and Kotlin libraries (Apache License 2.0) and the Google Mobile Ads SDK, which is used under Google\'s own terms.',
   },
 
   rules: {

@@ -22,7 +22,7 @@ import { Type } from '../ui/Type';
 type OnOff = 'on' | 'off';
 type ReminderChoice = 'off' | ReminderTime;
 
-export function Settings({ onExit, onRules }: { onExit: () => void; onRules: () => void }) {
+export function Settings({ onExit, onRules, onLicenses }: { onExit: () => void; onRules: () => void; onLicenses: () => void }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { save, setTheme, setSoundOn, setHapticsOn, setStatsOn, setReminder } = useStore();
@@ -148,6 +148,7 @@ export function Settings({ onExit, onRules }: { onExit: () => void; onRules: () 
           {t.settings.credits}
         </Type>
         <Type tone="muted">{t.settings.creditsText}</Type>
+        <Btn label={t.licenses.open} kind="outline" onPress={onLicenses} style={styles.rules} />
 
         <Type variant="label" tone="muted" style={styles.version}>
           {t.settings.version(APP_NAME, APP_VERSION)}

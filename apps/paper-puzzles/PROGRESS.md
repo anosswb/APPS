@@ -30,6 +30,10 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **New icon** (Anass asked for something about paper): a corner of the puzzle page with a masthead rule, a small grid, one tree and one tent. Picked from three options.
 
 - **Daily reminder** ("you can wait a whole day but you come back"): one note a day, only if the player says yes. Asked once, under a solved daily puzzle. 8 AM, Noon or 7 PM, or Off, in Settings. No note for a solved day; the notes stop after a week of silence; a tap on the note opens today's puzzle. Made on the phone, no server. Save format version 5. 65 tests green. Seen working in a browser with pretend notes (`EXPO_PUBLIC_REMINDER_PREVIEW=1`).
+- **Screen readers:** with VoiceOver or TalkBack on, every square is read aloud ("Row 2, column 3, grass") and changed with a double tap; the row and column numbers say how many tents are wanted and placed. Tested in a browser with a pretend screen reader (`EXPO_PUBLIC_READER_PREVIEW=1`), not with a real one.
+- **Small phones:** home, calendar, a 10 × 10 Sunday puzzle with a hint open, and Settings all fit at 360 wide with nothing cut off. On that size the squares of a 10 × 10 are 30 points, under the 44-point comfort size; 6 × 6 to 8 × 8 are fine.
+- **Open-source licenses page** in Settings: 57 shipped packages with copyright lines and the licence texts, made by `scripts/make-licences.js` and guarded by a test. 69 tests green.
+- The Android and iPhone JavaScript bundles both build (seen while making the licence list). The native Android build has still not run.
 
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
@@ -46,8 +50,8 @@ Touch feel and drag on a real screen · haptics · the stamp animation on device
 
 ## Next (in order)
 1. Fixes from Anass's phone test (look, feel, sounds).
-2. Screen-reader labels for each square; largest-font check; 360 dp check.
-3. A full "Open-source licences" page (today there is a short credits text in Settings).
+2. Try TalkBack on the test phone; try the phone's largest font size (the app caps text growth at 1.4×, never tried).
+3. Decide if a 10 × 10 Sunday is too small on a small phone (30-point squares at 360 wide). If yes: make Sunday 9 × 9 on narrow screens.
 4. Turn the numbers on (PostHog key, steps in `docs/numbers.md`).
 5. Real AdMob IDs (steps in `docs/money.md`), after the test build shows test ads working.
 6. The iPhone purchase adapter (steps in `docs/money.md`), after the Apple account exists.
