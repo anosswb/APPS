@@ -54,15 +54,18 @@ What "difficulty" changes depends on the game. Always change things the player c
 `relief` is quiet help after two fails on the same level. It is capped, and it resets on a win. It never removes the need to play.
 
 ### A3b. Inside a level: the progress band (the "Candy Crush sauce")
-**Source:** a video Anass sent on 14 Nov 2026. Its maker shows names and tables found inside the Candy Crush app files. *A source says; we did not check the files ourselves.* This is what Anass means by "the algorithm".
+**Source:** a video Anass sent on 14 Nov 2026, with its full spoken text. Its maker says he reverse-engineered the Candy Crush app and shows names and tables from its files. *A source says; we did not check the files ourselves.* This is what Anass means by "the algorithm".
 
 **What the video shows**
 1. **A band for every level.** A big table gives, for each level and each move number, a lower and an upper line for how far the player should be toward the goal (it calls this "pass proximity").
 2. **A check after every move.** The game compares the player's real progress with the band.
-   - Falling behind → a "make easier" action: it changes the odds of the next pieces (fewer colours, more of the ones that help).
+   - Falling behind → a "make easier" action: it changes the odds of the next pieces (fewer colours, more of the ones that help). On the last move it can even drop up to 56 extra candies onto the board.
    - Too far ahead → a "make harder" action: the odds go the other way.
    - Result: most levels end close, won or lost by a move or two. Close games feel exciting, and people replay them.
-3. **The money sits on the fail screen.** "Keep playing? +5 moves." Which offer, which price and which ad reward are picked from how close the player was, the losing streak, lives left, and whether they quit after failing before.
+3. **Everyone loses in the end, and the money sits on that fail screen.** Two ways to keep playing: watch an ad, or pay. Both are tuned by the same "pass proximity" number.
+   - **Ad:** the closer the player was to winning, the *smaller* the reward the ad gives. A player who was close needs little, so little is given.
+   - **Pay:** how much the player gets for the purchase is picked by a machine-learning model from pass proximity, the losing streak, low lives and even their place in the weekly race.
+   - In the maker's words: "the same number they use to keep you playing is the one they also use to sell you the way out."
 
 **The three ideas worth taking**
 - **Measure progress during the level**, not only win or lose at the end. A level needs a "how far along" number (goal %, squares solved, lines cleared) and a usual pace.
