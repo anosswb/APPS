@@ -14,6 +14,7 @@ Only events from the closed list in `src/stats/events.ts`, with numbers, true/fa
 | `video_result`, `ad_shown` | whether ads work and how often |
 | `full_edition_view`, `full_edition_bought` | whether the unlock sells |
 | `setting_changed` | what people switch off |
+| `reminder_answer` (yes / no / blocked), `reminder_open` | how many accept the daily note, and whether the note brings them back |
 
 ## The switch
 Settings › "Share anonymous numbers" (on by default, shown only when the build has a key). Off means nothing is sent.

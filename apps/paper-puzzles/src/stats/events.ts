@@ -15,6 +15,8 @@ export const EVENTS = {
   full_edition_view: ['from'],
   full_edition_bought: [],
   setting_changed: ['name', 'value'],
+  reminder_answer: ['value'],
+  reminder_open: [],
 } as const;
 
 export type EventName = keyof typeof EVENTS;
@@ -30,6 +32,7 @@ const WORDS = new Set([
   'home', 'calendar', 'book_end',
   'theme', 'sound', 'haptics', 'stats',
   'system', 'light', 'dark', 'on', 'off',
+  'reminder', 'morning', 'noon', 'evening', 'yes', 'no', 'blocked',
 ]);
 
 export type Props = Record<string, string | number | boolean | undefined>;

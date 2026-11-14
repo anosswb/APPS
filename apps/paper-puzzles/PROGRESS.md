@@ -29,7 +29,10 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Two modes, made obvious** (Anass, 14 Nov): the front page shows "Today's puzzle" (one per day, same for everyone) and "The puzzle book · level by level" with a strip of five level boxes: solved ones in red, the current one outlined, the big fifth one with a heavy border. After the daily puzzle, a button leads straight to the next level ("Keep going: Puzzle No. 13"), so nobody hits a dead end.
 - **New icon** (Anass asked for something about paper): a corner of the puzzle page with a masthead rule, a small grid, one tree and one tent. Picked from three options.
 
+- **Daily reminder** ("you can wait a whole day but you come back"): one note a day, only if the player says yes. Asked once, under a solved daily puzzle. 8 AM, Noon or 7 PM, or Off, in Settings. No note for a solved day; the notes stop after a week of silence; a tap on the note opens today's puzzle. Made on the phone, no server. Save format version 5. 65 tests green. Seen working in a browser with pretend notes (`EXPO_PUBLIC_REMINDER_PREVIEW=1`).
+
 ## Not checked (needs a real phone)
+**The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 
 **The sounds: nobody has heard them yet.** Listen for: the pencil tick 20 times in a row (annoying?), the tent tap (hollow?), the stamp (does it sound like a stamp on a phone speaker?). · 
 Touch feel and drag on a real screen · haptics · the stamp animation on device · font loading speed · Android back button · small phones (360 dp) and very large text.
@@ -38,7 +41,7 @@ Touch feel and drag on a real screen · haptics · the stamp animation on device
 - 13 Nov 2026: the newspaper look is approved (from screenshots).
 
 ## Waiting for Anass
-1. Get the test app on your phone (steps in `docs/builds.md`). Say what feels wrong: touch, sounds, ads.
+1. Get the test app on your phone (steps in `docs/builds.md`). Say what feels wrong: touch, sounds, ads, the reminder.
 2. Is the name "Paper Pines" OK as a working title?
 
 ## Next (in order)

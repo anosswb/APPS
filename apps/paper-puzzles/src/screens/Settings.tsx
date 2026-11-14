@@ -1,10 +1,13 @@
-import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_NAME, APP_VERSION } from '../config/app';
 import { MONEY_MODE } from '../config/money';
 import { ads } from '../money/ads';
+import { ReminderTime } from '../reminder/plan';
+import { reminders } from '../reminder/reminders';
+import { count } from '../stats/stats';
 import { STATS_AVAILABLE } from '../stats/stats';
 import { t } from '../i18n/en';
 import { useStore } from '../store/Store';
@@ -17,11 +20,45 @@ import { Rule } from '../ui/Rule';
 import { Type } from '../ui/Type';
 
 type OnOff = 'on' | 'off';
+type ReminderChoice = 'off' | ReminderTime;
 
 export function Settings({ onExit, onRules }: { onExit: () => void; onRules: () => void }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { save, setTheme, setSoundOn, setHapticsOn, setStatsOn } = useStore();
+  const { save, setTheme, setSoundOn, setHapticsOn, setStatsOn, setReminder } = useStore();
+  /** the reminder is wanted but the phone itself does not allow notes */
+  const [blocked, setBlocked] = useState(false);
+  const reminderOn = save.reminder.on;
+  useEffect(() => {
+    if (!reminderOn || !reminders.available()) return;
+    let alive = true;
+    reminders
+      .allowed()
+      .then((ok) => {
+        if (alive) setBlocked(!ok);
+      })
+      .catch((error) => console.warn('Could not read the note permission', error));
+    return () => {
+      alive = false;
+    };
+  }, [reminderOn]);
+
+  const chooseReminder = async (choice: ReminderChoice) => {
+    count('setting_changed', { name: 'reminder', value: choice });
+    if (choice === 'off') {
+      setBlocked(false);
+      setReminder({ on: false, asked: true });
+      return;
+    }
+    let ok = false;
+    try {
+      ok = await reminders.ask();
+    } catch (error) {
+      console.warn('Could not ask for notes', error);
+    }
+    setBlocked(!ok);
+    setReminder({ on: ok, time: choice, asked: true });
+  };
   const onOff = [
     { value: 'on' as OnOff, label: t.settings.on },
     { value: 'off' as OnOff, label: t.settings.off },
@@ -66,6 +103,29 @@ export function Settings({ onExit, onRules }: { onExit: () => void; onRules: () 
         </Type>
         <Choice<OnOff> label={t.settings.haptics} value={save.settings.haptics ? 'on' : 'off'} onChange={(v) => setHapticsOn(v === 'on')} options={onOff} />
 
+        {reminders.available() ? (
+          <>
+            <Type variant="label" tone="muted" style={styles.label}>
+              {t.reminder.setting}
+            </Type>
+            <Choice<ReminderChoice>
+              label={t.reminder.setting}
+              value={save.reminder.on ? save.reminder.time : 'off'}
+              onChange={(v) => void chooseReminder(v)}
+              options={[
+                { value: 'off', label: t.settings.off },
+                { value: 'morning', label: t.reminder.times.morning },
+                { value: 'noon', label: t.reminder.times.noon },
+                { value: 'evening', label: t.reminder.times.evening },
+              ]}
+            />
+            <Type tone="muted" style={styles.about}>
+              {blocked ? t.reminder.blocked : t.reminder.settingAbout}
+            </Type>
+            {blocked ? <Btn label={t.reminder.phoneSettings} kind="outline" onPress={() => void Linking.openSettings()} style={styles.about} /> : null}
+          </>
+        ) : null}
+
         <Btn label={t.home.rules} kind="outline" onPress={onRules} style={styles.rules} />
 
         <View style={styles.gap} />
@@ -104,6 +164,7 @@ const styles = StyleSheet.create({
   title: { marginTop: space.l },
   label: { marginTop: space.xl, marginBottom: space.s },
   rules: { marginTop: space.xl },
+  about: { marginTop: space.s },
   gap: { height: space.xl },
   version: { marginTop: space.xl, textAlign: 'center' },
 });

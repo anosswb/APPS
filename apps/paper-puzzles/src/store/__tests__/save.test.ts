@@ -90,6 +90,23 @@ describe('reading a save', () => {
     expect(out.money.fullEdition).toBe(true);
   });
 
+  test('a version 4 save gets the reminder switched off and not yet asked, and keeps the rest', () => {
+    const v4 = { schema: 4, book: { level: 9, relief: 1, solved: 8 }, daily: { '2026-11-13': { ms: 90000, hints: 1 } }, stats: { on: false, id: 'a'.repeat(32) } };
+    const out = migrate(v4, NOW);
+    expect(out.reminder).toEqual({ on: false, time: 'morning', asked: false });
+    expect(out.book.level).toBe(9);
+    expect(out.daily['2026-11-13']).toEqual({ ms: 90000, hints: 1 });
+    expect(out.stats).toEqual({ on: false, id: 'a'.repeat(32) });
+  });
+
+  test('the reminder choice survives a reload, and a broken time falls back to the morning', () => {
+    const s = freshSave(NOW);
+    s.reminder = { on: true, time: 'evening', asked: true };
+    expect(migrate(JSON.parse(JSON.stringify(s)), NOW).reminder).toEqual(s.reminder);
+    const broken = { ...JSON.parse(JSON.stringify(s)), reminder: { on: true, time: 'midnight', asked: 'yes' } };
+    expect(migrate(broken, NOW).reminder).toEqual({ on: true, time: 'morning', asked: false });
+  });
+
   test('the numbers switch and the anonymous id survive a reload', () => {
     const s = freshSave(NOW);
     s.stats.on = false;

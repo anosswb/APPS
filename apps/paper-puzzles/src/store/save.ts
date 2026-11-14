@@ -1,9 +1,10 @@
 /** What is kept on the phone, and how an old save is read safely after an update. */
 import { MoneyState } from '../money/rules';
+import { DEFAULT_REMINDER_TIME, REMINDER_HOURS, ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound · 3: added money · 4: added stats */
-export const SCHEMA = 4;
+/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder */
+export const SCHEMA = 5;
 
 export interface GameSave {
   marks: number[];
@@ -28,6 +29,8 @@ export interface Save {
   money: MoneyState;
   /** anonymous usage numbers: the switch, and a random id that names nobody */
   stats: { on: boolean; id: string };
+  /** the daily note: off until the player says yes */
+  reminder: ReminderState;
 }
 
 function randomId(): string {
@@ -46,6 +49,7 @@ export function freshSave(now: number = Date.now()): Save {
     seenRules: false,
     money: { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: now },
     stats: { on: true, id: randomId() },
+    reminder: { on: false, time: DEFAULT_REMINDER_TIME, asked: false },
   };
 }
 
@@ -57,7 +61,7 @@ function isObject(x: unknown): x is Record<string, unknown> {
 export function migrate(raw: unknown, now: number = Date.now()): Save {
   const base = freshSave(now);
   if (!isObject(raw)) return base;
-  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats } };
+  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats }, reminder: { ...base.reminder } };
   if (isObject(raw.settings)) {
     const s = raw.settings;
     if (s.theme === 'system' || s.theme === 'light' || s.theme === 'dark') out.settings.theme = s.theme;
@@ -93,6 +97,12 @@ export function migrate(raw: unknown, now: number = Date.now()): Save {
   if (isObject(raw.stats)) {
     if (typeof raw.stats.on === 'boolean') out.stats.on = raw.stats.on;
     if (typeof raw.stats.id === 'string' && /^[0-9a-f]{32}$/.test(raw.stats.id)) out.stats.id = raw.stats.id;
+  }
+  if (isObject(raw.reminder)) {
+    const r = raw.reminder;
+    if (typeof r.on === 'boolean') out.reminder.on = r.on;
+    if (typeof r.time === 'string' && Object.prototype.hasOwnProperty.call(REMINDER_HOURS, r.time)) out.reminder.time = r.time as ReminderState['time'];
+    if (typeof r.asked === 'boolean') out.reminder.asked = r.asked;
   }
   out.schema = SCHEMA;
   return out;

@@ -28,6 +28,8 @@ interface Props {
   nextLabel?: string;
   /** a quiet line above the buttons once the puzzle is solved */
   afterLine?: string;
+  /** a small notice under that line (the daily-reminder question) */
+  afterExtra?: React.ReactNode;
   onKeep: (game: GameSave) => void;
   onSolved: (ms: number, hints: number) => void;
   /** for the anonymous numbers: which kind of hint was shown */
@@ -37,7 +39,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, onKeep, onSolved, onHint: reportHint, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, onKeep, onSolved, onHint: reportHint, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -229,6 +231,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
                   {afterLine}
                 </Type>
               ) : null}
+              {afterExtra}
               {onNext ? <Btn label={nextLabel ?? t.game.next} onPress={onNext} style={styles.afterBtn} /> : null}
               <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
             </View>

@@ -68,6 +68,17 @@ const FILES = [
   // the opening screen keeps the simple pair: a pine and a tent, on the paper colour
   { name: 'splash-icon.png', size: 1024, svg: svg(art({ scale: 0.8 })), clear: true },
   { name: 'splash-icon-dark.png', size: 1024, svg: svg(art({ scale: 0.8, pine: '#9CC7A8', red: '#FF8A7A', door: '#181613' })), clear: true },
+  // the small mark beside a reminder on Android: one flat white tent, the phone colours it red
+  {
+    name: 'notification-icon.png',
+    size: 96,
+    clear: true,
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+      <mask id="t"><rect width="1024" height="1024" fill="black"/>
+        <g transform="translate(32 0) scale(40)"><path d="${POLE}" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="${TENT}" fill="white"/><path d="${DOOR}" fill="black"/></g>
+      </mask>
+      <rect width="1024" height="1024" fill="#FFFFFF" mask="url(#t)"/></svg>`,
+  },
   { name: 'favicon.png', size: 96, svg: svg(page({ scale: 1.1 }), PAPER) },
 ];
 
