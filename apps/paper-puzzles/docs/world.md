@@ -14,6 +14,7 @@ Chosen on 13 Nov 2026 so that building could start, and **approved by Anass the 
 | Motion | Almost none. The stamp drops in 220 ms. Reduce Motion: it simply appears |
 | Sound | Three sounds made by our own script: a pencil tick, a firmer tap for a tent, a stamp thud. Quiet by design. Not yet judged by ear on a phone |
 | Voice | A friendly puzzle editor. Short, plain, warm. Never says "Oops", "Great job!!", "You failed", never uses an exclamation mark |
+| Praise | After a solve, one headline that names what the player really did: "Under 30 seconds. Sharp work.", "Clean work. Not one hint.", "Down to the very last drop." For adults: an editor's nod, never candy talk. Rules in `src/game/praise.ts`, words in `t.praise`; a test bans exclamation marks and words like "awesome" |
 | **Signature** | The red rubber stamp, SOLVED, slightly crooked, landing on the grid. It also marks solved days on the front page |
 
 ## What the first screens look like
