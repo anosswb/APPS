@@ -12,3 +12,5 @@
 | 2026-11-14 | Wake-up alarm button, daily reminder with motivation, day and food planning go into the plan | His list of what a worker needs | Anass |
 | 2026-11-14 | The look: alive and modern, nothing like paper | "They need a live one, like a calendar, something good, not like this, like it's from paper." | Anass |
 | 2026-11-14 | The grey box uses AsyncStorage, one file, no router | It is a test, not the app. The starter's stack applies when the real screens are built | Claude |
+| 2026-11-14 | Look B (the board) is out; the look comes from A (sky) and C (ring) | "I love A and C, hard to choose between." | Anass |
+| 2026-11-14 | One job per tab: Today, Calendar, My day, Pay. Few colours and few words on each | "So much colour and text and things at one tab that feel distracting… put each thing in a place." | Anass |
