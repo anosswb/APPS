@@ -24,3 +24,11 @@ They are pictures only (HTML drawn by `build.mjs`), not app code. Redraw: `NODE_
 **References** (from what I know of these objects, not from photos looked at today; the stores were blocked): andon signal towers and scoreboards (B), a time-clock face and a punch card (C), the plant skyline before sunrise (A), hi-vis clothing, a foreman's whiteboard.
 **Fonts** are open (SIL Open Font Licence), from the Fontsource packages; icons are Lucide (ISC). Log them in `THIRD_PARTY.md` when one is used in the real app.
 **Not checked:** contrast with `tools/contrast.py` (after the pick), a real phone, motion and sound (pictures only).
+
+## Round 2 (14 Nov 2026, after Anass looked)
+He said: "I love A and C, hard to choose", but both had "so much colour and text and things at one tab that feel distracting… reduce that, or put each thing in a place", and "a special font".
+So: one job per tab (Today · Calendar · My day · Pay), fewer colours, fewer words.
+- `r2-calmer.png`: 1 Today in the sky look (rest count, the week, the alarm, nothing else) · 2 My day in the same look, with C's ring · 3 Today in the light ring look, for comparison.
+- `r2-fonts.png`: four fonts for the big words. All four are open-licence fonts, not drawn by us. Our own drawn numbers are possible later, once the app earns.
+- Recommendation: 1 + 2 together (A's sky for Today, C's ring lives on My day). Drawn by `build2.mjs`.
+**Waiting for:** his yes on the mix, and a font number.

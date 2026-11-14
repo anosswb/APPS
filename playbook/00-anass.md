@@ -58,3 +58,4 @@ Long explanations · being asked the same thing twice · being asked to pay earl
 - 2026-11-13: market rule: US first, English only, no Arabic and no Darija. Eight ideas were removed from the list for this reason.
 - 2026-11-13: commits must be in his own name with no AI credit lines; he opens and merges the pull requests himself (he wants the GitHub activity to be his).
 - 2026-11-13: approved the newspaper look of Paper Pines after seeing the screenshots ("it looks like a newspaper").
+- 2026-11-14 (Shift app): a screen with many colours, numbers and texts at once feels distracting to him, even when he loves the look. One job per screen, few colours, few words. He also asks for a font that feels special to the app.
