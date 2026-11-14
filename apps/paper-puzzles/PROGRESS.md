@@ -46,6 +46,7 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Two challenge modes** on the front page: "Beat the clock" and "One pot of ink". Both can be lost; the algorithm sets each player's time and ink. Lose screen with a video for more (Android), try again, closeness line. Save format version 7. 84 tests green. Played in the browser with pretend ads: lose, video, second video, try again with more room, win, next level. Not yet played on a phone, and the starting numbers (time × 3, N = 4) are guesses.
 - **Personal bests:** best time per grid size with no hints, and win runs in the two challenges. Shown on the solved screen and in a "Your bests" block on the front page. Save format version 8. 88 tests green. Seen working in the browser.
 - **Praise:** one headline after each solve that names what the player did, in a puzzle editor's voice (ten kinds, two to four wordings each). 97 tests green. Seen in the browser.
+- **Latest test build (14 Nov 2026, evening):** GitHub run 43624193586 on `main`, with everything above. Anass has not reported on this one yet. Not yet tried on his phone: the two challenge modes, personal bests, compliments, the stuck help, the reminder.
 
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
