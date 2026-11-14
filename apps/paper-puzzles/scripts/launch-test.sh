@@ -15,8 +15,17 @@ adb exec-out screencap -p > screen.png || true
 echo "==== app process after 25 seconds: '${PID}' ===="
 echo "==== crash and error lines ===="
 grep -n -E "FATAL|AndroidRuntime|ReactNativeJS|SoLoader|UnsatisfiedLink|libc    :|DEBUG   :|ExpoModulesCore|$PKG" logcat.txt | grep -v -E "^[0-9]+:[VDI]/(ActivityTaskManager|WindowManager|PackageManager|installd|Zygote)" | head -220
+# What is written on the screen. The front page must be there, not a blank or an error screen.
+adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -40 > screen-text.txt || true
+echo "==== words on the screen ===="
+cat screen-text.txt
 if [ -z "$PID" ]; then
   echo "==== THE APP DIED ===="
   exit 1
 fi
-echo "==== THE APP IS RUNNING ===="
+if ! grep -q "Paper Pines" screen-text.txt; then
+  echo "==== THE APP IS OPEN BUT THE FRONT PAGE IS NOT ON THE SCREEN ===="
+  exit 1
+fi
+echo "==== THE APP IS RUNNING AND SHOWS THE FRONT PAGE ===="

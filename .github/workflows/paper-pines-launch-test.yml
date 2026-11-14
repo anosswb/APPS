@@ -6,6 +6,13 @@ on:
   workflow_dispatch:
   push:
     branches: ['paper-pines/fix-start-crash']
+  pull_request:
+    paths:
+      - 'apps/paper-puzzles/package.json'
+      - 'apps/paper-puzzles/package-lock.json'
+      - 'apps/paper-puzzles/app.json'
+      - 'apps/paper-puzzles/scripts/launch-test.sh'
+      - '.github/workflows/paper-pines-*.yml'
 
 concurrency:
   group: paper-pines-launch-test
@@ -71,4 +78,5 @@ jobs:
           path: |
             apps/paper-puzzles/logcat.txt
             apps/paper-puzzles/screen.png
+            apps/paper-puzzles/screen-text.txt
           retention-days: 7
