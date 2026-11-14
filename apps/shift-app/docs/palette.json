@@ -1,0 +1,9 @@
+{
+  "_note": "Shift app palette, for tools/contrast.py. The app is dark only (docs/world.md), so both modes hold the same colours: the tool needs two.",
+  "worlds": {
+    "shift-daybreak": {
+      "light": { "bg": "#0B0F17", "surface": "#141A26", "text": "#F4EDE2", "muted": "#8E99AE", "primary": "#FFC470", "onPrimary": "#201004", "accent": "#FFC470" },
+      "dark":  { "bg": "#0B0F17", "surface": "#141A26", "text": "#F4EDE2", "muted": "#8E99AE", "primary": "#FFC470", "onPrimary": "#201004", "accent": "#FFC470" }
+    }
+  }
+}
