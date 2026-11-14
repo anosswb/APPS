@@ -1,0 +1,74 @@
+# Builds Paper Pines, starts it on an Android emulator and fails if the app closes by itself.
+# It prints the phone's crash log, so a crash at opening can be read without a real phone.
+name: Paper Pines launch test (Android emulator)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['paper-pines/fix-start-crash']
+
+concurrency:
+  group: paper-pines-launch-test
+  cancel-in-progress: true
+
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    defaults:
+      run:
+        working-directory: apps/paper-puzzles
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/paper-puzzles/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate the Android project
+        run: npx expo prebuild --platform android --no-install --clean
+
+      # Same release build as the test app, but for the emulator's processor (x86_64).
+      - name: Build the APK
+        working-directory: apps/paper-puzzles/android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace -PreactNativeArchitectures=x86_64
+
+      - name: Let the emulator use hardware speed-up
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Open the app on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          working-directory: apps/paper-puzzles
+          script: bash scripts/launch-test.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paper-pines-launch-log
+          path: |
+            apps/paper-puzzles/logcat.txt
+            apps/paper-puzzles/screen.png
+          retention-days: 7
