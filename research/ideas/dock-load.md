@@ -32,5 +32,5 @@ One day: a grey-box round in the browser (grid, three pieces at a time, a traile
 ## Verdict (Claude): TWIST, then build
 Build it as the honest block puzzle with a dock world, with the algorithm helping only. If Anass wants the full two-way version (harder when ahead), that is his call; the review quotes above are the cost.
 
-## Decision (Anass): build / twist / park — date, reason
-*(waiting)*
+## Decision (Anass): PARK — 14 Nov 2026
+"The store is full." He asked for three other apps to choose from. The two reports stay useful for any game with pieces and ads.
