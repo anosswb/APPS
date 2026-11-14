@@ -154,6 +154,20 @@ export const t = {
       return `Your puzzles and progress stay on this phone, and ${name} needs no account. ${own}${adLine}`;
     },
     stats: 'Share anonymous numbers',
+    // Test builds only: what the ads are doing, so a missing ad can be explained from a screenshot.
+    adTest: {
+      title: 'Test build: ads',
+      text: (s: { consent: string; started: boolean; fullScreen: string; video: string }, minutes: number, quiet: number, lastAd: number | null, level: number, firstLevel: number, gap: number) =>
+        [
+          `Consent: ${s.consent}`,
+          `Ads library started: ${s.started ? 'yes' : 'no'}`,
+          `Full-screen ad: ${s.fullScreen}`,
+          `Video ad: ${s.video}`,
+          `Minutes since the first opening: ${minutes} (no ad in the first ${quiet})`,
+          `Puzzle book: you are on No. ${level} (no ad before No. ${firstLevel} is finished)`,
+          `Last full-screen ad: ${lastAd === null ? 'never' : `${lastAd} min ago`} (one every ${gap} min at most)`,
+        ].join('\n'),
+    },
     adChoices: 'Ad privacy choices',
     credits: 'Credits',
     creditsText: 'Type: Newsreader and Libre Franklin, used under the SIL Open Font License. Built with Expo and React Native (MIT License). The drawings, sounds and puzzles are our own.',

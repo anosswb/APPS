@@ -35,6 +35,12 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Open-source licenses page** in Settings: 57 shipped packages with copyright lines and the licence texts, made by `scripts/make-licences.js` and guarded by a test. 69 tests green.
 - The Android and iPhone JavaScript bundles both build (seen while making the licence list). The native Android build has still not run.
 
+## Done (14 Nov 2026, after Anass's first phone test)
+- **The app runs on his phone.** The first build closed at opening (code shrinking removed a part the ads library needs); shrinking is off, and GitHub now opens every changed build on an emulator ("launch test").
+- **His verdict:** "it's good honestly". Sounds: too loud, cheap, noisy. No ad seen by puzzle 8.
+- **New sounds** (second set): four soft notes for marks, two notes for a tent, a five-second winning tune. All quieter. Made by `scripts/gen-sounds.py`. Waiting for his ears.
+- **Ads:** a status block at the bottom of Settings in test builds (consent, library started, ad loaded or the error, minutes since first opening). A failed load is retried. The cause of "no ad at puzzle 8" is not known yet: it is either the 10-minute quiet start or a load problem; the status block will say.
+
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 

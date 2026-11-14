@@ -3,7 +3,7 @@ import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_NAME, APP_VERSION } from '../config/app';
-import { MONEY_MODE } from '../config/money';
+import { AD_FIRST_BOOK_LEVEL, AD_MIN_GAP_MS, AD_QUIET_START_MS, MONEY_MODE } from '../config/money';
 import { ads } from '../money/ads';
 import { ReminderTime } from '../reminder/plan';
 import { reminders } from '../reminder/reminders';
@@ -42,6 +42,14 @@ export function Settings({ onExit, onRules, onLicenses }: { onExit: () => void; 
       alive = false;
     };
   }, [reminderOn]);
+
+  // Test builds: the ad status, read again every two seconds while this page is open.
+  const [adStatus, setAdStatus] = useState(() => ads.status());
+  useEffect(() => {
+    if (!ads.status()) return;
+    const timer = setInterval(() => setAdStatus(ads.status()), 2000);
+    return () => clearInterval(timer);
+  }, []);
 
   const chooseReminder = async (choice: ReminderChoice) => {
     count('setting_changed', { name: 'reminder', value: choice });
@@ -149,6 +157,25 @@ export function Settings({ onExit, onRules, onLicenses }: { onExit: () => void; 
         </Type>
         <Type tone="muted">{t.settings.creditsText}</Type>
         <Btn label={t.licenses.open} kind="outline" onPress={onLicenses} style={styles.rules} />
+
+        {adStatus ? (
+          <>
+            <Type variant="label" tone="accent" style={styles.label}>
+              {t.settings.adTest.title}
+            </Type>
+            <Type tone="muted">
+              {t.settings.adTest.text(
+                adStatus,
+                Math.floor((Date.now() - save.money.firstOpenAt) / 60000),
+                AD_QUIET_START_MS / 60000,
+                save.money.lastAdAt ? Math.floor((Date.now() - save.money.lastAdAt) / 60000) : null,
+                save.book.level,
+                AD_FIRST_BOOK_LEVEL,
+                AD_MIN_GAP_MS / 60000,
+              )}
+            </Type>
+          </>
+        ) : null}
 
         <Type variant="label" tone="muted" style={styles.version}>
           {t.settings.version(APP_NAME, APP_VERSION)}

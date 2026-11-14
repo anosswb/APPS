@@ -6,6 +6,14 @@ import { MONEY_PREVIEW } from '../config/money';
 
 export type VideoResult = 'earned' | 'dismissed' | 'unavailable';
 
+/** What the ads are doing right now, in plain words. Shown in Settings in test builds only. */
+export interface AdStatus {
+  consent: string;
+  started: boolean;
+  fullScreen: string;
+  video: string;
+}
+
 export interface Ads {
   /** ask for consent where the law needs it, then get the first ads ready */
   init(): Promise<void>;
@@ -16,6 +24,8 @@ export interface Ads {
   /** does the law give this player an ad-privacy form to reopen? */
   needsPrivacyOptions(): boolean;
   showPrivacyOptions(): Promise<void>;
+  /** null where there are no ads, and in the store build */
+  status(): AdStatus | null;
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -26,6 +36,7 @@ const none: Ads = {
   showRewarded: async () => 'unavailable',
   needsPrivacyOptions: () => false,
   showPrivacyOptions: async () => {},
+  status: () => null,
 };
 
 /** Preview only: pretends an ad played, so the flows can be seen in a browser. */
