@@ -15,6 +15,9 @@ adb exec-out screencap -p > screen.png || true
 echo "==== app process after 45 seconds: '${PID}' ===="
 echo "==== crash and error lines ===="
 grep -n -E "FATAL|AndroidRuntime|ReactNativeJS|SoLoader|UnsatisfiedLink|libc    :|DEBUG   :|ExpoModulesCore|Ads status|UserMessagingPlatform|$PKG" logcat.txt | grep -v -E "^[0-9]+:[VDI]/(ActivityTaskManager|WindowManager|PackageManager|installd|Zygote)" | head -220
+# A crash inside native code leaves a "tombstone" in the log: print all of it, with the reason and the call stack.
+echo "==== native crash report (empty when there was none) ===="
+grep -E "^F/|^A/|Abort message|JNI DETECTED|signal [0-9]+ \(SIG" logcat.txt | cut -c1-260 | head -120
 # What is written on the screen. The front page must be there, not a blank or an error screen.
 adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
 adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -40 > screen-text.txt || true
