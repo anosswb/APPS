@@ -249,6 +249,7 @@ function Screens() {
           count('puzzle_solved', { kind: route.key === today ? 'daily' : 'past', size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, hints });
         }}
         onHint={(kind, what) => count('hint_used', { kind, what })}
+        onStuck={() => count('stuck_nudge', { kind: route.key === today ? 'daily' : 'past', size: puzzle.n, grade: puzzle.grade })}
         onExit={() => setRoute(route.back ?? { name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}
       />
@@ -267,6 +268,7 @@ function Screens() {
           count('puzzle_solved', { kind: 'book', size: puzzle.n, grade: puzzle.grade, level: route.level, seconds: ms / 1000, hints, relief: route.relief });
         }}
         onHint={(kind, what) => count('hint_used', { kind, what })}
+        onStuck={() => count('stuck_nudge', { kind: 'book', size: puzzle.n, grade: puzzle.grade })}
         onNext={() => void nextBook(route.level)}
         onExit={() => setRoute({ name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}

@@ -17,6 +17,7 @@ export const EVENTS = {
   setting_changed: ['name', 'value'],
   reminder_answer: ['value'],
   reminder_open: [],
+  stuck_nudge: ['kind', 'size', 'grade'],
 } as const;
 
 export type EventName = keyof typeof EVENTS;

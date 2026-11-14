@@ -198,6 +198,8 @@ export const t = {
     home: 'Back to the front page',
     seeYou: 'Come back tomorrow for a new one.',
     keepGoing: (n: number) => `Keep going: Puzzle No. ${n}`,
+    // the Hint button after a long pause with no mark
+    hintNudge: 'Stuck? Hint',
     dailyDone: "That was today's puzzle. A new one comes tomorrow. The puzzle book never runs out.",
   },
 
