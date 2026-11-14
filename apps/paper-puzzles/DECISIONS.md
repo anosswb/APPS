@@ -18,3 +18,8 @@
 | 2026-11-14 | Sounds are made by our own script, not recorded or downloaded | We own them fully and can retune them; they must still be judged by ear on a phone | Claude |
 | 2026-11-14 | Sounds respect the silent switch and mix with the player's music | A puzzle tick must never cut off a podcast | Claude |
 | 2026-11-14 | Undo and Hint sit in a bottom bar | Thumb zone; the board stays clear | Claude |
+| 2026-11-14 | Last seven days of the calendar are always free; older days need one video each (Android) or the full edition (iPhone) | Keeps the daily habit free and gives the paid edition and the videos something real | Claude |
+| 2026-11-14 | If no video is ready, the day opens anyway | A player must never be left waiting for an ad that is not there (a bug Gobblo had) | Claude |
+| 2026-11-14 | iPhone: the Book is free to puzzle 30; buying is switched off and nothing locks until a real store adapter works | Untested purchase code must not ship, and a lock with no way through it would be a dead end | Claude |
+| 2026-11-14 | No full-screen ad before Book puzzle 6, in the first 10 minutes, or more than once every 4 minutes; none around the daily puzzle | The reviews: ads in the middle of play are the most hated thing | Claude |
+| 2026-11-14 | The app no longer runs in Expo Go (the ads library is native); test builds come from GitHub | Needed for ads; Anass gets a real installed app | Claude |

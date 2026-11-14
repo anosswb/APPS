@@ -3,6 +3,8 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_NAME, APP_VERSION } from '../config/app';
+import { MONEY_MODE } from '../config/money';
+import { ads } from '../money/ads';
 import { t } from '../i18n/en';
 import { useStore } from '../store/Store';
 import { ThemeChoice, useTheme } from '../theme/ThemeContext';
@@ -70,7 +72,8 @@ export function Settings({ onExit, onRules }: { onExit: () => void; onRules: () 
         <Type variant="label" tone="muted" style={styles.label}>
           {t.settings.privacy}
         </Type>
-        <Type tone="muted">{t.settings.privacyText(APP_NAME)}</Type>
+        <Type tone="muted">{t.settings.privacyText(APP_NAME, MONEY_MODE === 'ads')}</Type>
+        {ads.needsPrivacyOptions() ? <Btn label={t.settings.adChoices} kind="outline" onPress={() => void ads.showPrivacyOptions()} style={styles.rules} /> : null}
 
         <Type variant="label" tone="muted" style={styles.label}>
           {t.settings.credits}

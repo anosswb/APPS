@@ -26,6 +26,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 | `src/theme/tokens.ts` | Every colour, size and font name. Nowhere else |
 | `src/i18n/en.ts` | Every word the app shows |
 | `src/store/` | What is saved on the phone, with `migrate` for old saves |
+| `src/money/` | `rules.ts` (what is locked, when an ad may show; tested), `ads.ts` + `ads.android.ts`, `purchases.ts` |
+| `src/config/money.ts` | The numbers of the money plan and the preview switch |
 | `src/ui/` | Board, glyphs, stamp, buttons, text |
 | `src/screens/` | Home (front page), Game, Rules, Archive (past puzzles), Settings |
 | `scripts/gen-sounds.py` | Makes the three sounds in `assets/sounds/` |
@@ -40,6 +42,9 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 - Colours, sizes, fonts only from `tokens.ts`. Text only from `en.ts`. `start`/`end`, never `left`/`right`.
 - Storage changes: bump `SCHEMA`, extend `migrate`, add a test. Never drop a player's progress.
 - Daily and Book seeds (`daily-YYYY-MM-DD`, `book-<level>-<relief>`) must not change after launch, or everyone's puzzles change.
+- **Money decisions live in `src/money/rules.ts` only,** with tests. Screens ask the rules; they never decide.
+- `EXPO_PUBLIC_MONEY_PREVIEW` (pretend ads or pretend shop) is for the web preview only. It must never be set in a store build.
+- Nothing is locked on iPhone until a real purchase adapter exists and works (`purchases.available()`).
 - The name is in `src/config/app.ts` only.
 - `FIRST_EDITION` in `src/game/archive.ts` (the first day with a daily puzzle) must not change after launch.
 

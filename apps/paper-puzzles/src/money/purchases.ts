@@ -12,7 +12,11 @@ export interface Purchases {
   /** true only when a real purchase can be made right now */
   available(): boolean;
   init(): Promise<void>;
-  /** does the store say this person owns the full edition? */
+  /**
+   * Does the store say this person owns the full edition?
+   * It must THROW when the store cannot be reached (offline), and return false only when the store
+   * really answers "not owned". A false answer removes the unlock; a throw keeps the saved one.
+   */
   ownsFullEdition(): Promise<boolean>;
   /** the price as the store formats it for this person, or null if it is not known */
   price(): Promise<string | null>;
