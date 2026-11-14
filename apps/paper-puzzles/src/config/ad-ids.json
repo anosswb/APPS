@@ -1,0 +1,7 @@
+{
+  "_note": "Leave empty until the real AdMob IDs exist. Empty = Google's public TEST ads. Real IDs are used only when the build sets EXPO_PUBLIC_ADS_LIVE=1.",
+  "android": {
+    "interstitialId": "",
+    "rewardedId": ""
+  }
+}

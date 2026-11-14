@@ -10,6 +10,7 @@ import { useStore } from '../store/Store';
 import { useTheme } from '../theme/ThemeContext';
 import { hairline, space } from '../theme/tokens';
 import { Btn } from '../ui/Btn';
+import { LevelStrip } from '../ui/LevelStrip';
 import { MiniGrid } from '../ui/MiniGrid';
 import { Rule } from '../ui/Rule';
 import { Stamp } from '../ui/Stamp';
@@ -22,10 +23,13 @@ interface Props {
   onRules: () => void;
   onArchive: () => void;
   onSettings: () => void;
+  /** shown only when the full edition can really be bought and is not owned yet */
+  onFullEdition?: () => void;
+  bookIsLocked?: boolean;
 }
 
 /** The front page: masthead, today's puzzle, the week, the book. */
-export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings }: Props) {
+export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings, onFullEdition, bookIsLocked }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { save } = useStore();
@@ -117,16 +121,18 @@ export function Home({ today, onDaily, onBook, onRules, onArchive, onSettings }:
             <Type variant="label" tone="muted" style={styles.meta}>
               {t.sizeLine(spec.n, spec.grade)}
             </Type>
-            <Type tone="muted">{t.home.bookBlurb(save.book.solved)}</Type>
+            <Type tone="muted">{bookIsLocked ? t.full.bookEnd : t.home.bookBlurb(save.book.solved)}</Type>
           </View>
         </View>
-        <Btn label={t.home.open} kind={done ? 'ink' : 'outline'} onPress={onBook} style={styles.wide} />
+        <LevelStrip level={save.book.level} relief={save.book.relief} />
+        <Btn label={bookIsLocked ? t.archive.seeFull : t.home.play(save.book.level)} kind={done ? 'ink' : 'outline'} onPress={onBook} style={styles.wide} />
 
         <View style={styles.gap} />
         <Rule />
         <View style={styles.footer}>
           <Btn label={t.home.rules} kind="quiet" onPress={onRules} />
           <Btn label={t.home.settings} kind="quiet" onPress={onSettings} />
+          {onFullEdition ? <Btn label={t.full.homeLink} kind="quiet" onPress={onFullEdition} /> : null}
         </View>
       </View>
     </ScrollView>
@@ -150,6 +156,6 @@ const styles = StyleSheet.create({
   dayBox: { width: 30, height: 30 },
   gap: { height: space.xl },
   bookRow: { flexDirection: 'row' },
-  footer: { flexDirection: 'row', justifyContent: 'center', gap: space.l, marginTop: space.s },
+  footer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: space.l, marginTop: space.s },
   weekHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.m, marginBottom: space.xs },
 });

@@ -110,3 +110,25 @@ describe('the book', () => {
     expect(bookPuzzle(12)).toEqual(bookPuzzle(12));
   });
 });
+
+describe('the level strip on the front page', () => {
+  // imported here so the test stays with the other Book tests
+  const { levelWindow } = require('../../ui/LevelStrip') as typeof import('../../ui/LevelStrip');
+
+  test('early on it shows five neighbours and never goes below 1', () => {
+    expect(levelWindow(1)).toEqual([1, 2, 3, 4, 5]);
+    expect(levelWindow(4)).toEqual([2, 3, 4, 5, 6]);
+    expect(levelWindow(10)).toEqual([6, 7, 8, 9, 10]);
+  });
+
+  test('later it shows the whole wave of five, ending on the big one', () => {
+    expect(levelWindow(11)).toEqual([11, 12, 13, 14, 15]);
+    expect(levelWindow(15)).toEqual([11, 12, 13, 14, 15]);
+    expect(levelWindow(16)).toEqual([16, 17, 18, 19, 20]);
+    for (const level of [11, 13, 27, 104]) {
+      const window = levelWindow(level);
+      expect(window).toContain(level);
+      expect(bookSpec(window[4]).boss).toBe(true);
+    }
+  });
+});

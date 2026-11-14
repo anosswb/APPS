@@ -16,7 +16,7 @@ A quiet puzzle page on your phone: one puzzle a day that everyone shares, plus a
 ## Stack
 Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md` first: Expo changes every release, so read the versioned docs before using any Expo API.
 - Add packages with `EXPO_OFFLINE=1 npx expo install <pkg>` in cloud sessions (Expo's online service is blocked there; the offline flag uses the version list shipped inside Expo). On Anass's own machine plain `npx expo install` is fine.
-- Everything so far runs in **Expo Go** (no native build needed). Keep it that way until ads and purchases go in.
+- Test builds come from the GitHub workflow in `docs/builds.md`. A generated `android/` or `ios/` folder is never committed (it is in `.gitignore`).
 - No Expo Router yet: five screens switch in `App.tsx` with a small route object. It is enough for now; move to Expo Router when deep links or tabs are needed.
 
 ## Where the code is
@@ -26,9 +26,15 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 | `src/theme/tokens.ts` | Every colour, size and font name. Nowhere else |
 | `src/i18n/en.ts` | Every word the app shows |
 | `src/store/` | What is saved on the phone, with `migrate` for old saves |
+| `src/money/` | `rules.ts` (what is locked, when an ad may show; tested), `ads.ts` + `ads.android.ts`, `purchases.ts` |
+| `src/config/money.ts` | The numbers of the money plan and the preview switch |
+| `src/stats/` | Anonymous usage counts: the closed event list (tested) and the sender. `docs/numbers.md` |
+| `store/` | Drafts: listing text, privacy policy, terms |
 | `src/ui/` | Board, glyphs, stamp, buttons, text |
 | `src/screens/` | Home (front page), Game, Rules, Archive (past puzzles), Settings |
 | `scripts/gen-sounds.py` | Makes the three sounds in `assets/sounds/` |
+| `scripts/make-icons.js` | Draws the icon and opening-screen art in `assets/` |
+| `docs/builds.md` | How Anass gets a test app on his phone (GitHub builds it) |
 
 ## Hard rules for this app
 - **Every puzzle has exactly one answer and can be finished by logic.** A puzzle is kept only if `solveLogic` finishes it. `engine.test.ts` proves it by brute force. Never weaken these tests.
@@ -38,6 +44,10 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript 6 strict). Read `AGENTS.md`
 - Colours, sizes, fonts only from `tokens.ts`. Text only from `en.ts`. `start`/`end`, never `left`/`right`.
 - Storage changes: bump `SCHEMA`, extend `migrate`, add a test. Never drop a player's progress.
 - Daily and Book seeds (`daily-YYYY-MM-DD`, `book-<level>-<relief>`) must not change after launch, or everyone's puzzles change.
+- **Money decisions live in `src/money/rules.ts` only,** with tests. Screens ask the rules; they never decide.
+- `EXPO_PUBLIC_MONEY_PREVIEW` (pretend ads or pretend shop) is for the web preview only. It must never be set in a store build.
+- Nothing is locked on iPhone until a real purchase adapter exists and works (`purchases.available()`).
+- **Only events in `src/stats/events.ts` may be counted.** Never free text. A new event needs a row in `docs/numbers.md`.
 - The name is in `src/config/app.ts` only.
 - `FIRST_EDITION` in `src/game/archive.ts` (the first day with a daily puzzle) must not change after launch.
 

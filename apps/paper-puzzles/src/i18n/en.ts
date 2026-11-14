@@ -82,10 +82,15 @@ export const t = {
     solved: 'Solved',
     look: 'Look again',
     week: 'This week',
-    book: 'The book',
+    book: 'The puzzle book · level by level',
     bookTitle: (n: number) => `Puzzle No. ${n}`,
-    bookBlurb: (done: number) => (done === 0 ? 'Start here. The first few teach you the game.' : `${done} ${done === 1 ? 'puzzle' : 'puzzles'} solved so far. They get bigger as you go.`),
+    bookBlurb: (done: number) => (done === 0
+        ? 'Start here. One puzzle after another, each a little harder. The first few teach you the game.'
+        : `${done} ${done === 1 ? 'puzzle' : 'puzzles'} solved. They get bigger and trickier as you go, and every fifth one is a big one.`),
     open: 'Open',
+    play: (n: number) => `Play No. ${n}`,
+    big: 'Big one',
+    stripLabel: (n: number) => `You are on puzzle number ${n} of the book`,
     rules: 'How to play',
     past: 'Past puzzles',
     settings: 'Settings',
@@ -101,6 +106,35 @@ export const t = {
     dayLabel: (d: Date, state: 'solved' | 'started' | 'open' | 'closed') =>
       `${MONTHS[d.getMonth()]} ${d.getDate()}${state === 'solved' ? ', solved' : state === 'started' ? ', started' : state === 'closed' ? ', not available' : ''}`,
     week: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    lockedLabel: 'older puzzle, closed',
+    olderVideo: (d: Date) => `${MONTHS[d.getMonth()]} ${d.getDate()} is an older puzzle. A short video opens it, and it stays open.`,
+    watch: 'Watch a short video',
+    olderFull: (d: Date) => `${MONTHS[d.getMonth()]} ${d.getDate()} is an older puzzle. Older puzzles are part of the full edition.`,
+    seeFull: 'See the full edition',
+    notNow: 'Not now',
+    onUs: 'No video is ready right now, so this one is on us.',
+  },
+
+  full: {
+    title: 'The full edition',
+    promise: 'One payment. Yours for good. No subscription.',
+    items: [
+      'The whole Book: every puzzle after No. 30, with no end.',
+      'Every past puzzle, back to the first edition.',
+      'No ads. There are none on iPhone, and there never will be.',
+    ],
+    free: 'Still free for everyone: the daily puzzle, the last seven days, hints, and the first 30 puzzles of the Book.',
+    buy: (price: string | null) => (price ? `Buy once · ${price}` : 'Buy once'),
+    buying: 'One moment',
+    restore: 'Restore purchases',
+    restored: 'Found it. The full edition is yours again.',
+    nothingToRestore: 'No earlier purchase was found for this Apple account.',
+    failed: 'The purchase did not go through. Nothing was charged.',
+    thanks: 'Thank you. The full edition is yours.',
+    terms: 'Terms',
+    privacy: 'Privacy',
+    homeLink: 'The full edition',
+    bookEnd: 'Puzzle No. 30 was the last free one. The rest of the Book is in the full edition.',
   },
 
   settings: {
@@ -112,7 +146,15 @@ export const t = {
     on: 'On',
     off: 'Off',
     privacy: 'Privacy',
-    privacyText: (name: string) => `Your puzzles and progress stay on this phone. ${name} collects nothing and needs no account.`,
+    privacyText: (name: string, hasAds: boolean, hasStats: boolean) => {
+      const own = hasStats
+        ? `${name} counts a few things without knowing who you are (puzzles started and solved, hints used), so we can see what to improve. Nothing you could be recognized by is sent.`
+        : `${name} itself collects nothing.`;
+      const adLine = hasAds ? " The ads are served by Google, which uses this phone's advertising ID to choose them." : '';
+      return `Your puzzles and progress stay on this phone, and ${name} needs no account. ${own}${adLine}`;
+    },
+    stats: 'Share anonymous numbers',
+    adChoices: 'Ad privacy choices',
     credits: 'Credits',
     creditsText: 'Type: Newsreader and Libre Franklin, used under the SIL Open Font License. Built with Expo and React Native (MIT License). The drawings, sounds and puzzles are our own.',
     version: (name: string, v: string) => `${name}, version ${v}`,
@@ -135,6 +177,8 @@ export const t = {
     next: 'Next puzzle',
     home: 'Back to the front page',
     seeYou: 'Come back tomorrow for a new one.',
+    keepGoing: (n: number) => `Keep going: Puzzle No. ${n}`,
+    dailyDone: "That was today's puzzle. A new one comes tomorrow. The puzzle book never runs out.",
   },
 
   hint: (h: Hint): string => {

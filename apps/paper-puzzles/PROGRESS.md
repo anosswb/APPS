@@ -18,7 +18,19 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - Save format version 2 (adds the sound switch), with a test that an old save keeps everything.
 - 31 tests green. Seen working in a phone-sized browser: solve, calendar, a past day, settings, and everything still there after a reload.
 
+## Done (14 Nov 2026, later)
+- **Icon and opening screen** in the newspaper look, drawn by `scripts/make-icons.js`. App IDs set.
+- **Test build on GitHub** (`docs/builds.md`) and automatic checks on pull requests. The Android project generates cleanly; the full build has not run yet.
+- **Money:** tested rules (`src/money/rules.ts`), Android ads with consent and test ads, the full-edition page, locked older days with a video (Android) or the full edition (iPhone). Buying is switched off, so nothing is locked on iPhone yet. Seen working in three web previews. Save format version 3.
+
+- **Anonymous numbers:** a closed, tested event list and a tiny sender. Off until a PostHog key exists (`docs/numbers.md`). Save format version 4.
+- **Store page drafts** in `store/`: listing text, privacy policy, terms.
+
+- **Two modes, made obvious** (Anass, 14 Nov): the front page shows "Today's puzzle" (one per day, same for everyone) and "The puzzle book · level by level" with a strip of five level boxes: solved ones in red, the current one outlined, the big fifth one with a heavy border. After the daily puzzle, a button leads straight to the next level ("Keep going: Puzzle No. 13"), so nobody hits a dead end.
+- **New icon** (Anass asked for something about paper): a corner of the puzzle page with a masthead rule, a small grid, one tree and one tent. Picked from three options.
+
 ## Not checked (needs a real phone)
+**The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 
 **The sounds: nobody has heard them yet.** Listen for: the pencil tick 20 times in a row (annoying?), the tent tap (hollow?), the stamp (does it sound like a stamp on a phone speaker?). · 
 Touch feel and drag on a real screen · haptics · the stamp animation on device · font loading speed · Android back button · small phones (360 dp) and very large text.
 
@@ -26,16 +38,16 @@ Touch feel and drag on a real screen · haptics · the stamp animation on device
 - 13 Nov 2026: the newspaper look is approved (from screenshots).
 
 ## Waiting for Anass
-1. Try it on your phone with Expo Go (steps in `START_HERE.md` at the repo root). Say what feels wrong.
+1. Get the test app on your phone (steps in `docs/builds.md`). Say what feels wrong: touch, sounds, ads.
 2. Is the name "Paper Pines" OK as a working title?
 
 ## Next (in order)
 1. Fixes from Anass's phone test (look, feel, sounds).
 2. Screen-reader labels for each square; largest-font check; 360 dp check.
 3. A full "Open-source licences" page (today there is a short credits text in Settings).
-4. Anonymous analytics with a closed event list (playbook/10) and the one number (puzzles finished on day 1).
-5. Money: Android ads between Book puzzles, iPhone one-time unlock (needs a development build; the app stops working in Expo Go from then on).
-6. Our own icon and splash (the template's placeholders are still in `assets/`).
+4. Turn the numbers on (PostHog key, steps in `docs/numbers.md`).
+5. Real AdMob IDs (steps in `docs/money.md`), after the test build shows test ads working.
+6. The iPhone purchase adapter (steps in `docs/money.md`), after the Apple account exists.
 7. Name check in the stores and trademark databases; privacy and terms pages; store listing.
 8. Android closed test (12 testers, 14 days) as soon as the Play account exists.
 
