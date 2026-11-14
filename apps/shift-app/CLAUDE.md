@@ -8,7 +8,7 @@ Users in the United States, in American English: US spelling, dollars, 12-hour c
 ## One line
 Americans on rotating and 12-hour shifts, blue collar first, see every shift, their hours for the pay period and the days to payday in one look, without an app that loses their schedule. **The special thing:** the only shift calendar made by a 12-hour shift worker, for people who work with their hands.
 
-**Where it is (14 Nov 2026):** a grey box only. `App.tsx` is one plain screen with no design, on purpose. The rules in `src/core/` are real and tested. Do not style anything before `docs/world.md` is decided with Anass. The research is in `research/ideas/shift-app*.md` at the repo root.
+**Where it is (14 Nov 2026, evening):** the look is decided (`docs/world.md`, "Daybreak") and the first real screens exist: Today, Calendar, My day; Pay is a note. The rules in `src/core/` are real and tested. Test builds: `docs/builds.md`. The research is in `research/ideas/shift-app*.md` at the repo root.
 
 ## Read before working (only what the task needs)
 1. `docs/brief.md` — users, the pain (from real reviews), what v1 does and does not do

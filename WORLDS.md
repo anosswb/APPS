@@ -6,3 +6,4 @@ One line per shipped or in-progress app. A new app may not repeat the material, 
 |---|---|---|---|---|---|
 | Gobblo | ADHD brains, 16–30 | calm, cozy, a bit funny | flat water and soft otter | an otter that eats a task when you start it; the dive | in design, own repo |
 | Paper Pines (working title) | US adults 30+ who like a quiet puzzle | quiet, papery, exact | newsprint and two inks (black, red) plus pine green | a crooked red SOLVED rubber stamp landing on the grid | first screens built, `apps/paper-puzzles/` |
+| Shift app (working title) | US blue-collar shift workers | warm, open, calm | the sky on the drive to work, over dark ground | the sky that matches the real hour, rest days as small sunrises; a 24-hour ring for the day | first screens built, `apps/shift-app/` |

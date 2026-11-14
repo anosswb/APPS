@@ -17,3 +17,7 @@
 | 2026-11-14 | A day nobody marked is "not known yet" and is never guessed; answers that cross such a day carry `sure: false` | His work has no pattern. A wrong "rest in 2 days" at 5 am is worse than "next rest you marked: Monday" | Claude, from Anass's rule |
 | 2026-11-14 | A rule's percentage is the EXTRA on top of the normal rate (50 = pays 1.5 times) | "The percentage they get more when they work overpaid hours" | Claude, from his words; check the wording on the screen with him |
 | 2026-11-14 | Two rules on the same hour: the higher percentage wins; adding them is a setting | A guess about how most employers pay. Not checked with US workers | Claude (guess) |
+| 2026-11-14 | The look is "Daybreak": the sky for Today, the ring on My day, font 1 (Bricolage Grotesque). Dark only | "Yes, 1 + 2 together, font 1." | Anass |
+| 2026-11-14 | The grey box screen is replaced by the real screens (Today, Calendar, My day; Pay is a note for now) | He asked for an APK to try before his usage ends. The grey box stays in the git history | Claude, for his request |
+| 2026-11-14 | Test package ID `com.anosswb.shiftapp`. Not final: it becomes permanent only when the app goes to a store, after the name check | A build needs an ID | Claude |
+| 2026-11-14 | One tap on a day moves it: not known yet → work → rest → not known yet. Work uses the usual shift from "My numbers" | Fastest way to mark days with no pattern; to be judged on his phone | Claude |
