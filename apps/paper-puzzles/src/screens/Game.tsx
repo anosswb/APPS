@@ -17,6 +17,9 @@ import { Rule } from '../ui/Rule';
 import { Stamp } from '../ui/Stamp';
 import { Type } from '../ui/Type';
 
+/** A pause this long with no mark means the player is stuck. A guess; tune it from the numbers. */
+const STUCK_MS = 45 * 1000;
+
 interface Props {
   puzzle: Puzzle;
   title: string;
@@ -32,6 +35,8 @@ interface Props {
   afterExtra?: React.ReactNode;
   onKeep: (game: GameSave) => void;
   onSolved: (ms: number, hints: number) => void;
+  /** called once when the player has been stuck long enough for the Hint button to light up */
+  onStuck?: () => void;
   /** for the anonymous numbers: which kind of hint was shown */
   onHint?: (kind: string, what?: string) => void;
   onNext?: () => void;
@@ -39,7 +44,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, onKeep, onSolved, onHint: reportHint, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -69,6 +74,23 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     });
     return () => sub.remove();
   }, []);
+
+  // Falling behind: after a long pause with no mark, the Hint button lights up. Help comes to the player
+  // before they give up (playbook/06, A3b). Any mark or hint puts it out again.
+  const [stuck, setStuck] = useState(false);
+  const stuckTold = useRef(false);
+  useEffect(() => {
+    setStuck(false);
+    if (solved || hint) return;
+    const timer = setTimeout(() => {
+      setStuck(true);
+      if (!stuckTold.current) {
+        stuckTold.current = true;
+        onStuck?.();
+      }
+    }, STUCK_MS);
+    return () => clearTimeout(timer);
+  }, [marks, hint, solved]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Leaving the puzzle stops the winning tune.
   useEffect(() => () => sound.hush(), []);
@@ -264,7 +286,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
         <View style={[styles.dock, { borderTopColor: c.rule, backgroundColor: c.bg, paddingBottom: insets.bottom + space.m }]}>
           <View style={[styles.tools, { width: boardWidth }]}>
             <Btn label={t.game.undo} kind="outline" onPress={onUndo} disabled={!undo.length} style={styles.tool} />
-            <Btn label={t.game.hint} kind="outline" onPress={onHint} style={styles.tool} />
+            <Btn label={stuck ? t.game.hintNudge : t.game.hint} kind={stuck ? 'ink' : 'outline'} onPress={onHint} style={styles.tool} />
           </View>
         </View>
       )}

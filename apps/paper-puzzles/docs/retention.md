@@ -16,6 +16,7 @@ Built means it is in the code today; planned means not yet.
   - **Harder (−1, −2):** two fast, clean solves in a row (no hint, under 60% of the usual time) raise the next ones a step (grade first, then one size bigger, never above 10 × 10). A hint or a slow solve brings it one step back.
   - The first ten puzzles are the same for everyone.
   - "Usual time" is a **guess** today: 2, 3 and 4.5 seconds per square for gentle, steady and tricky. Tune it from the real numbers (`puzzle_solved` now carries `relief`).
+  - **Inside a puzzle** *(built)*: after 45 seconds with no mark, the Hint button lights up and reads "Stuck? Hint". Any mark puts it out. This is the "falling behind → make it easier" step of the Candy Crush system (`playbook/06`, A3b), done the only way a one-answer puzzle allows: the board never changes, the help comes forward. Counted as `stuck_nudge`.
   - This is our version of the Candy Crush idea. There, the game tunes how often you fail. Here nobody can fail, so we tune how hard the thinking is, to keep each player near the edge of their own skill. It never changes to sell anything.
 
 ## The stuck moment (our version of the fail moment)
