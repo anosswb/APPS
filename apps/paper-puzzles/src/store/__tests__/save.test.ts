@@ -2,11 +2,17 @@ import { freshSave, migrate, SCHEMA } from '../save';
 
 const NOW = 1_800_000_000_000;
 
+/** The anonymous id is random, so it is checked for shape and then set aside. */
+function plain<T extends { stats: { id: string } }>(save: T): T {
+  expect(save.stats.id).toMatch(/^[0-9a-f]{32}$/);
+  return { ...save, stats: { ...save.stats, id: 'x' } };
+}
+
 describe('reading a save', () => {
   test('nothing stored gives a fresh save', () => {
-    expect(migrate(null, NOW)).toEqual(freshSave(NOW));
-    expect(migrate('garbage', NOW)).toEqual(freshSave(NOW));
-    expect(migrate([], NOW)).toEqual(freshSave(NOW));
+    expect(plain(migrate(null, NOW))).toEqual(plain(freshSave(NOW)));
+    expect(plain(migrate('garbage', NOW))).toEqual(plain(freshSave(NOW)));
+    expect(plain(migrate([], NOW))).toEqual(plain(freshSave(NOW)));
   });
 
   test('a good save comes back unchanged', () => {
@@ -73,6 +79,22 @@ describe('reading a save', () => {
     expect(out.book.level).toBe(40);
     expect(out.settings.sound).toBe(false);
     expect(out.money).toEqual({ fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: NOW });
+  });
+
+  test('a version 3 save gets an anonymous id, numbers on, and keeps the rest', () => {
+    const v3 = { schema: 3, book: { level: 12, relief: 0, solved: 11 }, money: { fullEdition: true, unlockedDays: [], lastAdAt: 5, firstOpenAt: 7 } };
+    const out = migrate(v3, NOW);
+    expect(out.stats.on).toBe(true);
+    expect(out.stats.id).toMatch(/^[0-9a-f]{32}$/);
+    expect(out.book.level).toBe(12);
+    expect(out.money.fullEdition).toBe(true);
+  });
+
+  test('the numbers switch and the anonymous id survive a reload', () => {
+    const s = freshSave(NOW);
+    s.stats.on = false;
+    const back = migrate(JSON.parse(JSON.stringify(s)), NOW);
+    expect(back.stats).toEqual(s.stats);
   });
 
   test('a purchase and opened days survive a reload', () => {

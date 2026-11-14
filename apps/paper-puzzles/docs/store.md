@@ -8,5 +8,5 @@ Full rules: `playbook/08-store-policies.md` at the repo root. This file holds wh
 - **Permissions:** Android gets internet access and the advertising ID permission from the ads library. Nothing else.
 - **Look-alike risk (Apple, June 2026):** several Tents apps exist. Ours differs in look (newspaper), in promise (logic only, proven by tests), in hints (explained) and in money (pay once). Say this in the review notes and show it in the first screenshot.
 - **Fonts and code we use:** see `THIRD_PARTY.md`. All drawings are our own (`RIGHTS.md`).
-- **Still to write:** privacy policy and terms pages, support email, listing text and search words, screenshots.
+- **Drafts exist** in `store/` (listing, privacy, terms). Still to do: put the two pages on the web and their links in `src/config/money.ts`, a support email, real search-word research, screenshots.
 - **Android closed test:** not started (needs the Play account). 12 testers for 14 days.

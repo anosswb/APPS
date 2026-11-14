@@ -24,6 +24,7 @@ import { Game } from './src/screens/Game';
 import { Home } from './src/screens/Home';
 import { Rules } from './src/screens/Rules';
 import { Settings } from './src/screens/Settings';
+import { configureStats, count } from './src/stats/stats';
 import { GameSave } from './src/store/save';
 import { StoreProvider, useStore } from './src/store/Store';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
@@ -49,6 +50,10 @@ function Screens() {
   useEffect(() => setHaptics(save.settings.haptics), [save.settings.haptics]);
   useEffect(() => setSound(save.settings.sound), [save.settings.sound]);
   useEffect(() => initSound(), []);
+  useEffect(() => configureStats(save.stats.on, save.stats.id), [save.stats.on, save.stats.id]);
+  useEffect(() => {
+    if (store.ready) count('app_open');
+  }, [store.ready]);
 
   // Money: get ads ready (Android) and ask the store what is owned (iPhone). Both are quiet no-ops elsewhere.
   const { setFullEdition, markAdShown } = store;
@@ -83,6 +88,13 @@ function Screens() {
     return () => sub.remove();
   }, [route]);
 
+  // Count each puzzle opened and each visit to the rules or the full-edition page.
+  useEffect(() => {
+    if (route.name === 'rules') count('rules_seen');
+    else if (route.name === 'archive') count('past_puzzles_open');
+    else if (route.name === 'full') count('full_edition_view', { from: route.back.name === 'archive' ? 'calendar' : 'home' });
+  }, [route.name]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const puzzle = useMemo(() => {
     if (route.name === 'daily') return dailyPuzzle(route.key);
     if (route.name === 'book') return bookPuzzle(route.level, route.relief);
@@ -114,7 +126,10 @@ function Screens() {
       const now = Date.now();
       if (interstitialDue(MONEY_MODE, finishedLevel, now, save.money)) {
         try {
-          if (await ads.showInterstitial()) markAdShown(Date.now());
+          if (await ads.showInterstitial()) {
+            markAdShown(Date.now());
+            count('ad_shown');
+          }
         } catch (error) {
           console.warn('Ad error', error);
         }
@@ -152,7 +167,11 @@ function Screens() {
         initial={save.games[puzzle.id]}
         alreadySolved={!!save.daily[route.key]}
         onKeep={keep}
-        onSolved={(ms, hints) => store.finishDaily(route.key, ms, hints)}
+        onSolved={(ms, hints) => {
+          store.finishDaily(route.key, ms, hints);
+          count('puzzle_solved', { kind: route.key === today ? 'daily' : 'past', size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, hints });
+        }}
+        onHint={(kind, what) => count('hint_used', { kind, what })}
         onExit={() => setRoute(route.back ?? { name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}
       />
@@ -166,7 +185,11 @@ function Screens() {
         initial={save.games[puzzle.id]}
         showLegend={route.level <= 3}
         onKeep={keep}
-        onSolved={(_ms, hints) => store.finishBook(puzzle.id, hints)}
+        onSolved={(ms, hints) => {
+          store.finishBook(puzzle.id, hints);
+          count('puzzle_solved', { kind: 'book', size: puzzle.n, grade: puzzle.grade, level: route.level, seconds: ms / 1000, hints });
+        }}
+        onHint={(kind, what) => count('hint_used', { kind, what })}
         onNext={() => void nextBook(route.level)}
         onExit={() => setRoute({ name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}

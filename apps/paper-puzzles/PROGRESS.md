@@ -23,6 +23,9 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Test build on GitHub** (`docs/builds.md`) and automatic checks on pull requests. The Android project generates cleanly; the full build has not run yet.
 - **Money:** tested rules (`src/money/rules.ts`), Android ads with consent and test ads, the full-edition page, locked older days with a video (Android) or the full edition (iPhone). Buying is switched off, so nothing is locked on iPhone yet. Seen working in three web previews. Save format version 3.
 
+- **Anonymous numbers:** a closed, tested event list and a tiny sender. Off until a PostHog key exists (`docs/numbers.md`). Save format version 4.
+- **Store page drafts** in `store/`: listing text, privacy policy, terms.
+
 ## Not checked (needs a real phone)
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 
 **The sounds: nobody has heard them yet.** Listen for: the pencil tick 20 times in a row (annoying?), the tent tap (hollow?), the stamp (does it sound like a stamp on a phone speaker?). · 
@@ -39,7 +42,7 @@ Touch feel and drag on a real screen · haptics · the stamp animation on device
 1. Fixes from Anass's phone test (look, feel, sounds).
 2. Screen-reader labels for each square; largest-font check; 360 dp check.
 3. A full "Open-source licences" page (today there is a short credits text in Settings).
-4. Anonymous analytics with a closed event list (playbook/10) and the one number (puzzles finished on day 1).
+4. Turn the numbers on (PostHog key, steps in `docs/numbers.md`).
 5. Real AdMob IDs (steps in `docs/money.md`), after the test build shows test ads working.
 6. The iPhone purchase adapter (steps in `docs/money.md`), after the Apple account exists.
 7. Name check in the stores and trademark databases; privacy and terms pages; store listing.

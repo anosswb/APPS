@@ -2,8 +2,8 @@
 import { MoneyState } from '../money/rules';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound · 3: added money */
-export const SCHEMA = 3;
+/** 2: added settings.sound · 3: added money · 4: added stats */
+export const SCHEMA = 4;
 
 export interface GameSave {
   marks: number[];
@@ -26,6 +26,14 @@ export interface Save {
   games: Record<string, GameSave>;
   seenRules: boolean;
   money: MoneyState;
+  /** anonymous usage numbers: the switch, and a random id that names nobody */
+  stats: { on: boolean; id: string };
+}
+
+function randomId(): string {
+  let out = '';
+  for (let i = 0; i < 32; i++) out += Math.floor(Math.random() * 16).toString(16);
+  return out;
 }
 
 export function freshSave(now: number = Date.now()): Save {
@@ -37,6 +45,7 @@ export function freshSave(now: number = Date.now()): Save {
     games: {},
     seenRules: false,
     money: { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: now },
+    stats: { on: true, id: randomId() },
   };
 }
 
@@ -48,7 +57,7 @@ function isObject(x: unknown): x is Record<string, unknown> {
 export function migrate(raw: unknown, now: number = Date.now()): Save {
   const base = freshSave(now);
   if (!isObject(raw)) return base;
-  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] } };
+  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats } };
   if (isObject(raw.settings)) {
     const s = raw.settings;
     if (s.theme === 'system' || s.theme === 'light' || s.theme === 'dark') out.settings.theme = s.theme;
@@ -80,6 +89,10 @@ export function migrate(raw: unknown, now: number = Date.now()): Save {
     if (Array.isArray(m.unlockedDays)) out.money.unlockedDays = m.unlockedDays.filter((d): d is string => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d));
     if (typeof m.lastAdAt === 'number' && m.lastAdAt >= 0) out.money.lastAdAt = m.lastAdAt;
     if (typeof m.firstOpenAt === 'number' && m.firstOpenAt > 0) out.money.firstOpenAt = m.firstOpenAt;
+  }
+  if (isObject(raw.stats)) {
+    if (typeof raw.stats.on === 'boolean') out.stats.on = raw.stats.on;
+    if (typeof raw.stats.id === 'string' && /^[0-9a-f]{32}$/.test(raw.stats.id)) out.stats.id = raw.stats.id;
   }
   out.schema = SCHEMA;
   return out;

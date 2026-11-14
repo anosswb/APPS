@@ -28,12 +28,14 @@ interface Props {
   nextLabel?: string;
   onKeep: (game: GameSave) => void;
   onSolved: (ms: number, hints: number) => void;
+  /** for the anonymous numbers: which kind of hint was shown */
+  onHint?: (kind: string, what?: string) => void;
   onNext?: () => void;
   onExit: () => void;
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, onKeep, onSolved, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, onKeep, onSolved, onHint: reportHint, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -137,10 +139,11 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     if (solved) return;
     const h = getHint(puzzle, marks);
     setHint(h);
+    reportHint?.(h.kind, h.kind === 'step' ? h.step.technique : h.kind === 'mistake' ? h.reason : undefined);
     const count = hints + 1;
     setHints(count);
     onKeep({ marks, ms: elapsed(), hints: count });
-  }, [elapsed, hints, marks, onKeep, puzzle, solved]);
+  }, [elapsed, hints, marks, onKeep, puzzle, reportHint, solved]);
 
   const applyHint = useCallback(() => {
     if (!hint) return;

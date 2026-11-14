@@ -141,10 +141,14 @@ export const t = {
     on: 'On',
     off: 'Off',
     privacy: 'Privacy',
-    privacyText: (name: string, hasAds: boolean) =>
-      hasAds
-        ? `Your puzzles and progress stay on this phone, and ${name} needs no account. The ads are served by Google, which uses this phone's advertising ID to choose them. ${name} itself collects nothing.`
-        : `Your puzzles and progress stay on this phone. ${name} collects nothing and needs no account.`,
+    privacyText: (name: string, hasAds: boolean, hasStats: boolean) => {
+      const own = hasStats
+        ? `${name} counts a few things without knowing who you are (puzzles started and solved, hints used), so we can see what to improve. Nothing you could be recognized by is sent.`
+        : `${name} itself collects nothing.`;
+      const adLine = hasAds ? " The ads are served by Google, which uses this phone's advertising ID to choose them." : '';
+      return `Your puzzles and progress stay on this phone, and ${name} needs no account. ${own}${adLine}`;
+    },
+    stats: 'Share anonymous numbers',
     adChoices: 'Ad privacy choices',
     credits: 'Credits',
     creditsText: 'Type: Newsreader and Libre Franklin, used under the SIL Open Font License. Built with Expo and React Native (MIT License). The drawings, sounds and puzzles are our own.',

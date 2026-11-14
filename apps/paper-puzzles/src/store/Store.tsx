@@ -19,6 +19,7 @@ interface StoreApi {
   unlockDay: (key: string) => void;
   setFullEdition: (owned: boolean) => void;
   markAdShown: (now: number) => void;
+  setStatsOn: (on: boolean) => void;
 }
 
 const Ctx = createContext<StoreApi | null>(null);
@@ -105,12 +106,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setSave((s) => (s.money.fullEdition === owned ? s : { ...s, money: { ...s.money, fullEdition: owned } }));
   }, []);
 
+  const setStatsOn = useCallback((on: boolean) => {
+    setSave((s) => ({ ...s, stats: { ...s.stats, on } }));
+  }, []);
+
   const markAdShown = useCallback((now: number) => {
     setSave((s) => ({ ...s, money: { ...s.money, lastAdAt: now } }));
   }, []);
 
   return (
-    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn }}>{children}</Ctx.Provider>
   );
 }
 
