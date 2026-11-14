@@ -1,5 +1,11 @@
 # PROGRESS.md
 
+## Where things stand (14 Nov 2026, evening) — read this first
+- **Paper Pines** (`apps/paper-puzzles/`): runs on Anass's phone and he likes it ("a good game, I love it"). It has: the daily puzzle, the puzzle book with difficulty that adapts both ways, two challenge modes that can be lost (clock, limited ink), personal bests, compliments, a daily reminder, soft sounds, test ads that work. Test builds come from GitHub (`apps/paper-puzzles/docs/builds.md`). Next: his feedback on the latest build, then the store work. Details: its `PROGRESS.md`.
+- **Shift app** (`apps/shift-app/`): research, brief and a grey box with tested rules. Anass saw the grey box and gave the real requirements (irregular work and rest days, his own overtime percentages, wake-up alarm, day and food planning, a lively modern look). They are in `apps/shift-app/docs/brief.md`. Next: the look (three directions as pictures), then the real first screen. Details: its `PROGRESS.md`.
+- **Dock load:** checked and parked (the block-puzzle store is full). The two reports stay in `research/ideas/`.
+- **How Anass works:** one session per app. Short, simple English. Show pictures. He decides fast and wants things built, not discussed.
+
 ## Done
 - 2026-11-13: repo created. Playbook (14 pages), research file, roadmap, tools, starter template, skills and agents.
 - 2026-11-13: `CHEATSHEET.md` (15 steps from "make me an app" to the stores, with `/make-app`) and `IDEAS.md` with 20 apps (scores are guesses).
@@ -13,8 +19,8 @@
 - 2026-11-14: Paper Pines got past puzzles (calendar), settings, sound and a bottom tool bar. Details in `apps/paper-puzzles/PROGRESS.md`.
 
 ## Next
-1. Anass tries Paper Pines and says what feels wrong (look, name, feel).
-2. Continue Paper Pines from `apps/paper-puzzles/PROGRESS.md`.
+1. Paper Pines: Anass's feedback on the latest test build; then name check, AdMob IDs, store listing (`apps/paper-puzzles/PROGRESS.md`).
+2. Shift app: the look, then the first real screen (`apps/shift-app/PROGRESS.md`).
 3. Anass starts the Android tester group (15–20 people).
 4. `/score-idea` on the next two ideas Anass picks from `IDEAS.md`.
 

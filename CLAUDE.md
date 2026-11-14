@@ -36,7 +36,9 @@ Anass. Solo founder in Morocco. Works 12-hour shifts, so his time and energy are
 ## Git (Anass's rule, 13 Nov 2026)
 - **Commits are in Anass's name.** Before the first commit of a session, in this repo: `git config user.name "anosswb"` and `git config user.email "147461163+anosswb@users.noreply.github.com"`.
 - **No AI or tool credit anywhere:** not in commit messages, pull request text or branch names. Write the message as a plain description of the change.
-- Work goes on a branch with a plain name (for example `paper-pines/archive`). Push the branch. **Anass opens and merges the pull request himself.** Never push to `main`, never force-push, never rewrite history that is already on GitHub.
+- Work goes on a branch with a plain name (for example `paper-pines/archive`). Push the branch. Never push to `main` directly, never force-push, never rewrite history that is already on GitHub.
+- **Pull requests (changed by Anass on 14 Nov 2026: "I allow anything you want to do in GitHub, just do it"):** you may open the pull request, merge it once its checks pass, and start the build workflows yourself. In a new session, tell him once that you will do this. Pull request text follows the no-credit rule above.
+- **One session per app (Anass, 14 Nov 2026).** A session works on one app folder only and uses branch names that start with that app's name.
 
 ## When Anass asks for an app
 Follow `CHEATSHEET.md` step by step (`/make-app`). It is the path from the idea to the stores, with the points where you stop and wait for him.

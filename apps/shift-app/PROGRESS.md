@@ -9,11 +9,12 @@ Path: `CHEATSHEET.md` at the repo root. Second app of the factory, picked by Ana
 - **Step 5, brief:** `docs/brief.md` (draft; three open questions for Anass).
 - **Step 7, grey box:** the rules (`src/core/`: dates, rotation, 13 ready rotations, pay period, simple overtime) with 15 passing tests, and one plain screen (`App.tsx`): pick a rotation, say where you are today, see today, the pay period, payday, a month; tap a day to change it; saved on the phone. Seen working in a phone-sized browser. No design on purpose.
 
-## Waiting for Anass
-1. Try the grey box with your real roster. Is it faster than the paper? What is missing at 5 am?
-2. Answer the three open questions in `docs/brief.md`.
+## Anass's answer (14 Nov 2026)
+He saw the grey box. The plain look shocked him until he understood it was a test with no design. His real requirements are in `docs/brief.md` ("What Anass said"): irregular work and rest days with no pattern, his own overtime percentages, daily reminder and motivation, a wake-up alarm button, day and food planning, help with what blue-collar workers suffer from, and a lively modern look.
 
 ## Next (in order)
+0. **Rewrite "Version 1 does" in the brief from his requirements, then step 6, the look:** three directions as pictures of the main screen (`/app-world`). Alive, modern, nothing like Paper Pines. He picks. Then the first real screen.
+0b. Engine work his requirements need: a mode with no rotation (days marked one by one, rest days first), and overtime rules with the user's own percentages (`src/core/pay.ts` has only the fixed federal rule today).
 1. His answers → fix the brief.
 2. Name: 5 candidates, check stores, trademark, domain (needs a session that can open the stores).
 3. Step 6, the look: three directions as pictures (`/app-world`). Nothing from Paper Pines.
