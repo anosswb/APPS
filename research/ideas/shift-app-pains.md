@@ -14,3 +14,21 @@ Asked by Anass ("see Reddit what people in blue collar suffer the most"). Done b
 
 **Best fits for this app:** last-minute changes, the short paycheck, rest and family time.
 **To do when Reddit can be opened, or by asking 10 US workers:** confirm the ranking with their own words before building more.
+
+## Second look: which features next (15 Nov 2026, helper agent on the stronger model)
+**Same limit:** Reddit and the app stores could not be opened. All of this is from search snippets (some are summaries of reviews), so every rank is medium confidence at best.
+
+| # | Feature | Why (search snippet) | Evidence | Size | Free or paid idea |
+|---|---|---|---|---|---|
+| 1 | Night, weekend and holiday extra pay rules | Dock workers asking for "OT rates, pay differentials and weekends/holiday premiums"; a timesheet app reviewed as not supporting shift differential | medium | medium | paid |
+| 2 | Paycheck check: set the pay period, type what the pay stub says, see the gap | Guides on hours lost to rounding and missed clock-ins; paid apps already sell this | medium | small–medium | paid |
+| 3 | Home-screen widget: time left, next shift, days off | A shift app reviewed as having no widget | medium | medium | free |
+| 4 | Several jobs or sites, each with its own rate | "different terminals = different hours" | medium | medium | paid |
+| 5 | Unpaid lunch taken off automatically, with a note when you worked through it | Logged hours and paycheck do not match when lunch is auto-deducted | medium | small | free |
+| 6 | Share the schedule as a picture or calendar file | Other apps sell sending shifts "as an image" | medium | small | free |
+| 7 | Export and backup to a file (CSV, PDF timesheet) | An hours app reviewed as exporting "so badly" | medium | small | PDF paid |
+| 8 | Days off (PTO) and attendance points counter | A plant where refusing overtime earned a point | weak | small | free |
+| 9 | Overtime call log (when you were told) | Same story; the need itself is a guess | weak | small | free |
+
+**Build next (helper's pick):** 1, 2, 3. **Avoid:** take-home pay after tax (wrong easily, close to a financial claim); sleep coaching or "safe to drive" alerts (medical); truckers' legal driving-hours logs (regulated).
+One number: about 15% of US workers do shift work (CDC, search snippet).

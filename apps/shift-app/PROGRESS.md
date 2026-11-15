@@ -37,6 +37,14 @@ He said: write the tap rule; My numbers did not change the app; "just a calendar
 - Pains research saved: `research/ideas/shift-app-pains.md` (thin: Reddit blocked).
 - Seen working in a phone-sized browser in both modes (`docs/looks/real-screens.png`). 30 tests pass. Second APK built from `main`.
 
+## Done (15 Nov 2026, later) — after he tried the second APK
+- Look, third pass (calm blue/black/green, glass panels, dot calendar): `docs/world.md`, `src/theme/tokens.ts`, `src/ui/Bits.tsx`. `/slop-check` and `/dataviz` were run.
+- "My day stays constant" fixed for good (`planOf`).
+- Pay = daily clock-in/clock-out log with each day's pay, week on top, month under, a small hours chart, week arrows (`src/screens/Pay.tsx`, `payPlan` in `src/store.ts`).
+- Welcome page (`src/screens/Welcome.tsx`).
+- Feature research by a helper: `research/ideas/shift-app-pains.md` (second table). Its top three: extra pay rules for nights and holidays, a paycheck check against the pay stub, a home-screen widget. **Anass has not chosen yet.**
+- Seen working in a phone-sized browser, both modes (`docs/looks/real-screens.png`). 30 tests pass. No tests yet for `src/store.ts` (`planOf`, `payPlan`).
+
 ## Not done on these screens yet (be honest in the next session)
 `/slop-check` not run · night shifts: the "now" line does not follow a shift that started yesterday · pay period and payday not on the Pay tab (week and month only) · "days I mark" pay rule has no screen · no change note on a day · no share-the-month picture · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
 

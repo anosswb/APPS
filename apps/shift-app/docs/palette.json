@@ -1,24 +1,24 @@
 {
-  "_note": "Shift app palette, for tools/contrast.py. Mirrors src/theme/tokens.ts. accent is checked as a fill (onPrimary on primary); accentText is the accent as text on the background.",
+  "_note": "Shift app palette, for tools/contrast.py. Mirrors src/theme/tokens.ts (solid colours; glass panels are checked as their nearest solid). primary = the pill button, accent = the blue.",
   "worlds": {
     "shift-daybreak": {
       "light": {
-        "bg": "#EEEFF2",
+        "bg": "#E9ECF1",
         "surface": "#FFFFFF",
-        "text": "#12151A",
-        "muted": "#5A6370",
-        "primary": "#8F5200",
+        "text": "#0E1013",
+        "muted": "#5D6470",
+        "primary": "#0E1013",
         "onPrimary": "#FFFFFF",
-        "accent": "#8F5200"
+        "accent": "#2458E6"
       },
       "dark": {
-        "bg": "#0C0E12",
-        "surface": "#161A20",
-        "text": "#F2EEE6",
-        "muted": "#8B93A1",
-        "primary": "#F5B14C",
-        "onPrimary": "#1A1003",
-        "accent": "#F5B14C"
+        "bg": "#0A0B0D",
+        "surface": "#1B1D21",
+        "text": "#F5F6F7",
+        "muted": "#8A909B",
+        "primary": "#F5F6F7",
+        "onPrimary": "#0A0B0D",
+        "accent": "#4C82F7"
       }
     }
   }
