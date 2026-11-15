@@ -10,16 +10,18 @@ import { InstrumentSans_700Bold } from '@expo-google-fonts/instrument-sans/700Bo
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { AppState, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppState, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { todayKey } from './src/core/dates';
 import { Day, markDay } from './src/core/days';
 import { t } from './src/i18n/en';
 import { Calendar } from './src/screens/Calendar';
 import { MyDay } from './src/screens/MyDay';
+import { Pay } from './src/screens/Pay';
 import { Today } from './src/screens/Today';
 import { load, save, Saved } from './src/store';
-import { color, font, size, space, type } from './src/theme/tokens';
+import { font, size, space, themes, type } from './src/theme/tokens';
+import { ThemeProvider } from './src/theme/useTheme';
 import { Icon, IconName } from './src/ui/Icon';
 
 type Tab = 'today' | 'calendar' | 'myDay' | 'pay';
@@ -27,6 +29,7 @@ const TABS: [Tab, IconName][] = [['today', 'home'], ['calendar', 'calendar'], ['
 
 function Shell() {
   const insets = useSafeAreaInsets();
+  const phone = useColorScheme();
   const [data, setData] = useState<Saved | null>(null);
   const [tab, setTab] = useState<Tab>('today');
   const [now, setNow] = useState(() => new Date());
@@ -39,7 +42,8 @@ function Shell() {
     return () => { clearInterval(id); sub.remove(); };
   }, []);
 
-  if (!data) return <View style={st.fill} />;
+  const c = themes[(data?.look ?? 'auto') === 'auto' ? (phone === 'light' ? 'light' : 'dark') : data!.look === 'light' ? 'light' : 'dark'];
+  if (!data) return <View style={[st.fill, { backgroundColor: c.bg }]} />;
   const today = todayKey(now);
   const change = (next: Saved) => { setData(next); save(next); };
   // One tap moves a day along: not known yet → work → rest → not known yet.
@@ -50,45 +54,36 @@ function Shell() {
   };
 
   return (
-    <View style={st.fill}>
-      <StatusBar style="light" />
-      <View style={st.fill}>
-        {tab === 'today' && <Today data={data} today={today} now={now} top={insets.top} onCycle={cycle} />}
-        {tab === 'calendar' && <Calendar data={data} today={today} top={insets.top} onCycle={cycle} />}
-        {tab === 'myDay' && <MyDay data={data} today={today} now={now} top={insets.top} onChange={change} />}
-        {tab === 'pay' && (
-          <View style={[st.pay, { paddingTop: insets.top + space.m }]}>
-            <Text style={st.title}>{t.pay.title}</Text>
-            <Text style={st.soon}>{t.pay.soon}</Text>
-            <Text style={st.body}>{t.pay.what}</Text>
-          </View>
-        )}
+    <ThemeProvider theme={c}>
+      <View style={[st.fill, { backgroundColor: c.bg }]}>
+        <StatusBar style={tab === 'today' || c.dark ? 'light' : 'dark'} />
+        <View style={st.fill}>
+          {tab === 'today' && <Today data={data} today={today} now={now} top={insets.top} onCycle={cycle} />}
+          {tab === 'calendar' && <Calendar data={data} today={today} top={insets.top} onCycle={cycle} />}
+          {tab === 'myDay' && <MyDay data={data} today={today} now={now} top={insets.top} onChange={change} />}
+          {tab === 'pay' && <Pay data={data} today={today} top={insets.top} onChange={change} />}
+        </View>
+        <View style={[st.nav, { backgroundColor: c.bg, borderTopColor: c.line, paddingBottom: Math.max(insets.bottom, space.s) }]}>
+          {TABS.map(([id, icon]) => (
+            <Pressable key={id} onPress={() => setTab(id)} accessibilityRole="tab" accessibilityState={{ selected: tab === id }} accessibilityLabel={t.tabs[id]} style={st.tab}>
+              <Icon name={icon} color={tab === id ? c.accentText : c.muted} />
+              <Text style={[st.tabText, { color: tab === id ? c.accentText : c.muted }]}>{t.tabs[id]}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
-      <View style={[st.nav, { paddingBottom: Math.max(insets.bottom, space.s) }]}>
-        {TABS.map(([id, icon]) => (
-          <Pressable key={id} onPress={() => setTab(id)} accessibilityRole="tab" accessibilityState={{ selected: tab === id }} accessibilityLabel={t.tabs[id]} style={st.tab}>
-            <Icon name={icon} color={tab === id ? color.sun : color.muted} />
-            <Text style={[st.tabText, tab === id && st.on]}>{t.tabs[id]}</Text>
-          </Pressable>
-        ))}
-      </View>
-    </View>
+    </ThemeProvider>
   );
 }
 
 export default function App() {
   const [ready] = useFonts({ BricolageGrotesque_700Bold, BricolageGrotesque_800ExtraBold, InstrumentSans_500Medium, InstrumentSans_600SemiBold, InstrumentSans_700Bold });
-  return <SafeAreaProvider>{ready ? <Shell /> : <View style={st.fill} />}</SafeAreaProvider>;
+  return <SafeAreaProvider>{ready ? <Shell /> : <View style={[st.fill, { backgroundColor: themes.dark.bg }]} />}</SafeAreaProvider>;
 }
 
 const st = StyleSheet.create({
-  fill: { flex: 1, backgroundColor: color.bg },
-  nav: { flexDirection: 'row', backgroundColor: color.bg, borderTopWidth: 1, borderTopColor: color.line },
+  fill: { flex: 1 },
+  nav: { flexDirection: 'row', borderTopWidth: 1 },
   tab: { flex: 1, height: size.nav, alignItems: 'center', justifyContent: 'center', gap: space.xs },
-  tabText: { fontFamily: font.textBold, fontSize: type.small.size - 1, color: color.muted },
-  on: { color: color.sun },
-  pay: { flex: 1, paddingHorizontal: space.l, gap: space.m },
-  title: { fontFamily: font.display, fontSize: type.title.size, letterSpacing: type.title.tracking, color: color.text },
-  soon: { fontFamily: font.number, fontSize: type.number.size, color: color.sun },
-  body: { fontFamily: font.text, fontSize: type.body.size, lineHeight: type.body.line, color: color.textSoft },
+  tabText: { fontFamily: font.textBold, fontSize: type.caps.size },
 });

@@ -29,8 +29,16 @@ He saw the grey box. The plain look shocked him until he understood it was a tes
 - **Real screens built** (the grey box is gone from `App.tsx`): Today (rest count, week strip, alarm button that opens the Android clock), Calendar (month, tap to mark), My day (ring, day line, "My numbers"), Pay (a note only). Saved on the phone with a schema version (`src/store.ts`). Seen working in a phone-sized browser (`npx expo export --platform web`). 30 tests pass.
 - **Android test build workflow:** `.github/workflows/shift-app-test-build.yml`, how to use it in `docs/builds.md`.
 
+## Done (15 Nov 2026) — after he tried the first APK
+He said: write the tap rule; My numbers did not change the app; "just a calendar that looks like shit"; add real help from what blue-collar workers suffer from; premium, manly look with light and dark mode.
+- Tap rule on Today and Calendar. Shift-change bug fixed (`MyDay.tsx`).
+- Look pass two: themes `dark` and `light` in `src/theme/tokens.ts`, `useTheme`, follows the phone or his choice (My day → Look). Solid day blocks, panels, small capital labels.
+- Today got a "now" line (clock in / time left with a bar / shift done, sleep by). Pay is a real tab (rate, three overtime numbers, week and month estimate, "estimate" label).
+- Pains research saved: `research/ideas/shift-app-pains.md` (thin: Reddit blocked).
+- Seen working in a phone-sized browser in both modes (`docs/looks/real-screens.png`). 30 tests pass. Second APK built from `main`.
+
 ## Not done on these screens yet (be honest in the next session)
-`/slop-check` not run · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
+`/slop-check` not run · night shifts: the "now" line does not follow a shift that started yesterday · pay period and payday not on the Pay tab (week and month only) · "days I mark" pay rule has no screen · no change note on a day · no share-the-month picture · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
 
 ## Next (in order)
 0. After his pick: write `docs/world.md`, the token file, `tools/contrast.py`, the row in `WORLDS.md`, the decision in `DECISIONS.md`. Then the real first screen.
