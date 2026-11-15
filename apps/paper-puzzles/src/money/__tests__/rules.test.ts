@@ -1,4 +1,4 @@
-import { archiveLocked, bookLocked, interstitialDue, MoneyState, oldestFreeDay } from '../rules';
+import { archiveLocked, bookLocked, interstitialDue, MoneyState, oldestFreeDay, puzzlesFinished } from '../rules';
 
 const MIN = 60 * 1000;
 const base: MoneyState = { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: 0 };
@@ -59,7 +59,12 @@ describe('full-screen ads', () => {
     expect(interstitialDue('ads', 20, late, base)).toBe(true);
   });
 
-  test('never before Book puzzle 6 is finished', () => {
+  test('counts finished puzzles across free play, ink and clock', () => {
+    expect(puzzlesFinished({ book: 1, ink: 1, race: 1 })).toBe(0);
+    expect(puzzlesFinished({ book: 1, ink: 5, race: 3 })).toBe(6);
+  });
+
+  test('never before six puzzles are finished', () => {
     expect(interstitialDue('ads', 5, late, base)).toBe(false);
     expect(interstitialDue('ads', 6, late, base)).toBe(true);
   });

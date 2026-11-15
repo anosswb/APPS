@@ -48,6 +48,12 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Praise:** one headline after each solve that names what the player did, in a puzzle editor's voice (ten kinds, two to four wordings each). 97 tests green. Seen in the browser.
 - **Latest test build (14 Nov 2026, evening):** GitHub run 43624193586 on `main`, with everything above. Anass has not reported on this one yet. Not yet tried on his phone: the two challenge modes, personal bests, compliments, the stuck help, the reminder.
 
+## Done (15 Nov 2026, Anass's feedback on run 43624193586: "all good")
+- **Ink is the main game:** the front page leads with "One pot of ink" (big headline, ink pot drawing, the pot as drops, win run). "Beat the clock" second, with a stopwatch drawing. Then today's puzzle. The book is now **Free play** (no clock, no ink limit).
+- **In a challenge:** the pot is a row of drops that empty, the last two in red; the clock is a bar that empties. Seen in the browser, light and dark.
+- **Ads** come after a won ink or clock puzzle too (they only came in the book before). 98 tests green.
+- **Real ads:** waiting for Anass's AdMob IDs (steps in `docs/money.md`).
+
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 

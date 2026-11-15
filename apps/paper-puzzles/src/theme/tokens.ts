@@ -64,7 +64,7 @@ export const font = {
   sansBold: 'LibreFranklin_700Bold',
 } as const;
 
-export const size = { masthead: 44, title: 28, body: 17, label: 12 } as const;
+export const size = { masthead: 44, headline: 38, title: 28, body: 17, label: 12 } as const;
 export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 } as const;
 /** Print has square corners. */
 export const radius = 2;

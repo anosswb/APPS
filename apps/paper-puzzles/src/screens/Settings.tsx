@@ -3,8 +3,9 @@ import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_NAME, APP_VERSION } from '../config/app';
-import { AD_FIRST_BOOK_LEVEL, AD_MIN_GAP_MS, AD_QUIET_START_MS, MONEY_MODE } from '../config/money';
+import { AD_AFTER_PUZZLES, AD_MIN_GAP_MS, AD_QUIET_START_MS, MONEY_MODE } from '../config/money';
 import { ads } from '../money/ads';
+import { puzzlesFinished } from '../money/rules';
 import { ReminderTime } from '../reminder/plan';
 import { reminders } from '../reminder/reminders';
 import { count } from '../stats/stats';
@@ -169,8 +170,8 @@ export function Settings({ onExit, onRules, onLicenses }: { onExit: () => void; 
                 Math.floor((Date.now() - save.money.firstOpenAt) / 60000),
                 AD_QUIET_START_MS / 60000,
                 save.money.lastAdAt ? Math.floor((Date.now() - save.money.lastAdAt) / 60000) : null,
-                save.book.level,
-                AD_FIRST_BOOK_LEVEL,
+                puzzlesFinished({ book: save.book.level, ink: save.challenge.ink.level, race: save.challenge.race.level }),
+                AD_AFTER_PUZZLES,
                 AD_MIN_GAP_MS / 60000,
               )}
             </Type>
