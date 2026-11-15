@@ -1,5 +1,6 @@
 /** My day: the 24 hours around a shift as one ring, then the times as plain lines, then the worker's own numbers. */
-import React from 'react';
+import React, { useState } from 'react';
+import { Platform } from 'react-native';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { weekday } from '../core/dates';
@@ -9,7 +10,8 @@ import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 import { font, radius, size, space, type } from '../theme/tokens';
 import { Look, useTheme } from '../theme/useTheme';
-import { Caps, Glass, Stepper } from '../ui/Bits';
+import { ask } from '../notify';
+import { Caps, Field, Glass, Link, Segment, TimeField, Toggle } from '../ui/Bits';
 
 const R = size.ringR;
 const BOX = 2 * R + size.ring + 8;
@@ -36,14 +38,20 @@ export function MyDay({ data, today, now, top, onChange }: { data: Saved; today:
   const day: WorkDay = isToday ? (todayDay as WorkDay) : next?.day ?? { kind: 'work', start: data.shift.start, end: data.shift.end };
   const d = new Date(today + 'T12:00:00');
   const an = ((now.getHours() * 60 + now.getMinutes()) / 1440) * 2 * Math.PI;
-  const shift = (k: 'start' | 'end', by: number) => onChange({ ...data, shift: { ...data.shift, [k]: wrap(data.shift[k] + by) } });
-  const habit = (k: keyof Habits, by: number, min: number, max: number) => onChange({ ...data, habits: { ...data.habits, [k]: Math.min(max, Math.max(min, data.habits[k] + by)) } });
+  const [blocked, setBlocked] = useState(false);
+  const shift = (k: 'start' | 'end', v: number) => onChange({ ...data, shift: { ...data.shift, [k]: wrap(v) } });
+  const habit = (k: keyof Habits, v: number, min: number) => onChange({ ...data, habits: { ...data.habits, [k]: Math.max(min, v) } });
+  const remind = async (k: 'lunch' | 'twoLeft', on: boolean) => {
+    if (on && !(await ask())) { setBlocked(Platform.OS !== 'web'); if (Platform.OS !== 'web') return; }
+    setBlocked(false);
+    onChange({ ...data, remind: { ...data.remind, [k]: on }, remindAsked: true });
+  };
 
   const line = dayLine(day, data.habits);
   const rows: [number, string, boolean][] = [[line.wake, t.myDay.rows.wake, false], [line.leave, t.myDay.rows.leave, false], [line.clockIn, t.myDay.rows.clockIn, true], [line.eat, t.myDay.rows.eat, false], [line.clockOut, t.myDay.rows.clockOut, true], [line.home, t.myDay.rows.home, false], [line.sleepBy + 1440, t.myDay.rows.sleepBy, false]];
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: space.xl, gap: space.m }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
       <View style={st.head}>
         <Text style={[st.title, { color: c.text }]}>{t.myDay.title}</Text>
         <Text style={[st.date, { color: c.muted }]}>{isToday ? `${t.daysShort[d.getDay()]}, ${t.monthsShort[d.getMonth()]} ${d.getDate()}` : next ? t.myDay.nextShift(t.days[weekday(next.key)]) : t.myDay.usual}</Text>
@@ -73,23 +81,29 @@ export function MyDay({ data, today, now, top, onChange }: { data: Saved; today:
 
       <Glass style={{ paddingVertical: space.m }}>
         <View style={{ marginBottom: space.s }}><Caps>{t.myDay.numbers}</Caps></View>
-        <Stepper label={t.myDay.start} value={clock(data.shift.start).text} onLess={() => shift('start', -30)} onMore={() => shift('start', 30)} />
-        <Stepper label={t.myDay.end} value={clock(data.shift.end).text} onLess={() => shift('end', -30)} onMore={() => shift('end', 30)} />
-        <Stepper label={t.myDay.getReady} value={t.myDay.min(data.habits.getReady)} onLess={() => habit('getReady', -5, 5, 180)} onMore={() => habit('getReady', 5, 5, 180)} />
-        <Stepper label={t.myDay.commute} value={t.myDay.min(data.habits.commute)} onLess={() => habit('commute', -5, 0, 180)} onMore={() => habit('commute', 5, 0, 180)} />
-        <Stepper label={t.myDay.sleep} value={t.myDay.hrs(data.habits.sleep)} onLess={() => habit('sleep', -0.5, 3, 12)} onMore={() => habit('sleep', 0.5, 3, 12)} />
+        <TimeField label={t.myDay.start} value={data.shift.start} onChange={(v) => shift('start', v)} />
+        <TimeField label={t.myDay.end} value={data.shift.end} onChange={(v) => shift('end', v)} />
+        <Field label={t.myDay.getReady} value={data.habits.getReady} onChange={(v) => habit('getReady', v, 0)} suffix="min" decimals={false} max={300} />
+        <Field label={t.myDay.commute} value={data.habits.commute} onChange={(v) => habit('commute', v, 0)} suffix="min" decimals={false} max={300} />
+        <Field label={t.myDay.sleep} value={data.habits.sleep} onChange={(v) => habit('sleep', v, 0)} suffix="h" max={14} />
+      </Glass>
+
+      <Glass style={{ paddingVertical: space.m }}>
+        <Caps>{t.myDay.reminders}</Caps>
+        <Toggle label={t.myDay.lunch} sub={t.myDay.lunchSub} icon="utensils" on={data.remind.lunch} onChange={(on) => remind('lunch', on)} />
+        <Toggle label={t.myDay.twoLeft} sub={t.myDay.twoLeftSub} icon="hourglass" on={data.remind.twoLeft} onChange={(on) => remind('twoLeft', on)} />
+        {blocked && <Text style={[st.what, { color: c.textSoft, marginTop: space.s }]}>{t.myDay.blocked}</Text>}
+      </Glass>
+
+      <Glass style={{ paddingVertical: space.m, gap: space.s }}>
+        <Caps>{t.myDay.widget}</Caps>
+        <Text style={[st.what, { color: c.textSoft }]}>{t.myDay.widgetHow}</Text>
       </Glass>
 
       <Glass style={{ paddingVertical: space.m, gap: space.s }}>
         <Caps>{t.myDay.look}</Caps>
-        <View style={[st.seg, { backgroundColor: c.track }]}>
-          {LOOKS.map((l) => (
-            <Pressable key={l} onPress={() => onChange({ ...data, look: l })} accessibilityRole="button" accessibilityState={{ selected: data.look === l }} style={[st.segBtn, data.look === l && { backgroundColor: c.raised }]}>
-              <Text style={[st.segText, { color: data.look === l ? c.text : c.muted }]}>{t.myDay.looks[l]}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <Pressable onPress={() => onChange({ ...data, welcomed: false })} accessibilityRole="button" style={st.link}><Text style={[st.linkText, { color: c.blue }]}>{t.myDay.guide}</Text></Pressable>
+        <Segment options={LOOKS.map((l) => [l, t.myDay.looks[l]] as [Look, string])} value={data.look} onChange={(l) => onChange({ ...data, look: l })} />
+        <Link label={t.myDay.guide} onPress={() => onChange({ ...data, welcomed: false })} />
       </Glass>
     </ScrollView>
   );

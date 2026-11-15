@@ -21,7 +21,9 @@ export type RuleWhen =
   /** every hour on this weekday (0 = Sunday … 6 = Saturday) */
   | { type: 'weekday'; day: number }
   /** every hour on a day the worker marked by hand ("holiday", "night", "call-in") */
-  | { type: 'mark'; mark: string };
+  | { type: 'mark'; mark: string }
+  /** every hour whose clock time is inside a window, minutes after midnight (22:00 → 06:00 crosses midnight) */
+  | { type: 'clock'; from: number; to: number };
 
 export interface PayRule {
   id: string;
@@ -96,6 +98,12 @@ export function payByRules(plan: Plan, rules: PayRule[], o: PayOptions, start: s
             const at = r.when.hours - weekSoFar;
             if (at > 0 && at < h) cuts.add(at);
           }
+          if (r.when.type === 'clock') {
+            // Where the window opens and closes, in hours after the shift started (a long shift can meet them twice).
+            for (const b of [r.when.from, r.when.to]) {
+              for (let at = ((((b - day.start) % 1440) + 1440) % 1440) / 60; at < h; at += 24) if (at > 0) cuts.add(at);
+            }
+          }
         }
         const points = [...cuts].sort((a, b) => a - b);
         for (let i = 0; i + 1 < points.length; i++) {
@@ -106,6 +114,10 @@ export function payByRules(plan: Plan, rules: PayRule[], o: PayOptions, start: s
             if (w.type === 'dayOver') return from >= w.hours;
             if (w.type === 'weekOver') return weekSoFar + from >= w.hours;
             if (w.type === 'weekday') return weekday(key) === w.day;
+            if (w.type === 'clock') {
+              const t = (((day.start + Math.round(from * 60)) % 1440) + 1440) % 1440;
+              return w.from === w.to ? false : w.from < w.to ? t >= w.from && t < w.to : t >= w.from || t < w.to;
+            }
             return (day.marks ?? []).includes(w.mark);
           });
           const len = points[i + 1] - from;

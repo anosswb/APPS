@@ -10,10 +10,11 @@ import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 import { font, onSky, radius, size, skyStops, space, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
-import { Caps, Glass, Pill } from '../ui/Bits';
+import { ask } from '../notify';
+import { Caps, Glass, GlassPill, Link } from '../ui/Bits';
 import { DayCell } from '../ui/DayCell';
 
-export function Today({ data, today, now, top, onCycle }: { data: Saved; today: string; now: Date; top: number; onCycle: (key: string) => void }) {
+export function Today({ data, today, now, top, onCycle, onChange }: { data: Saved; today: string; now: Date; top: number; onCycle: (key: string) => void; onChange: (next: Saved) => void }) {
   const c = useTheme();
   const { height } = useWindowDimensions();
   const plan = planOf(data);
@@ -57,7 +58,8 @@ export function Today({ data, today, now, top, onCycle }: { data: Saved; today: 
   const alarmToday = !!line && line.wake >= 0 && minutes < line.wake;
   const alarmDay: Day | null = alarmToday ? todayDay : work?.day ?? null;
   const wake = alarmDay?.kind === 'work' ? clock(dayLine(alarmDay, data.habits).wake) : null;
-  const alarmName = t.today.alarm(alarmToday ? "today's" : work ? `${t.days[weekday(work.key)]}'s` : '');
+  const alarmName = t.today.setAlarm;
+  const alarmDayShort = alarmToday ? t.today.title : work ? t.daysShort[weekday(work.key)] : '';
 
   const setAlarm = async () => {
     if (!wake) return;
@@ -74,9 +76,9 @@ export function Today({ data, today, now, top, onCycle }: { data: Saved; today: 
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <LinearGradient colors={[colors[0], colors[1], colors[2], colors[3]]} locations={[...skyStops]} style={[st.sky, { height: Math.round(height * size.skyPart) }]} />
-      <ScrollView bounces={false} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
+    <View style={{ flex: 1 }}>
+      <LinearGradient colors={[colors[0], colors[1], colors[2], c.dark ? 'rgba(10,15,21,0)' : 'rgba(226,232,240,0)']} locations={[...skyStops]} style={[st.sky, { height: Math.round(height * size.skyPart) }]} />
+      <ScrollView bounces={false} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
         <View style={st.head}>
           <View style={{ flex: 1 }}>
             <Text style={st.title}>{t.today.title}</Text>
@@ -98,7 +100,7 @@ export function Today({ data, today, now, top, onCycle }: { data: Saved; today: 
             </View>
             {bar >= 0 && <View style={[st.track, { backgroundColor: c.track }]}><View style={[st.fill, { backgroundColor: c.blue, width: `${Math.round(bar * 100)}%` }]} /></View>}
           </View>
-          {wake && <Pill icon="alarm" label={alarmName} right={wake.text} onPress={setAlarm} />}
+          {wake && <GlassPill icon="alarm" tone="blue" label={alarmName} right={`${alarmDayShort} ${wake.text}`} onPress={setAlarm} />}
         </Glass>
 
         <Glass style={{ gap: space.s, paddingHorizontal: space.s }}>
@@ -118,6 +120,16 @@ export function Today({ data, today, now, top, onCycle }: { data: Saved; today: 
           </View>
           <Text style={[st.hint, { color: c.textSoft }]}>{t.tapHint}</Text>
         </Glass>
+
+        {!data.remindAsked && Object.values(data.book).some((d) => d.kind === 'work') && (
+          <Glass style={{ gap: space.s }}>
+            <Text style={[st.nowLeft, { color: c.text }]}>{t.notes.offer}</Text>
+            <View style={st.offer}>
+              <Link label={t.notes.noThanks} muted onPress={() => onChange({ ...data, remindAsked: true })} />
+              <GlassPill icon="bell" label={t.notes.turnOn} onPress={async () => { const ok = await ask(); onChange({ ...data, remindAsked: true, remind: ok ? { lunch: true, twoLeft: true } : data.remind }); }} />
+            </View>
+          </Glass>
+        )}
       </ScrollView>
     </View>
   );
@@ -144,5 +156,6 @@ const st = StyleSheet.create({
   dot: { width: size.dot, height: size.dot, borderRadius: size.dot / 2 },
   restDot: { width: size.dot * 2.6 },
   strip: { flexDirection: 'row', gap: 2 },
+  offer: { gap: space.s },
   hint: { fontFamily: font.text, fontSize: type.small.size, textAlign: 'center' },
 });

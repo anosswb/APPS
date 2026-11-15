@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { t } from '../i18n/en';
 import { font, onSky, size, skyStops, space, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
-import { Glass, Pill } from '../ui/Bits';
+import { Glass, GlassPill } from '../ui/Bits';
 import { Icon } from '../ui/Icon';
 
 export function Welcome({ top, bottom, onStart }: { top: number; bottom: number; onStart: () => void }) {
@@ -13,7 +13,7 @@ export function Welcome({ top, bottom, onStart }: { top: number; bottom: number;
   const s = c.sky.dawn;
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <LinearGradient colors={[s[0], s[1], s[2], s[3]]} locations={[...skyStops]} style={[st.sky, { height: size.sky + top }]} />
+      <LinearGradient colors={[s[0], s[1], s[2], c.dark ? 'rgba(10,15,21,0)' : 'rgba(226,232,240,0)']} locations={[...skyStops]} style={[st.sky, { height: size.sky + top }]} />
       <ScrollView contentContainerStyle={{ paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
         <View style={{ paddingHorizontal: space.s, gap: space.s, marginBottom: space.s }}>
           <Text style={st.title}>{t.welcome.title}</Text>
@@ -32,7 +32,7 @@ export function Welcome({ top, bottom, onStart }: { top: number; bottom: number;
         </Glass>
       </ScrollView>
       <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
-        <Pill label={t.welcome.start} onPress={onStart} />
+        <GlassPill icon="right" label={t.welcome.start} onPress={onStart} />
       </View>
     </View>
   );

@@ -1,15 +1,14 @@
 /** Calendar: the whole month in one glass panel. Tap a day to change it. */
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { monthWeeks, weekday } from '../core/dates';
 import { dayOn } from '../core/days';
 import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 import { font, size, space, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
-import { Glass } from '../ui/Bits';
+import { Glass, GlassButton } from '../ui/Bits';
 import { DayCell } from '../ui/DayCell';
-import { Icon } from '../ui/Icon';
 
 export function Calendar({ data, today, top, onCycle }: { data: Saved; today: string; top: number; onCycle: (key: string) => void }) {
   const c = useTheme();
@@ -24,14 +23,14 @@ export function Calendar({ data, today, top, onCycle }: { data: Saved; today: st
     <View style={st.sum} key={label}>{dot && <View style={[st.dot, { backgroundColor: dot }]} />}<Text style={[st.sumText, { color: c.textSoft }]}>{label}</Text></View>
   );
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: c.bg }} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
       <View style={st.head}>
         <View style={{ flex: 1 }}>
           <Text style={[st.title, { color: c.text }]}>{t.months[ym.m - 1]}</Text>
           <Text style={[st.year, { color: c.muted }]}>{ym.y}</Text>
         </View>
-        <Pressable onPress={() => move(-1)} accessibilityRole="button" accessibilityLabel={t.cal.prev} style={[st.nav, { backgroundColor: c.card, borderColor: c.cardLine }]}><Icon name="left" color={c.text} /></Pressable>
-        <Pressable onPress={() => move(1)} accessibilityRole="button" accessibilityLabel={t.cal.next} style={[st.nav, { backgroundColor: c.card, borderColor: c.cardLine }]}><Icon name="right" color={c.text} /></Pressable>
+        <GlassButton icon="left" label={t.cal.prev} onPress={() => move(-1)} />
+        <GlassButton icon="right" label={t.cal.next} onPress={() => move(1)} />
       </View>
       <Glass style={{ paddingHorizontal: space.s, gap: 2 }}>
         <View style={st.week}>{t.daysLetter.map((l, i) => <Text key={i} style={[st.letter, { color: c.muted }]}>{l}</Text>)}</View>

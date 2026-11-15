@@ -27,6 +27,10 @@ export interface Theme {
   green: string;
   sleep: string;
   track: string;
+  /** liquid glass: the see-through fill, its edge, the light that sits on its top, and the lit (on) state */
+  glass: { fill: string; edge: string; hi: string; on: string; onEdge: string };
+  /** the quiet gradient behind every screen, so the glass has something to sit on */
+  backdrop: string[];
   /** behind Today, top to bottom, by hour. The last stop is the background. */
   sky: { night: string[]; dawn: string[]; day: string[]; dusk: string[] };
 }
@@ -48,6 +52,8 @@ export const themes: { dark: Theme; light: Theme } = {
     blue: '#4C82F7',
     green: '#27A866',
     sleep: '#3A4670',
+    glass: { fill: 'rgba(255,255,255,0.08)', edge: 'rgba(255,255,255,0.20)', hi: 'rgba(255,255,255,0.18)', on: 'rgba(39,168,102,0.62)', onEdge: 'rgba(150,235,190,0.55)' },
+    backdrop: ['#0F1E30', '#0A0F15', '#08090B'],
     track: '#22252B',
     sky: {
       night: ['#030406', '#0A1230', '#122458', '#0A0B0D'],
@@ -72,6 +78,8 @@ export const themes: { dark: Theme; light: Theme } = {
     blue: '#2458E6',
     green: '#12824A',
     sleep: '#7C8DBE',
+    glass: { fill: 'rgba(255,255,255,0.58)', edge: 'rgba(14,16,19,0.08)', hi: 'rgba(255,255,255,0.85)', on: 'rgba(18,130,74,0.92)', onEdge: 'rgba(255,255,255,0.55)' },
+    backdrop: ['#CFDCEA', '#E2E8F0', '#EDF0F4'],
     track: '#D9DDE4',
     sky: {
       night: ['#1B2A4A', '#3A5488', '#8FA6CC', '#E9ECF1'],
@@ -105,5 +113,5 @@ export const type = {
 
 export const space = { xs: 6, s: 10, m: 16, l: 22, xl: 34 } as const;
 export const radius = { card: 28, inner: 18, pill: 999 } as const;
-export const size = { tap: 50, button: 56, ring: 20, ringR: 100, ringSmall: 58, icon: 22, iconBig: 24, dot: 6, sun: 9, sky: 430, skyPart: 0.62, nav: 62, step: 44, bar: 6, timeCol: 108, valCol: 92, dayPill: 78, chart: 72, chartBar: 18 } as const;
+export const size = { tap: 50, button: 56, ring: 20, ringR: 100, ringSmall: 58, icon: 22, iconBig: 24, dot: 6, sun: 9, sky: 430, skyPart: 0.62, nav: 64, navSpace: 104, glassBtn: 52, glassIcon: 40, step: 44, bar: 6, timeCol: 108, valCol: 92, dayPill: 78, chart: 72, chartBar: 18 } as const;
 export const motion = { quick: 160, soft: 420 } as const;
