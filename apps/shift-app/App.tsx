@@ -19,7 +19,10 @@ import { Calendar } from './src/screens/Calendar';
 import { MyDay } from './src/screens/MyDay';
 import { Pay } from './src/screens/Pay';
 import { Today } from './src/screens/Today';
+import { Quiz, Result } from './src/screens/Onboarding';
+import { Paywall } from './src/screens/Paywall';
 import { Welcome } from './src/screens/Welcome';
+import { SELLS_PLUS } from './src/money/plus';
 import { schedule } from './src/notify';
 import { load, save, Saved } from './src/store';
 import { updateWidget } from './src/widget/sync';
@@ -35,6 +38,8 @@ function Shell() {
   const phone = useColorScheme();
   const [data, setData] = useState<Saved | null>(null);
   const [tab, setTab] = useState<Tab>('today');
+  const [stage, setStage] = useState<'welcome' | 'quiz' | 'result' | 'paywall'>('welcome');
+  const [showPlus, setShowPlus] = useState(false);
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => { load().then(setData); }, []);
@@ -63,11 +68,21 @@ function Shell() {
     change({ ...data, book: markDay(data.book, key, next) });
   };
 
-  if (!data.welcomed) {
+  // First open: welcome, four questions, "here is your setup", then Plus on iPhone (with "Continue free"). Android goes straight in.
+  if (!data.welcomed || showPlus) {
+    const done = (next: Saved) => { setStage('welcome'); change({ ...next, welcomed: true }); };
+    let page: React.ReactNode;
+    if (showPlus) page = <Paywall top={insets.top} bottom={insets.bottom} onBuy={() => { change({ ...data, plus: true }); setShowPlus(false); }} onLater={() => setShowPlus(false)} laterLabel={t.plus.close} />;
+    else if (stage === 'welcome') page = <Welcome top={insets.top} bottom={insets.bottom} onStart={() => setStage('quiz')} />;
+    else if (stage === 'quiz') page = <Quiz data={data} top={insets.top} bottom={insets.bottom} onDone={(next) => { change(next); setStage('result'); }} />;
+    else if (stage === 'result') page = <Result data={data} top={insets.top} bottom={insets.bottom} onNext={() => (SELLS_PLUS ? setStage('paywall') : done(data))} />;
+    else page = <Paywall top={insets.top} bottom={insets.bottom} onBuy={() => done({ ...data, plus: true })} onLater={() => done(data)} />;
     return (
       <ThemeProvider theme={c}>
-        <StatusBar style="light" />
-        <Welcome top={insets.top} bottom={insets.bottom} onStart={() => change({ ...data, welcomed: true })} />
+        <View style={[st.fill, { backgroundColor: c.bg }]}>
+          <StatusBar style="light" />
+          {page}
+        </View>
       </ThemeProvider>
     );
   }
@@ -81,7 +96,7 @@ function Shell() {
           {tab === 'today' && <Today data={data} today={today} now={now} top={insets.top} onCycle={cycle} onChange={change} />}
           {tab === 'calendar' && <Calendar data={data} today={today} top={insets.top} onCycle={cycle} />}
           {tab === 'myDay' && <MyDay data={data} today={today} now={now} top={insets.top} onChange={change} />}
-          {tab === 'pay' && <Pay data={data} today={today} now={now} top={insets.top} onChange={change} />}
+          {tab === 'pay' && <Pay data={data} today={today} now={now} top={insets.top} onChange={change} onPlus={() => setShowPlus(true)} />}
         </View>
         <View style={[st.navWrap, { bottom: Math.max(insets.bottom, space.s) + 4 }]} pointerEvents="box-none">
           <View style={[st.nav, { backgroundColor: c.dark ? 'rgba(22,25,31,0.94)' : 'rgba(255,255,255,0.94)', borderColor: c.glass.edge }]}>

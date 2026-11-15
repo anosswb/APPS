@@ -22,8 +22,12 @@ export interface Saved {
   remind: { lunch: boolean; twoLeft: boolean };
   /** the offer on Today was answered */
   remindAsked: boolean;
-  /** the welcome page was seen */
+  /** the welcome page, the quiz and the last page were seen */
   welcomed: boolean;
+  /** the answers to the first-open questions */
+  profile: { job: string; hours: number; notice: string; pain: string };
+  /** Plus is unlocked (test unlock only until purchases are live) */
+  plus: boolean;
   /** 'auto' follows the phone */
   look: 'auto' | 'light' | 'dark';
   /** the worker's own pay numbers. A percentage of 0 means the rule is off. */
@@ -72,7 +76,7 @@ export function rulesOf(p: PayNumbers): PayRule[] {
   ];
 }
 
-export const FRESH: Saved = { v: SCHEMA, book: {}, habits: DEFAULT_HABITS, shift: { start: 6 * 60, end: 18 * 60 }, look: 'auto', pay: FRESH_PAY, log: {}, stubs: {}, remind: { lunch: false, twoLeft: false }, remindAsked: false, welcomed: false };
+export const FRESH: Saved = { v: SCHEMA, book: {}, habits: DEFAULT_HABITS, shift: { start: 6 * 60, end: 18 * 60 }, look: 'auto', pay: FRESH_PAY, log: {}, stubs: {}, remind: { lunch: false, twoLeft: false }, remindAsked: false, welcomed: false, profile: { job: '', hours: 12, notice: '', pain: '' }, plus: false };
 
 /** Turns anything read from the phone into today's shape. Unknown or broken data starts fresh instead of crashing. */
 export function migrate(raw: unknown): Saved {
@@ -90,6 +94,8 @@ export function migrate(raw: unknown): Saved {
     stubs: r.stubs && typeof r.stubs === 'object' ? r.stubs : {},
     remind: { lunch: r.remind?.lunch === true, twoLeft: r.remind?.twoLeft === true },
     remindAsked: r.remindAsked === true,
+    profile: { ...FRESH.profile, ...(r.profile ?? {}) },
+    plus: r.plus === true,
     welcomed: r.welcomed === true || (!!r.book && Object.keys(r.book).length > 0),
   };
 }

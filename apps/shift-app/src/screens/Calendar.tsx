@@ -7,6 +7,7 @@ import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 import { font, size, space, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
+import { AdSlot } from '../money/AdSlot';
 import { Glass, GlassButton } from '../ui/Bits';
 import { DayCell } from '../ui/DayCell';
 
@@ -48,6 +49,7 @@ export function Calendar({ data, today, top, onCycle }: { data: Saved; today: st
         {sum(null, t.cal.open(keys.length - worked - rested))}
       </View>
       <Text style={[st.hint, { color: c.textSoft }]}>{t.tapHint}</Text>
+      <AdSlot />
     </ScrollView>
   );
 }

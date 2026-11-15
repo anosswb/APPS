@@ -11,6 +11,8 @@ import { t } from '../i18n/en';
 import { LogDay, PayNumbers, payPlan, periodAround, rulesOf, Saved } from '../store';
 import { font, size, space, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
+import { AdSlot } from '../money/AdSlot';
+import { hasPlus, SELLS_PLUS } from '../money/plus';
 import { Caps, Field, Glass, GlassButton, GlassPill, Link, Segment, TimeField, Toggle } from '../ui/Bits';
 
 const money = (n: number) => `$${Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
@@ -18,9 +20,11 @@ const r1 = (n: number) => Math.round(n * 10) / 10;
 const wrap = (m: number) => ((m % 1440) + 1440) % 1440;
 const over = (r: RulePay) => r.lines.filter((l) => l.percent > 0).reduce((s, l) => s + l.hours, 0);
 
-export function Pay({ data, today, now, top, onChange }: { data: Saved; today: string; now: Date; top: number; onChange: (next: Saved) => void }) {
+export function Pay({ data, today, now, top, onChange, onPlus }: { data: Saved; today: string; now: Date; top: number; onChange: (next: Saved) => void; onPlus: () => void }) {
   const c = useTheme();
-  const p = data.pay;
+  const plus = hasPlus(data);
+  // Without Plus the extras are kept but not counted, so nothing is lost when Plus is turned on.
+  const p = plus ? data.pay : { ...data.pay, nightPercent: 0, saturdayPercent: 0, sundayPercent: 0, holidayPercent: 0 };
   const [weekOff, setWeekOff] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
   const [typing, setTyping] = useState<number | null>(null);
@@ -47,7 +51,7 @@ export function Pay({ data, today, now, top, onChange }: { data: Saved; today: s
     if (v) log[key] = v; else delete log[key];
     onChange({ ...data, log });
   };
-  const setPay = (patch: Partial<PayNumbers>) => onChange({ ...data, pay: { ...p, ...patch } });
+  const setPay = (patch: Partial<PayNumbers>) => onChange({ ...data, pay: { ...data.pay, ...patch } });
   const label = (key: string) => `${t.daysShort[weekday(key)]} ${Number(key.slice(8))}`;
   const mon = (key: string) => `${t.monthsShort[Number(key.slice(5, 7)) - 1]} ${Number(key.slice(8))}`;
   const more = (r: RulePay, all: RulePay) => (all.gross !== null && r.gross !== null && all.gross - r.gross > 0.005 ? t.pay.planned(`+${money(all.gross - r.gross)}`) : '');
@@ -174,6 +178,8 @@ export function Pay({ data, today, now, top, onChange }: { data: Saved; today: s
         })}
       </Glass>
 
+      {plus && (
+        <>
       <Glass style={{ gap: space.s }}>
         <View style={st.weekNav}>
           <GlassButton icon="left" label={t.pay.prevPeriod} onPress={() => setStubOff(stubOff - 1)} s={size.glassIcon} />
@@ -192,6 +198,15 @@ export function Pay({ data, today, now, top, onChange }: { data: Saved; today: s
         <Text style={[st.verdict, { color: good ? c.green : c.text }]}>{verdict}</Text>
       </Glass>
 
+        </>
+      )}
+      {!plus && (
+        <Glass style={{ gap: space.s }}>
+          <Caps color={c.green}>{t.plus.locked}</Caps>
+          <Text style={[st.monthLabel, { color: c.text }]}>{t.plus.lockedSub}</Text>
+          <GlassPill icon="receipt" label={t.plus.see} onPress={onPlus} />
+        </Glass>
+      )}
       <Glass style={{ paddingVertical: space.m }}>
         <Caps>{t.pay.mine}</Caps>
         <Field label={t.pay.rate} value={p.rate} onChange={(v) => setPay({ rate: v })} prefix="$" max={1000} />
@@ -199,6 +214,8 @@ export function Pay({ data, today, now, top, onChange }: { data: Saved; today: s
         <Field label={t.pay.otExtra} value={p.dayPercent} onChange={(v) => setPay({ dayPercent: v })} suffix="%" max={500} />
         <Field label={t.pay.weekHours} value={p.weekHours} onChange={(v) => setPay({ weekHours: v })} suffix="h" max={168} />
         <Field label={t.pay.weekPercent} value={p.weekPercent} onChange={(v) => setPay({ weekPercent: v })} suffix="%" max={500} />
+        {plus && (
+          <>
         <View style={{ marginTop: space.l }}><Caps>{t.pay.rules}</Caps></View>
         <Field label={t.pay.nightPct} value={p.nightPercent} onChange={(v) => setPay({ nightPercent: v })} suffix="%" max={500} />
         <TimeField label={t.pay.nightFrom} value={p.nightFrom} onChange={(v) => setPay({ nightFrom: v })} />
@@ -207,13 +224,17 @@ export function Pay({ data, today, now, top, onChange }: { data: Saved; today: s
         <Field label={t.pay.sunday} value={p.sundayPercent} onChange={(v) => setPay({ sundayPercent: v })} suffix="%" max={500} />
         <Field label={t.pay.holidayPct} value={p.holidayPercent} onChange={(v) => setPay({ holidayPercent: v })} suffix="%" max={500} />
         <Text style={[st.small, { color: c.textSoft, marginTop: space.s }]}>{t.pay.highest}</Text>
+          </>
+        )}
         <View style={{ marginTop: space.l, gap: space.s }}>
           <Caps>{t.pay.period}</Caps>
           <Segment options={[[1, t.pay.weekly], [2, t.pay.biweekly]]} value={p.periodWeeks} onChange={(v) => setPay({ periodWeeks: v as 1 | 2 })} />
           {p.periodWeeks === 2 && <Link label={t.pay.movePeriod} onPress={() => setPay({ periodStart: addDays(p.periodStart, 7) })} />}
         </View>
         <Text style={[st.small, { color: c.muted, marginTop: space.m }]}>{t.pay.note}</Text>
+        {SELLS_PLUS && data.plus && <Text style={[st.small, { color: c.green, marginTop: space.s }]}>{t.plus.have}</Text>}
       </Glass>
+      <AdSlot />
     </ScrollView>
   );
 }
