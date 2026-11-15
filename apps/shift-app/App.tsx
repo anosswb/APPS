@@ -2,8 +2,7 @@
  * Shift app. World "Daybreak" (docs/world.md): the sky for Today, the ring on My day. One job per tab.
  * The rules live in src/core (tested). Everything is saved on the phone only.
  */
-import { BricolageGrotesque_700Bold } from '@expo-google-fonts/bricolage-grotesque/700Bold';
-import { BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque/800ExtraBold';
+import { BricolageGrotesque_600SemiBold } from '@expo-google-fonts/bricolage-grotesque/600SemiBold';
 import { InstrumentSans_500Medium } from '@expo-google-fonts/instrument-sans/500Medium';
 import { InstrumentSans_600SemiBold } from '@expo-google-fonts/instrument-sans/600SemiBold';
 import { InstrumentSans_700Bold } from '@expo-google-fonts/instrument-sans/700Bold';
@@ -19,6 +18,7 @@ import { Calendar } from './src/screens/Calendar';
 import { MyDay } from './src/screens/MyDay';
 import { Pay } from './src/screens/Pay';
 import { Today } from './src/screens/Today';
+import { Welcome } from './src/screens/Welcome';
 import { load, save, Saved } from './src/store';
 import { font, size, space, themes, type } from './src/theme/tokens';
 import { ThemeProvider } from './src/theme/useTheme';
@@ -53,6 +53,15 @@ function Shell() {
     change({ ...data, book: markDay(data.book, key, next) });
   };
 
+  if (!data.welcomed) {
+    return (
+      <ThemeProvider theme={c}>
+        <StatusBar style="light" />
+        <Welcome top={insets.top} bottom={insets.bottom} onStart={() => change({ ...data, welcomed: true })} />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={c}>
       <View style={[st.fill, { backgroundColor: c.bg }]}>
@@ -61,13 +70,13 @@ function Shell() {
           {tab === 'today' && <Today data={data} today={today} now={now} top={insets.top} onCycle={cycle} />}
           {tab === 'calendar' && <Calendar data={data} today={today} top={insets.top} onCycle={cycle} />}
           {tab === 'myDay' && <MyDay data={data} today={today} now={now} top={insets.top} onChange={change} />}
-          {tab === 'pay' && <Pay data={data} today={today} top={insets.top} onChange={change} />}
+          {tab === 'pay' && <Pay data={data} today={today} now={now} top={insets.top} onChange={change} />}
         </View>
         <View style={[st.nav, { backgroundColor: c.bg, borderTopColor: c.line, paddingBottom: Math.max(insets.bottom, space.s) }]}>
           {TABS.map(([id, icon]) => (
             <Pressable key={id} onPress={() => setTab(id)} accessibilityRole="tab" accessibilityState={{ selected: tab === id }} accessibilityLabel={t.tabs[id]} style={st.tab}>
-              <Icon name={icon} color={tab === id ? c.accentText : c.muted} />
-              <Text style={[st.tabText, { color: tab === id ? c.accentText : c.muted }]}>{t.tabs[id]}</Text>
+              <Icon name={icon} color={tab === id ? c.text : c.muted} />
+              <Text style={[st.tabText, { color: tab === id ? c.text : c.muted }]}>{t.tabs[id]}</Text>
             </Pressable>
           ))}
         </View>
@@ -77,7 +86,7 @@ function Shell() {
 }
 
 export default function App() {
-  const [ready] = useFonts({ BricolageGrotesque_700Bold, BricolageGrotesque_800ExtraBold, InstrumentSans_500Medium, InstrumentSans_600SemiBold, InstrumentSans_700Bold });
+  const [ready] = useFonts({ BricolageGrotesque_600SemiBold, InstrumentSans_500Medium, InstrumentSans_600SemiBold, InstrumentSans_700Bold });
   return <SafeAreaProvider>{ready ? <Shell /> : <View style={[st.fill, { backgroundColor: themes.dark.bg }]} />}</SafeAreaProvider>;
 }
 

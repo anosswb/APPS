@@ -3,7 +3,7 @@ import React from 'react';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { size } from '../theme/tokens';
 
-export type IconName = 'alarm' | 'calendar' | 'pay' | 'home' | 'day' | 'left' | 'right' | 'minus' | 'plus';
+export type IconName = 'check' | 'alarm' | 'calendar' | 'pay' | 'home' | 'day' | 'left' | 'right' | 'minus' | 'plus';
 
 export function Icon({ name, color, s = size.icon }: { name: IconName; color: string; s?: number }) {
   const p = { stroke: color, strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
@@ -16,6 +16,7 @@ export function Icon({ name, color, s = size.icon }: { name: IconName; color: st
       {name === 'day' && (<><Circle cx="12" cy="12" r="10" {...p} /><Path d="M12 6v6l4 2" {...p} /></>)}
       {name === 'left' && <Path d="m15 18-6-6 6-6" {...p} />}
       {name === 'right' && <Path d="m9 18 6-6-6-6" {...p} />}
+      {name === 'check' && <Path d="M20 6 9 17l-5-5" {...p} />}
       {name === 'minus' && <Path d="M5 12h14" {...p} />}
       {name === 'plus' && <Path d="M5 12h14M12 5v14" {...p} />}
     </Svg>

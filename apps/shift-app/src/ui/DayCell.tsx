@@ -1,30 +1,29 @@
-/** One day: a work day is a solid block, a rest day is the sun colour, a day not known yet is dashed. Tap to change it. */
+/** One day in a week strip or a month: a number with a dot under it. Blue dot = work, green = rest, none = not known. */
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Day } from '../core/days';
 import { t } from '../i18n/en';
-import { font, radius, type } from '../theme/tokens';
+import { font, radius, size, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
 
-export function DayCell({ day, top, bottom, num, isToday, height, onPress, label }: { day: Day | null; top?: string; bottom?: string; num: number; isToday: boolean; height: number; onPress: () => void; label: string }) {
+export function DayCell({ day, top, num, isToday, height, onPress, label }: { day: Day | null; top?: string; num: number; isToday: boolean; height: number; onPress: () => void; label: string }) {
   const c = useTheme();
-  const rest = day?.kind === 'rest';
-  const bg = rest ? c.accent : day ? (isToday ? c.today : c.surface) : 'transparent';
-  const fg = rest ? c.onAccent : day ? (isToday ? c.onToday : c.text) : c.muted;
   const kind = day ? t.kind[day.kind] : t.kind.unknown;
+  const dot = day?.kind === 'work' ? c.blue : day?.kind === 'rest' ? c.green : 'transparent';
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}, ${kind}`}
-      style={({ pressed }) => [st.cell, { height, backgroundColor: bg, borderColor: day ? (isToday && rest ? c.text : bg) : isToday ? c.text : c.dashed, borderStyle: day || isToday ? 'solid' : 'dashed', opacity: pressed ? 0.7 : 1 }]}>
-      {top !== undefined && <Text style={[st.small, { color: fg, opacity: 0.75 }]}>{top}</Text>}
-      <Text style={[st.num, { color: fg }]}>{num}</Text>
-      {bottom !== undefined && <Text style={[st.small, { color: fg }]}>{bottom}</Text>}
-      {!day && isToday && top === undefined && <View />}
+      style={({ pressed }) => [st.cell, { height, backgroundColor: isToday ? c.raised : 'transparent', opacity: pressed ? 0.6 : 1 }]}>
+      {top !== undefined && <Text style={[st.top, { color: c.muted }]}>{top}</Text>}
+      <Text style={[st.num, { color: day || isToday ? c.text : c.muted }]}>{num}</Text>
+      <View style={[st.dot, { backgroundColor: dot }, day?.kind === 'rest' && st.rest]} />
     </Pressable>
   );
 }
 
 const st = StyleSheet.create({
-  cell: { flex: 1, borderRadius: radius.day, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', gap: 5 },
-  small: { fontFamily: font.textBold, fontSize: type.caps.size },
-  num: { fontFamily: font.number, fontSize: type.big.size },
+  cell: { flex: 1, borderRadius: radius.inner, alignItems: 'center', justifyContent: 'center', gap: 7 },
+  top: { fontFamily: font.textBold, fontSize: type.small.size },
+  num: { fontFamily: font.textBold, fontSize: type.body.size + 2 },
+  dot: { width: size.dot, height: size.dot, borderRadius: size.dot / 2 },
+  rest: { width: size.dot * 2.6 },
 });
