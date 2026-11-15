@@ -35,6 +35,8 @@ export const t = {
       tapIt: 'Tap it below',
     },
     setAlarm: 'Set wake-up alarm',
+    toLight: 'Switch to light mode',
+    toDark: 'Switch to dark mode',
     alarmHelpTitle: (time: string) => `Wake up at ${time}`,
     alarmHelp: 'Open your Clock app and set this alarm. This phone did not let us open it for you.',
     ok: 'OK',
