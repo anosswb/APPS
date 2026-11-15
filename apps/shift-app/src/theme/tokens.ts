@@ -1,38 +1,82 @@
 /**
  * The one token file of the Shift app. Every colour, size, radius and duration comes from here.
- * World: "Daybreak" (docs/world.md). Dark only. Checked with tools/contrast.py on docs/palette.json.
+ * World: "Daybreak" (docs/world.md). Two modes, each designed on its own: dark (graphite) and light (stone).
+ * Checked with tools/contrast.py on docs/palette.json.
  */
-export const color = {
-  bg: '#0B0F17', // the ground at night
-  surface: '#141A26', // a work day in the week strip
-  line: '#1B2332',
-  text: '#F4EDE2', // cream
-  textSoft: '#D5DCEC',
-  muted: '#8E99AE',
-  dashed: '#323C50', // a day not known yet
-  sun: '#FFC470', // the one action colour: rest, the alarm button, the active tab
-  onSun: '#201004',
-  sunCore: '#FFF3DC',
-  restTop: '#FFD08A', // a rest day is a small sunrise
-  restMid: '#F4A24C',
-  restBottom: '#E8873F',
-  onRest: '#3A1804',
-  today: '#F4EDE2',
-  onToday: '#0B0F17',
-  sleep: '#2A3B63', // the sleep part of the day ring
-  ringTrack: '#161D2A',
-} as const;
+export interface Theme {
+  dark: boolean;
+  bg: string;
+  surface: string;
+  surfaceHi: string;
+  line: string;
+  text: string;
+  textSoft: string;
+  muted: string;
+  dashed: string;
+  /** the one action colour, as a fill: rest days, the alarm button */
+  accent: string;
+  onAccent: string;
+  /** the same colour when it is text or an icon on the background */
+  accentText: string;
+  today: string;
+  onToday: string;
+  sleep: string;
+  track: string;
+}
 
-/** The sky behind "Today" follows the phone's clock. Top to horizon. */
+export const themes: { dark: Theme; light: Theme } = {
+  dark: {
+    dark: true,
+    bg: '#0C0E12',
+    surface: '#161A20',
+    surfaceHi: '#1F242C',
+    line: '#262B34',
+    text: '#F2EEE6',
+    textSoft: '#C9CDD4',
+    muted: '#8B93A1',
+    dashed: '#3A414D',
+    accent: '#F5B14C',
+    onAccent: '#1A1003',
+    accentText: '#F5B14C',
+    today: '#F2EEE6',
+    onToday: '#0C0E12',
+    sleep: '#34466F',
+    track: '#1A1E26',
+  },
+  light: {
+    dark: false,
+    bg: '#EEEFF2',
+    surface: '#FFFFFF',
+    surfaceHi: '#E2E4E9',
+    line: '#D5D8DE',
+    text: '#12151A',
+    textSoft: '#30363F',
+    muted: '#5A6370',
+    dashed: '#AEB4BD',
+    accent: '#F2A531',
+    onAccent: '#1A1003',
+    accentText: '#8F5200',
+    today: '#12151A',
+    onToday: '#FFFFFF',
+    sleep: '#5C73A8',
+    track: '#DDE0E6',
+  },
+};
+
+/** The sky behind "Today" follows the phone's clock, in both modes. Top to horizon. Text on it is always sky.text. */
 export const sky = {
   dawn: ['#081226', '#0E1D3A', '#22335A', '#5E4660', '#C9663F', '#F4A24C', '#FFD08A'],
   day: ['#123A73', '#1B4B8F', '#2C62AC', '#4A7FC2', '#7FA9D8', '#B4D0EA', '#DCE9F5'],
   dusk: ['#0C1730', '#1A2548', '#3A3260', '#7A4762', '#D0603F', '#F0913F', '#FFC470'],
   night: ['#05080F', '#070C18', '#0A1224', '#0D1830', '#12203D', '#172848', '#1D3052'],
+  stops: [0, 0.38, 0.6, 0.77, 0.9, 0.97, 1],
+  text: '#F4EDE2',
+  textSoft: '#D5DCEC',
+  sun: '#FFC470',
+  sunCore: '#FFF3DC',
+  star: '#DCE6FF',
+  arc: '#FFE7C2',
 } as const;
-export const skyStops = [0, 0.38, 0.6, 0.77, 0.9, 0.97, 1] as const;
-export const star = '#DCE6FF';
-export const arc = '#FFE7C2';
 
 export const font = {
   display: 'BricolageGrotesque_800ExtraBold', // big words
@@ -43,16 +87,17 @@ export const font = {
 } as const;
 
 export const type = {
-  hero: { size: 68, line: 64, weight: '800', tracking: -2.7 },
-  title: { size: 34, line: 36, weight: '800', tracking: -1 },
-  number: { size: 24, line: 26, weight: '700', tracking: -0.5 },
-  body: { size: 17, line: 24, weight: '500', tracking: 0 },
-  label: { size: 15, line: 20, weight: '600', tracking: 0 },
-  small: { size: 12, line: 14, weight: '600', tracking: 0 },
+  hero: { size: 56, line: 54, tracking: -2.2 },
+  title: { size: 30, line: 34, tracking: -0.9 },
+  big: { size: 22, line: 26, tracking: -0.4 },
+  body: { size: 16, line: 22, tracking: 0 },
+  label: { size: 14, line: 18, tracking: 0 },
+  small: { size: 12, line: 14, tracking: 0 },
+  caps: { size: 11, line: 14, tracking: 1.2 },
 } as const;
 
-export const space = { xs: 6, s: 10, m: 16, l: 26, xl: 40 } as const;
-export const radius = { day: 20, button: 24, full: 999 } as const;
-export const size = { tap: 56, button: 72, dayCell: 86, ring: 26, icon: 22, iconBig: 28, sun: 11, skyline: 60, nav: 64, step: 44 } as const;
-/** Slow and soft: the sun moves, nothing bounces. Reduce Motion turns the sun's travel into a plain fade. */
+export const space = { xs: 6, s: 10, m: 16, l: 22, xl: 36 } as const;
+export const radius = { day: 14, panel: 16, button: 18, full: 999 } as const;
+export const size = { tap: 52, button: 64, dayCell: 78, ring: 22, ringR: 104, icon: 22, iconBig: 26, sun: 10, skyline: 60, sky: 318, nav: 62, step: 44, bar: 6, timeCol: 112, valCol: 96 } as const;
+/** Slow and soft: the sun moves, nothing bounces. */
 export const motion = { quick: 160, soft: 420, sun: 1200 } as const;

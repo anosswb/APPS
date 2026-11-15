@@ -12,11 +12,12 @@ Built by GitHub, for free, with no Expo account. A real installed app, signed fo
 If the run shows a red cross: tap it, tap the red step, copy the last 30 lines and send them to Claude.
 
 ## What to try (5 minutes)
-1. **Today:** tap the days of the week. One tap = work, two = rest, three = not known. Does the big text say the right thing ("Rest in 2 days", "Day 3 in a row")?
+1. **Today:** tap the days: 1 tap = work day, 2 taps = rest day, 3 taps = clear. Is the big text right? Is the line under the sky right (time to clock in, or time left in your shift)?
 2. **The alarm button:** does the phone's clock open with the wake-up time filled in?
-3. **My day:** change your shift start, get-ready time and commute with − and +. Are the times right for your real day? (New shift times apply to days you mark after the change.)
-4. **Calendar:** mark a few weeks. Close the app, open it again: is everything still there?
-5. Look at Today at different hours: the sky changes (before sunrise, day, evening, night).
+3. **My day:** change "Shift starts" with − and +. Go back to Today: did the small time on the work days change too?
+4. **Pay:** type your hourly rate and set your own overtime numbers. Is the estimate for this week close to what you expect?
+5. **Look:** My day → Look → Light, then Dark. Which one is better for your eyes?
+6. Close the app and open it again: is everything still there?
 
 ## What this build is not
-Pay is only a note. No reminder yet. No backup yet. The sun does not glide, it jumps once a minute.
+No daily reminder yet. No backup yet. No pay period or payday yet (week and month only). The sun does not glide, it jumps once a minute.

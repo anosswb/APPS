@@ -5,11 +5,11 @@ Picked by Anass on 14 Nov 2026 from pictures (`docs/looks/`): "Yes, 1 + 2 togeth
 | | |
 |---|---|
 | Person and moment | A warehouse or plant worker, about 4:40 am, dark kitchen, one hand, five seconds, half awake. One question: "when do I rest?" |
-| Three words | warm, open, calm |
+| Three words | solid, warm, calm ("premium, manly, good for the eye", Anass 15 Nov) |
 | Material | The sky on the drive to work, and the dark ground under it |
-| Colour | Dark only. Neutrals: night ground `#0B0F17`, cream `#F4EDE2`. One action colour: sun amber `#FFC470` (rest, the alarm button, the active tab). The sky gradient is the only other colour and it is behind Today only. Checked: `python3 tools/contrast.py apps/shift-app/docs/palette.json` passes, lowest 6.1 |
+| Colour | Two modes, each designed on its own (Anass, 15 Nov: "light and dark mode"). Dark: graphite `#0C0E12`, cream `#F2EEE6`. Light: stone `#EEEFF2`, ink `#12151A`, white panels. One action colour in both: sun amber (fill `#F5B14C` / `#F2A531`; as text on light `#8F5200`). No gradients except the sky behind Today. Follows the phone, or the worker picks in My day. Checked: `python3 tools/contrast.py apps/shift-app/docs/palette.json` passes (lowest 5.3) |
 | Type | Reading: Instrument Sans. Big words and numbers: Bricolage Grotesque (his font 1). Latin only for now |
-| Shape and depth | Tall soft capsules for days (radius 20), one big button (radius 24). Flat: no shadows, no cards inside cards |
+| Shape and depth | Solid blocks for days (radius 14), hairline panels (radius 16), one big button. Flat: no shadows, no cards inside cards. Small capital labels for sections |
 | Icons | Lucide, one set, line weight 2 |
 | Motion | Slow and soft. The sun moves along the day and the sky follows the phone's clock. Nothing bounces. (Not animated yet: it jumps once a minute) |
 | Sound | None for now |

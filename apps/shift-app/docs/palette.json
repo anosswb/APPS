@@ -1,9 +1,25 @@
 {
-  "_note": "Shift app palette, for tools/contrast.py. The app is dark only (docs/world.md), so both modes hold the same colours: the tool needs two.",
+  "_note": "Shift app palette, for tools/contrast.py. Mirrors src/theme/tokens.ts. accent is checked as a fill (onPrimary on primary); accentText is the accent as text on the background.",
   "worlds": {
     "shift-daybreak": {
-      "light": { "bg": "#0B0F17", "surface": "#141A26", "text": "#F4EDE2", "muted": "#8E99AE", "primary": "#FFC470", "onPrimary": "#201004", "accent": "#FFC470" },
-      "dark":  { "bg": "#0B0F17", "surface": "#141A26", "text": "#F4EDE2", "muted": "#8E99AE", "primary": "#FFC470", "onPrimary": "#201004", "accent": "#FFC470" }
+      "light": {
+        "bg": "#EEEFF2",
+        "surface": "#FFFFFF",
+        "text": "#12151A",
+        "muted": "#5A6370",
+        "primary": "#8F5200",
+        "onPrimary": "#FFFFFF",
+        "accent": "#8F5200"
+      },
+      "dark": {
+        "bg": "#0C0E12",
+        "surface": "#161A20",
+        "text": "#F2EEE6",
+        "muted": "#8B93A1",
+        "primary": "#F5B14C",
+        "onPrimary": "#1A1003",
+        "accent": "#F5B14C"
+      }
     }
   }
 }
