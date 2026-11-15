@@ -11,7 +11,7 @@ import { planOf, Saved } from '../store';
 import { font, onSky, radius, size, skyStops, space, type } from '../theme/tokens';
 import { useTheme } from '../theme/useTheme';
 import { ask } from '../notify';
-import { Caps, Glass, GlassPill, Link } from '../ui/Bits';
+import { Caps, Glass, GlassButton, GlassPill, Link } from '../ui/Bits';
 import { DayCell } from '../ui/DayCell';
 
 export function Today({ data, today, now, top, onCycle, onChange }: { data: Saved; today: string; now: Date; top: number; onCycle: (key: string) => void; onChange: (next: Saved) => void }) {
@@ -84,6 +84,7 @@ export function Today({ data, today, now, top, onCycle, onChange }: { data: Save
             <Text style={st.title}>{t.today.title}</Text>
             <Text style={st.date}>{dateOf(today)}</Text>
           </View>
+          <GlassButton icon={c.dark ? 'sun' : 'moon'} label={c.dark ? t.today.toLight : t.today.toDark} onPress={() => onChange({ ...data, look: c.dark ? 'light' : 'dark' })} />
         </View>
 
         <Glass style={{ gap: space.m, backgroundColor: c.cardOnSky }}>

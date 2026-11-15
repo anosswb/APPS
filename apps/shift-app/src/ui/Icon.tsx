@@ -3,7 +3,7 @@ import React from 'react';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { size } from '../theme/tokens';
 
-export type IconName = 'edit' | 'bell' | 'moon' | 'flag' | 'login' | 'logout' | 'utensils' | 'hourglass' | 'receipt' | 'check' | 'alarm' | 'calendar' | 'pay' | 'home' | 'day' | 'left' | 'right' | 'minus' | 'plus';
+export type IconName = 'sun' | 'edit' | 'bell' | 'moon' | 'flag' | 'login' | 'logout' | 'utensils' | 'hourglass' | 'receipt' | 'check' | 'alarm' | 'calendar' | 'pay' | 'home' | 'day' | 'left' | 'right' | 'minus' | 'plus';
 
 export function Icon({ name, color, s = size.icon }: { name: IconName; color: string; s?: number }) {
   const p = { stroke: color, strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
@@ -16,6 +16,7 @@ export function Icon({ name, color, s = size.icon }: { name: IconName; color: st
       {name === 'day' && (<><Circle cx="12" cy="12" r="10" {...p} /><Path d="M12 6v6l4 2" {...p} /></>)}
       {name === 'left' && <Path d="m15 18-6-6 6-6" {...p} />}
       {name === 'right' && <Path d="m9 18 6-6-6-6" {...p} />}
+      {name === 'sun' && (<><Circle cx="12" cy="12" r="4" {...p} /><Path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" {...p} /></>)}
       {name === 'edit' && <Path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" {...p} />}
       {name === 'bell' && <Path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0" {...p} />}
       {name === 'moon' && <Path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" {...p} />}
