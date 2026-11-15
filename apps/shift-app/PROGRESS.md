@@ -45,6 +45,17 @@ He said: write the tap rule; My numbers did not change the app; "just a calendar
 - Feature research by a helper: `research/ideas/shift-app-pains.md` (second table). Its top three: extra pay rules for nights and holidays, a paycheck check against the pay stub, a home-screen widget. **Anass has not chosen yet.**
 - Seen working in a phone-sized browser, both modes (`docs/looks/real-screens.png`). 30 tests pass. No tests yet for `src/store.ts` (`planOf`, `payPlan`).
 
+## Done (15 Nov 2026, evening) — his list after the third APK
+- Clock in now, or type the time (pencil button). Past days: typed In/Out with AM/PM, holiday switch.
+- All numbers typed with the keyboard (`Field`, `TimeField` in `src/ui/Bits.tsx`).
+- Notes on work days: lunch and 2 hours to go (`src/notify.ts`), switches in My day, offer on Today.
+- Extra pay: night window, Saturday, Sunday, holiday (engine rule type `clock` in `src/core/payrules.ts`, tested).
+- Pay stub check with weekly or 2-week periods (`periodAround` in `src/store.ts`, tested).
+- Android home-screen widget "Next rest" (`src/widget/`), refreshed by the app and about every 30 minutes.
+- Liquid-glass buttons and a floating glass tab bar, light and dark.
+- 39 tests pass (new: store helpers, night hours, pay periods). Seen in a phone-sized browser in both modes.
+- **Not checked:** the widget and the notes on a real phone (they cannot run in a browser); the APK build with the widget library is the first one.
+
 ## Not done on these screens yet (be honest in the next session)
 `/slop-check` not run · night shifts: the "now" line does not follow a shift that started yesterday · pay period and payday not on the Pay tab (week and month only) · "days I mark" pay rule has no screen · no change note on a day · no share-the-month picture · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
 
