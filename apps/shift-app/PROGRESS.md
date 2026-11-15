@@ -56,6 +56,13 @@ He said: write the tap rule; My numbers did not change the app; "just a calendar
 - 39 tests pass (new: store helpers, night hours, pay periods). Seen in a phone-sized browser in both modes.
 - **Not checked:** the widget and the notes on a real phone (they cannot run in a browser); the APK build with the widget library is the first one.
 
+## Done (15 Nov 2026, night) — first-open flow and money
+- Welcome → quiz (`src/screens/Onboarding.tsx`) → results → Plus page (`src/screens/Paywall.tsx`, iPhone and web preview only).
+- Plus locks on Pay for night/weekend/holiday pay and the stub check (`src/money/plus.ts`). Test unlock only.
+- Android test banner ads (`src/money/AdSlot.android.tsx`, AdMob test IDs, code shrinking off as in Paper Pines).
+- Sun/moon light-dark button on Today.
+- **Next:** his feedback on the phone; backup button (biggest review complaint); prices (his decision); real purchases need the Apple account ($99/yr) and RevenueCat or StoreKit; ad consent (UMP) before live ads; Terms and Privacy pages (free page, no domain needed: research/2026-11-15-free-stores.md).
+
 ## Not done on these screens yet (be honest in the next session)
 `/slop-check` not run · night shifts: the "now" line does not follow a shift that started yesterday · pay period and payday not on the Pay tab (week and month only) · "days I mark" pay rule has no screen · no change note on a day · no share-the-month picture · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
 
