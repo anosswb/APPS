@@ -82,15 +82,15 @@ export const t = {
     solved: 'Solved',
     look: 'Look again',
     week: 'This week',
-    book: 'The puzzle book · level by level',
+    book: 'Free play · no clock, no ink limit',
     bookTitle: (n: number) => `Puzzle No. ${n}`,
     bookBlurb: (done: number) => (done === 0
-        ? 'Start here. One puzzle after another, each a little harder. The first few teach you the game.'
-        : `${done} ${done === 1 ? 'puzzle' : 'puzzles'} solved. They get bigger and trickier as you go, and every fifth one is a big one.`),
+        ? 'Your own pace, with hints when you want them. The first few teach you the game.'
+        : `${done} solved. Just the puzzle and you, hints allowed. Every fifth one is a big one.`),
     open: 'Open',
     play: (n: number) => `Play No. ${n}`,
     big: 'Big one',
-    stripLabel: (n: number) => `You are on puzzle number ${n} of the book`,
+    stripLabel: (n: number) => `You are on puzzle number ${n} of free play`,
     rules: 'How to play',
     past: 'Past puzzles',
     settings: 'Settings',
@@ -123,7 +123,7 @@ export const t = {
       'Every past puzzle, back to the first edition.',
       'No ads. There are none on iPhone, and there never will be.',
     ],
-    free: 'Still free for everyone: the daily puzzle, the last seven days, hints, and the first 30 puzzles of the Book.',
+    free: 'Still free for everyone: the daily puzzle, the last seven days, hints, and the first 30 puzzles of free play.',
     buy: (price: string | null) => (price ? `Buy once · ${price}` : 'Buy once'),
     buying: 'One moment',
     restore: 'Restore purchases',
@@ -134,7 +134,7 @@ export const t = {
     terms: 'Terms',
     privacy: 'Privacy',
     homeLink: 'The full edition',
-    bookEnd: 'Puzzle No. 30 was the last free one. The rest of the Book is in the full edition.',
+    bookEnd: 'Puzzle No. 30 was the last free one in free play. The rest is in the full edition.',
   },
 
   settings: {
@@ -157,14 +157,14 @@ export const t = {
     // Test builds only: what the ads are doing, so a missing ad can be explained from a screenshot.
     adTest: {
       title: 'Test build: ads',
-      text: (s: { consent: string; started: boolean; fullScreen: string; video: string }, minutes: number, quiet: number, lastAd: number | null, level: number, firstLevel: number, gap: number) =>
+      text: (s: { consent: string; started: boolean; fullScreen: string; video: string }, minutes: number, quiet: number, lastAd: number | null, finished: number, after: number, gap: number) =>
         [
           `Consent: ${s.consent}`,
           `Ads library started: ${s.started ? 'yes' : 'no'}`,
           `Full-screen ad: ${s.fullScreen}`,
           `Video ad: ${s.video}`,
           `Minutes since the first opening: ${minutes} (no ad in the first ${quiet})`,
-          `Puzzle book: you are on No. ${level} (no ad before No. ${firstLevel} is finished)`,
+          `Puzzles finished: ${finished} (no ad before ${after})`,
           `Last full-screen ad: ${lastAd === null ? 'never' : `${lastAd} min ago`} (one every ${gap} min at most)`,
         ].join('\n'),
     },
@@ -200,7 +200,7 @@ export const t = {
     keepGoing: (n: number) => `Keep going: Puzzle No. ${n}`,
     // the Hint button after a long pause with no mark
     hintNudge: 'Stuck? Hint',
-    dailyDone: "That was today's puzzle. A new one comes tomorrow. The puzzle book never runs out.",
+    dailyDone: "That was today's puzzle. A new one comes tomorrow. Free play never runs out.",
   },
 
   hint: (h: Hint): string => {
@@ -219,6 +219,24 @@ export const t = {
   },
 
   challenge: {
+    lead: 'The main game',
+    second: 'Also on the clock',
+    name: { race: 'Beat the clock', ink: 'One pot of ink' },
+    level: (n: number) => `No. ${n}`,
+    deck: {
+      ink: (tents: number, drops: number) =>
+        `${tents} tents to pitch, ${drops} drops in the pot. Every tent costs a drop. Run dry and the page is lost.`,
+      race: (time: string) => `Solve it before the clock runs out. You have ${time}.`,
+    },
+    play: (n: number) => `Play No. ${n}`,
+    keepGoing: (n: number) => `Keep going: One pot of ink No. ${n}`,
+    run: (now: number, best: number) => (now > 0 ? `${now} ${now === 1 ? 'win' : 'wins'} in a row · best ${best}` : `Best run: ${best} in a row`),
+    inkLeft: 'Ink',
+    timeLeft: 'Clock',
+    gauge: {
+      ink: (left: number, total: number) => `${left} of ${total} drops of ink left`,
+      race: (time: string) => `${time} left on the clock`,
+    },
     kicker: 'Challenges',
     blurb: 'Two ways to test yourself. These can be lost, and you can always try again.',
     open: { race: (n: number) => `Beat the clock · No. ${n}`, ink: (n: number) => `One pot of ink · No. ${n}` },

@@ -18,7 +18,7 @@ import { dailyPuzzle, dateKey, keyToDate } from './src/game/daily';
 import { t } from './src/i18n/en';
 import { ads } from './src/money/ads';
 import { purchases } from './src/money/purchases';
-import { bookLocked, interstitialDue } from './src/money/rules';
+import { bookLocked, interstitialDue, puzzlesFinished } from './src/money/rules';
 import { planReminders, shouldAsk } from './src/reminder/plan';
 import { ReminderAsk } from './src/reminder/ReminderAsk';
 import { reminders } from './src/reminder/reminders';
@@ -215,23 +215,32 @@ function Screens() {
   }, [bookIsLocked, save.book.level, save.book.relief, save.seenRules, store]);
 
   // After a Book puzzle: maybe one full-screen ad (Android, by the rules in money/rules.ts), then the next puzzle.
-  const nextBook = useCallback(
-    async (finishedLevel: number) => {
-      const now = Date.now();
-      if (interstitialDue(MONEY_MODE, finishedLevel, now, save.money)) {
-        try {
-          if (await ads.showInterstitial()) {
-            markAdShown(Date.now());
-            count('ad_shown');
-          }
-        } catch (error) {
-          console.warn('Ad error', error);
-        }
+  // After a won puzzle the player taps "Next": the one moment a full-screen ad may come (rules.ts decides).
+  const maybeAd = useCallback(async () => {
+    const finished = puzzlesFinished({ book: save.book.level, ink: save.challenge.ink.level, race: save.challenge.race.level });
+    if (!interstitialDue(MONEY_MODE, finished, Date.now(), save.money)) return;
+    try {
+      if (await ads.showInterstitial()) {
+        markAdShown(Date.now());
+        count('ad_shown');
       }
-      if (bookIsLocked) setRoute({ name: 'full', back: { name: 'home' } });
-      else setRoute({ name: 'book', level: save.book.level, relief: save.book.relief });
+    } catch (error) {
+      console.warn('Ad error', error);
+    }
+  }, [markAdShown, save.book.level, save.challenge, save.money]);
+
+  const nextBook = useCallback(async () => {
+    await maybeAd();
+    if (bookIsLocked) setRoute({ name: 'full', back: { name: 'home' } });
+    else setRoute({ name: 'book', level: save.book.level, relief: save.book.relief });
+  }, [bookIsLocked, maybeAd, save.book.level, save.book.relief]);
+
+  const nextChallenge = useCallback(
+    async (kind: ChallengeKind) => {
+      await maybeAd();
+      openChallenge(kind);
     },
-    [bookIsLocked, markAdShown, save.book.level, save.book.relief, save.money],
+    [maybeAd, openChallenge],
   );
 
   let screen: React.ReactNode;
@@ -275,8 +284,8 @@ function Screens() {
             <ReminderAsk result={askResult} time={save.reminder.time} onAnswer={(yes) => void answerReminder(yes)} />
           ) : null
         }
-        nextLabel={bookIsLocked ? t.archive.seeFull : t.game.keepGoing(save.book.level)}
-        onNext={openBook}
+        nextLabel={t.challenge.keepGoing(save.challenge.ink.level)}
+        onNext={() => openChallenge('ink')}
         onKeep={keep}
         onSolved={(ms, hints) => {
           store.finishDaily(route.key, ms, hints);
@@ -304,7 +313,7 @@ function Screens() {
         }}
         onHint={(kind, what) => count('hint_used', { kind, what })}
         onStuck={() => count('stuck_nudge', { kind: 'book', size: puzzle.n, grade: puzzle.grade })}
-        onNext={() => void nextBook(route.level)}
+        onNext={() => void nextBook()}
         onExit={() => setRoute({ name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}
       />
@@ -332,7 +341,7 @@ function Screens() {
           store.finishChallenge(kind, true, helped, kind === 'race' ? { n: puzzle.n, ms } : undefined);
           count('challenge_end', { kind, result: 'won', level: route.level, size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, closeness: 100, helped });
         }}
-        onNext={() => openChallenge(kind)}
+        onNext={() => void nextChallenge(kind)}
         onExit={() => setRoute({ name: 'home' })}
         onRules={() => setRoute({ name: 'rules', back: route })}
       />

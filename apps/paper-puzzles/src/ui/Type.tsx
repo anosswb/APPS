@@ -4,11 +4,12 @@ import { Text as RNText, TextProps, TextStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { font, size } from '../theme/tokens';
 
-type Variant = 'masthead' | 'title' | 'body' | 'bodyItalic' | 'label' | 'number';
+type Variant = 'masthead' | 'headline' | 'title' | 'body' | 'bodyItalic' | 'label' | 'number';
 type Tone = 'text' | 'muted' | 'accent' | 'onPrimary';
 
 const STYLES: Record<Variant, TextStyle> = {
   masthead: { fontFamily: font.serifBold, fontSize: size.masthead, lineHeight: size.masthead * 1.05, letterSpacing: -0.5 },
+  headline: { fontFamily: font.serifBold, fontSize: size.headline, lineHeight: size.headline * 1.08, letterSpacing: -0.4 },
   title: { fontFamily: font.serifMedium, fontSize: size.title, lineHeight: size.title * 1.15 },
   body: { fontFamily: font.serif, fontSize: size.body, lineHeight: size.body * 1.4 },
   bodyItalic: { fontFamily: font.serifItalic, fontSize: size.body, lineHeight: size.body * 1.4 },

@@ -1,6 +1,6 @@
 /** Every money decision in one place, as plain functions with tests. No ad or store code here. */
 import {
-  AD_FIRST_BOOK_LEVEL,
+  AD_AFTER_PUZZLES,
   AD_MIN_GAP_MS,
   AD_QUIET_START_MS,
   FREE_ARCHIVE_DAYS,
@@ -44,10 +44,18 @@ export function bookLocked(level: number, mode: MoneyMode, canSell: boolean, m: 
   return mode === 'iap' && canSell && !m.fullEdition && level > FREE_BOOK_PUZZLES;
 }
 
-/** Android only: may a full-screen ad be shown after this Book puzzle, before the next one opens? */
-export function interstitialDue(mode: MoneyMode, finishedLevel: number, now: number, m: MoneyState): boolean {
+/** How many puzzles a player has finished in the three level-by-level modes. Each level starts at 1. */
+export function puzzlesFinished(levels: { book: number; ink: number; race: number }): number {
+  return Math.max(0, levels.book - 1) + Math.max(0, levels.ink - 1) + Math.max(0, levels.race - 1);
+}
+
+/**
+ * Android only: may a full-screen ad be shown now? It is asked only after a WON puzzle, when the player
+ * taps "Next" (free play, ink or clock). Never after a loss, never around the daily puzzle.
+ */
+export function interstitialDue(mode: MoneyMode, finished: number, now: number, m: MoneyState): boolean {
   if (mode !== 'ads') return false;
-  if (finishedLevel < AD_FIRST_BOOK_LEVEL) return false;
+  if (finished < AD_AFTER_PUZZLES) return false;
   if (now - m.firstOpenAt < AD_QUIET_START_MS) return false;
   return now - m.lastAdAt >= AD_MIN_GAP_MS;
 }

@@ -13,6 +13,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { hairline, space, tapMin } from '../theme/tokens';
 import { Board } from '../ui/Board';
 import { Btn } from '../ui/Btn';
+import { ClockGauge, InkGauge } from '../ui/Gauge';
 import { Chevron } from '../ui/Glyphs';
 import { haptic } from '../ui/haptics';
 import { sound } from '../ui/sound';
@@ -331,11 +332,19 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
             <Type variant="label" tone="muted">
               {t.sizeLine(puzzle.n, puzzle.grade)}
             </Type>
-            <Type variant="label" tone={tentsPlaced > tentsWanted || (challenge?.kind === 'race' && leftMs < 20000) || (challenge?.kind === 'ink' && inkLeft <= 1) ? 'accent' : 'muted'}>
+            <Type variant="label" tone={tentsPlaced > tentsWanted ? 'accent' : 'muted'}>
               {t.game.tents(tentsPlaced, tentsWanted)}
-              {challenge?.kind === 'race' ? ` · ${t.challenge.clock(clock(leftMs))}` : challenge?.kind === 'ink' ? ` · ${t.challenge.ink(inkLeft)}` : ''}
             </Type>
           </View>
+          {challenge && !solved ? (
+            <View style={styles.gauge}>
+              {challenge.kind === 'ink' ? (
+                <InkGauge total={room} left={inkLeft} width={boardWidth} />
+              ) : (
+                <ClockGauge totalMs={room} leftMs={leftMs} width={boardWidth} />
+              )}
+            </View>
+          ) : null}
 
           <View>
             <Board
@@ -452,6 +461,7 @@ const styles = StyleSheet.create({
   bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: tapMin },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.xs, minHeight: tapMin, paddingRight: space.m },
   title: { marginTop: space.l },
+  gauge: { marginBottom: space.m },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.xs, marginBottom: space.m },
   stampOver: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   screen: { flex: 1 },

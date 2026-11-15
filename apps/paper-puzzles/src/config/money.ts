@@ -17,8 +17,8 @@ export const MONEY_MODE: MoneyMode = MONEY_PREVIEW ?? Platform.select<MoneyMode>
 export const FREE_BOOK_PUZZLES = 30;
 /** Both stores: today and the six days before it are always open in the calendar. */
 export const FREE_ARCHIVE_DAYS = 7;
-/** Android: no full-screen ad before this Book puzzle is finished... */
-export const AD_FIRST_BOOK_LEVEL = 6;
+/** Android: no full-screen ad before the player has finished this many puzzles (free play, ink and clock together)... */
+export const AD_AFTER_PUZZLES = 6;
 /** ...nor in the first ten minutes after the very first opening... */
 export const AD_QUIET_START_MS = 10 * 60 * 1000;
 /** ...and never more often than once every four minutes. */
