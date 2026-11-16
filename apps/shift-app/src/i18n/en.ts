@@ -20,7 +20,7 @@ export const t = {
     noRestSub: 'Tap your rest days in the week below.',
     inARow: (n: number) => `Day ${n} in a row`,
     backOn: (day: string) => `Back to work ${day}`,
-    maybeSooner: 'Some days before it are not marked',
+    maybeSooner: 'Rest may come sooner: some days before it are not marked',
     thisWeek: 'Next 7 days',
     now: {
       clockIn: (time: string) => `Clock in ${time}`,
