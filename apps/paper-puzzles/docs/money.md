@@ -8,7 +8,7 @@ The daily puzzle · the last seven days in the calendar · every puzzle already 
 ## Android (ads) — code written, NOT yet tried on a phone
 | Thing | Rule (in `src/money/rules.ts`, tested) |
 |---|---|
-| Full-screen ad | Only after a WON puzzle, on the "Next" tap (free play, ink pot or clock). Never after a loss. Never before 6 puzzles are finished (all modes together), never in the first 10 minutes after the first opening, at most one every 4 minutes. Never around the daily puzzle, never over an open puzzle. |
+| Full-screen ad | Only at a good moment: after a WON puzzle, on the "Next" tap (free play, ink pot or clock), when at least 3 games were played since the app opened or since the last ad AND the last 2 were wins. Never after a loss, nor on the first win after a loss. Never before 6 puzzles are finished (all modes together), never in the first 10 minutes after the first opening, at most one every 4 minutes. Never around the daily puzzle, never over an open puzzle. |
 | Optional video | Opens one past day older than a week, for good. If no video is ready, the day opens anyway ("this one is on us"). |
 | Optional video on a lost challenge | "Watch a video: 3 more drops" or more seconds, at most twice per puzzle. Try again is always free. If no video is ready, the player keeps going anyway. |
 | Consent | Google's consent form runs first where the law asks for it; Settings shows "Ad privacy choices" when required. |

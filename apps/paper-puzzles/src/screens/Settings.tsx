@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { APP_NAME, APP_VERSION } from '../config/app';
 import { AD_AFTER_PUZZLES, AD_MIN_GAP_MS, AD_QUIET_START_MS, MONEY_MODE } from '../config/money';
 import { ads } from '../money/ads';
+import { adMood } from '../money/mood';
 import { puzzlesFinished } from '../money/rules';
 import { ReminderTime } from '../reminder/plan';
 import { reminders } from '../reminder/reminders';
@@ -173,6 +174,7 @@ export function Settings({ onExit, onRules, onLicenses }: { onExit: () => void; 
                 puzzlesFinished({ book: save.book.level, ink: save.challenge.ink.level, race: save.challenge.race.level }),
                 AD_AFTER_PUZZLES,
                 AD_MIN_GAP_MS / 60000,
+                adMood.now(),
               )}
             </Type>
           </>

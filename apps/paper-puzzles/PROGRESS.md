@@ -54,6 +54,10 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Ads** come after a won ink or clock puzzle too (they only came in the book before). 98 tests green.
 - **Real ads:** waiting for Anass's AdMob IDs (steps in `docs/money.md`).
 
+## Done (16 Nov 2026)
+- **Ads only at a good moment** (Anass got an ad on his first win after opening): a full-screen ad needs 3 games since opening or since the last ad, and the last 2 won. Never after a loss. Tested (101 tests); not yet seen on a phone. The Settings status block shows the count.
+- Test build run 43775764360 (ink as the main game) built fine.
+
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 

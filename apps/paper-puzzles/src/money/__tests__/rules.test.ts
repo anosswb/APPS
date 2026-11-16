@@ -1,8 +1,10 @@
-import { archiveLocked, bookLocked, interstitialDue, MoneyState, oldestFreeDay, puzzlesFinished } from '../rules';
+import { afterGame, AdMood, archiveLocked, bookLocked, freshMood, goodMoment, interstitialDue, MoneyState, oldestFreeDay, puzzlesFinished } from '../rules';
 
 const MIN = 60 * 1000;
 const base: MoneyState = { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: 0 };
 const today = '2026-12-20';
+const play = (...results: boolean[]): AdMood => results.reduce(afterGame, freshMood());
+const happy = play(true, true, true);
 
 describe('past puzzles', () => {
   test('today and the six days before it are always open', () => {
@@ -51,12 +53,34 @@ describe('the Book', () => {
   });
 });
 
+describe('full-screen ads come only at a good moment', () => {
+  const late = 60 * MIN;
+  test('never in the first games after opening the app', () => {
+    expect(goodMoment(freshMood())).toBe(false);
+    expect(goodMoment(play(true))).toBe(false);
+    expect(goodMoment(play(true, true))).toBe(false);
+    expect(goodMoment(play(true, true, true))).toBe(true);
+    expect(interstitialDue('ads', 20, late, base, play(true))).toBe(false);
+  });
+
+  test('never after a loss, nor on the first win after a loss', () => {
+    expect(goodMoment(play(true, true, false))).toBe(false);
+    expect(goodMoment(play(false, false, true))).toBe(false);
+    expect(goodMoment(play(false, false, true, true))).toBe(true);
+    expect(goodMoment(play(true, false, true, true))).toBe(true);
+  });
+
+  test('after an ad the count starts again', () => {
+    expect(goodMoment(play(true, true))).toBe(false);
+  });
+});
+
 describe('full-screen ads', () => {
   const late = 60 * MIN;
   test('only on Android', () => {
-    expect(interstitialDue('iap', 20, late, base)).toBe(false);
-    expect(interstitialDue('none', 20, late, base)).toBe(false);
-    expect(interstitialDue('ads', 20, late, base)).toBe(true);
+    expect(interstitialDue('iap', 20, late, base, happy)).toBe(false);
+    expect(interstitialDue('none', 20, late, base, happy)).toBe(false);
+    expect(interstitialDue('ads', 20, late, base, happy)).toBe(true);
   });
 
   test('counts finished puzzles across free play, ink and clock', () => {
@@ -65,19 +89,19 @@ describe('full-screen ads', () => {
   });
 
   test('never before six puzzles are finished', () => {
-    expect(interstitialDue('ads', 5, late, base)).toBe(false);
-    expect(interstitialDue('ads', 6, late, base)).toBe(true);
+    expect(interstitialDue('ads', 5, late, base, happy)).toBe(false);
+    expect(interstitialDue('ads', 6, late, base, happy)).toBe(true);
   });
 
   test('never in the first ten minutes after the first opening', () => {
     const m = { ...base, firstOpenAt: 1000 * MIN };
-    expect(interstitialDue('ads', 20, 1009 * MIN, m)).toBe(false);
-    expect(interstitialDue('ads', 20, 1010 * MIN, m)).toBe(true);
+    expect(interstitialDue('ads', 20, 1009 * MIN, m, happy)).toBe(false);
+    expect(interstitialDue('ads', 20, 1010 * MIN, m, happy)).toBe(true);
   });
 
   test('at most one every four minutes', () => {
     const m = { ...base, lastAdAt: 100 * MIN };
-    expect(interstitialDue('ads', 20, 103 * MIN, m)).toBe(false);
-    expect(interstitialDue('ads', 20, 104 * MIN, m)).toBe(true);
+    expect(interstitialDue('ads', 20, 103 * MIN, m, happy)).toBe(false);
+    expect(interstitialDue('ads', 20, 104 * MIN, m, happy)).toBe(true);
   });
 });

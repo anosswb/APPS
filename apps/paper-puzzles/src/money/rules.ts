@@ -1,8 +1,10 @@
 /** Every money decision in one place, as plain functions with tests. No ad or store code here. */
 import {
   AD_AFTER_PUZZLES,
+  AD_GAMES_BETWEEN,
   AD_MIN_GAP_MS,
   AD_QUIET_START_MS,
+  AD_WINS_IN_A_ROW,
   FREE_ARCHIVE_DAYS,
   FREE_BOOK_PUZZLES,
   MoneyMode,
@@ -44,6 +46,32 @@ export function bookLocked(level: number, mode: MoneyMode, canSell: boolean, m: 
   return mode === 'iap' && canSell && !m.fullEdition && level > FREE_BOOK_PUZZLES;
 }
 
+/**
+ * The player's mood since the app was opened, or since the last full-screen ad (Anass, 16 Nov 2026):
+ * an ad comes only at a good moment. Kept in memory only: a fresh opening starts a fresh count.
+ */
+export interface AdMood {
+  /** games finished (won or lost) since the app opened or since the last ad */
+  games: number;
+  /** the results of those games, newest last: true = won */
+  results: boolean[];
+}
+export const freshMood = (): AdMood => ({ games: 0, results: [] });
+
+/** One game ended. A lost challenge counts; a puzzle left half-done does not. */
+export function afterGame(mood: AdMood, won: boolean): AdMood {
+  return { games: mood.games + 1, results: [...mood.results, won].slice(-AD_WINS_IN_A_ROW) };
+}
+
+/**
+ * A good moment: at least AD_GAMES_BETWEEN games, and the last AD_WINS_IN_A_ROW were all wins.
+ * So never right after opening, never after a loss, and not on the first win after losses either:
+ * a player who just fought back deserves to enjoy it.
+ */
+export function goodMoment(mood: AdMood): boolean {
+  return mood.games >= AD_GAMES_BETWEEN && mood.results.length >= AD_WINS_IN_A_ROW && mood.results.every(Boolean);
+}
+
 /** How many puzzles a player has finished in the three level-by-level modes. Each level starts at 1. */
 export function puzzlesFinished(levels: { book: number; ink: number; race: number }): number {
   return Math.max(0, levels.book - 1) + Math.max(0, levels.ink - 1) + Math.max(0, levels.race - 1);
@@ -53,8 +81,9 @@ export function puzzlesFinished(levels: { book: number; ink: number; race: numbe
  * Android only: may a full-screen ad be shown now? It is asked only after a WON puzzle, when the player
  * taps "Next" (free play, ink or clock). Never after a loss, never around the daily puzzle.
  */
-export function interstitialDue(mode: MoneyMode, finished: number, now: number, m: MoneyState): boolean {
+export function interstitialDue(mode: MoneyMode, finished: number, now: number, m: MoneyState, mood: AdMood): boolean {
   if (mode !== 'ads') return false;
+  if (!goodMoment(mood)) return false;
   if (finished < AD_AFTER_PUZZLES) return false;
   if (now - m.firstOpenAt < AD_QUIET_START_MS) return false;
   return now - m.lastAdAt >= AD_MIN_GAP_MS;

@@ -19,6 +19,10 @@ export const FREE_BOOK_PUZZLES = 30;
 export const FREE_ARCHIVE_DAYS = 7;
 /** Android: no full-screen ad before the player has finished this many puzzles (free play, ink and clock together)... */
 export const AD_AFTER_PUZZLES = 6;
+/** ...only after this many games since the app opened or since the last ad... */
+export const AD_GAMES_BETWEEN = 3;
+/** ...and only when the last this-many games were all wins (never after a loss). */
+export const AD_WINS_IN_A_ROW = 2;
 /** ...nor in the first ten minutes after the very first opening... */
 export const AD_QUIET_START_MS = 10 * 60 * 1000;
 /** ...and never more often than once every four minutes. */
