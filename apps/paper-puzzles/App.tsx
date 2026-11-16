@@ -18,6 +18,7 @@ import { dailyPuzzle, dateKey, keyToDate } from './src/game/daily';
 import { t } from './src/i18n/en';
 import { ads } from './src/money/ads';
 import { purchases } from './src/money/purchases';
+import { adMood } from './src/money/mood';
 import { bookLocked, interstitialDue, puzzlesFinished } from './src/money/rules';
 import { planReminders, shouldAsk } from './src/reminder/plan';
 import { ReminderAsk } from './src/reminder/ReminderAsk';
@@ -218,9 +219,10 @@ function Screens() {
   // After a won puzzle the player taps "Next": the one moment a full-screen ad may come (rules.ts decides).
   const maybeAd = useCallback(async () => {
     const finished = puzzlesFinished({ book: save.book.level, ink: save.challenge.ink.level, race: save.challenge.race.level });
-    if (!interstitialDue(MONEY_MODE, finished, Date.now(), save.money)) return;
+    if (!interstitialDue(MONEY_MODE, finished, Date.now(), save.money, adMood.now())) return;
     try {
       if (await ads.showInterstitial()) {
+        adMood.adShown();
         markAdShown(Date.now());
         count('ad_shown');
       }
@@ -289,6 +291,7 @@ function Screens() {
         onKeep={keep}
         onSolved={(ms, hints) => {
           store.finishDaily(route.key, ms, hints);
+          adMood.game(true);
           count('puzzle_solved', { kind: route.key === today ? 'daily' : 'past', size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, hints });
         }}
         onHint={(kind, what) => count('hint_used', { kind, what })}
@@ -309,6 +312,7 @@ function Screens() {
         onKeep={keep}
         onSolved={(ms, hints) => {
           store.finishBook(puzzle.id, hints, ms);
+          adMood.game(true);
           count('puzzle_solved', { kind: 'book', size: puzzle.n, grade: puzzle.grade, level: route.level, seconds: ms / 1000, hints, relief: route.relief });
         }}
         onHint={(kind, what) => count('hint_used', { kind, what })}
@@ -332,12 +336,14 @@ function Screens() {
         onContinue={keepPlaying}
         onRetry={() => setRoute({ ...route, attempt: route.attempt + 1 })}
         onLost={(right, total, ms) => {
+          adMood.game(false);
           store.finishChallenge(kind, false, false);
           count('challenge_end', { kind, result: 'lost', level: route.level, size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, closeness: Math.round((right / total) * 100) });
         }}
         nextLabel={t.challenge.next[kind]}
         onKeep={() => {}}
         onSolved={(ms, _hints, helped) => {
+          adMood.game(true);
           store.finishChallenge(kind, true, helped, kind === 'race' ? { n: puzzle.n, ms } : undefined);
           count('challenge_end', { kind, result: 'won', level: route.level, size: puzzle.n, grade: puzzle.grade, seconds: ms / 1000, closeness: 100, helped });
         }}

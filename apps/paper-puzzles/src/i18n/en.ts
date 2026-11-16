@@ -157,7 +157,7 @@ export const t = {
     // Test builds only: what the ads are doing, so a missing ad can be explained from a screenshot.
     adTest: {
       title: 'Test build: ads',
-      text: (s: { consent: string; started: boolean; fullScreen: string; video: string }, minutes: number, quiet: number, lastAd: number | null, finished: number, after: number, gap: number) =>
+      text: (s: { consent: string; started: boolean; fullScreen: string; video: string }, minutes: number, quiet: number, lastAd: number | null, finished: number, after: number, gap: number, mood: { games: number; results: boolean[] }) =>
         [
           `Consent: ${s.consent}`,
           `Ads library started: ${s.started ? 'yes' : 'no'}`,
@@ -166,6 +166,7 @@ export const t = {
           `Minutes since the first opening: ${minutes} (no ad in the first ${quiet})`,
           `Puzzles finished: ${finished} (no ad before ${after})`,
           `Last full-screen ad: ${lastAd === null ? 'never' : `${lastAd} min ago`} (one every ${gap} min at most)`,
+          `Games since opening or the last ad: ${mood.games} (an ad needs 3, the last 2 won). Last results: ${mood.results.map((w) => (w ? 'won' : 'lost')).join(', ') || 'none'}`,
         ].join('\n'),
     },
     adChoices: 'Ad privacy choices',
