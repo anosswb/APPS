@@ -1,6 +1,6 @@
 /** My day: the 24 hours around a shift as one ring, then the times as plain lines, then the worker's own numbers. */
 import React, { useState } from 'react';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { weekday } from '../core/dates';
@@ -10,8 +10,9 @@ import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 import { font, radius, size, space, type } from '../theme/tokens';
 import { Look, useTheme } from '../theme/useTheme';
+import { canBackup, pickBackup, saveBackup } from '../backup';
 import { ask } from '../notify';
-import { Caps, Field, Glass, Link, Segment, TimeField, Toggle } from '../ui/Bits';
+import { Caps, Field, Glass, GlassPill, Link, Segment, TimeField, Toggle } from '../ui/Bits';
 
 const R = size.ringR;
 const BOX = 2 * R + size.ring + 8;
@@ -41,6 +42,26 @@ export function MyDay({ data, today, now, top, onChange }: { data: Saved; today:
   const [blocked, setBlocked] = useState(false);
   const shift = (k: 'start' | 'end', v: number) => onChange({ ...data, shift: { ...data.shift, [k]: wrap(v) } });
   const habit = (k: keyof Habits, v: number, min: number) => onChange({ ...data, habits: { ...data.habits, [k]: Math.max(min, v) } });
+  const [note, setNote] = useState('');
+  const doSave = async () => {
+    if (!canBackup) return setNote(t.myDay.noWeb);
+    try { await saveBackup(data); setNote(''); } catch (e) { console.warn('Backup failed', e); setNote(t.myDay.failed); }
+  };
+  const doRestore = async () => {
+    if (!canBackup) return setNote(t.myDay.noWeb);
+    try {
+      const b = await pickBackup();
+      if (!b) return;
+      const when = b.made ? new Date(b.made).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+      Alert.alert(t.myDay.restoreTitle, t.myDay.restoreBody(when), [
+        { text: t.myDay.cancel, style: 'cancel' },
+        { text: t.myDay.restoreYes, style: 'destructive', onPress: () => { onChange({ ...b.data, welcomed: true }); setNote(t.myDay.restored); } },
+      ]);
+    } catch (e) {
+      console.warn('Restore failed', e);
+      setNote(e instanceof Error && e.message === 'not a backup' ? t.myDay.notBackup : t.myDay.failed);
+    }
+  };
   const remind = async (k: 'lunch' | 'twoLeft', on: boolean) => {
     if (on && !(await ask())) { setBlocked(Platform.OS !== 'web'); if (Platform.OS !== 'web') return; }
     setBlocked(false);
@@ -93,6 +114,14 @@ export function MyDay({ data, today, now, top, onChange }: { data: Saved; today:
         <Toggle label={t.myDay.lunch} sub={t.myDay.lunchSub} icon="utensils" on={data.remind.lunch} onChange={(on) => remind('lunch', on)} />
         <Toggle label={t.myDay.twoLeft} sub={t.myDay.twoLeftSub} icon="hourglass" on={data.remind.twoLeft} onChange={(on) => remind('twoLeft', on)} />
         {blocked && <Text style={[st.what, { color: c.textSoft, marginTop: space.s }]}>{t.myDay.blocked}</Text>}
+      </Glass>
+
+      <Glass style={{ paddingVertical: space.m, gap: space.s }}>
+        <Caps>{t.myDay.backup}</Caps>
+        <Text style={[st.what, { color: c.textSoft }]}>{t.myDay.backupWhy}</Text>
+        <GlassPill icon="receipt" tone="blue" label={t.myDay.save} onPress={doSave} />
+        <Link label={t.myDay.restore} onPress={doRestore} />
+        {note !== '' && <Text style={[st.what, { color: c.textSoft }]}>{note}</Text>}
       </Glass>
 
       <Glass style={{ paddingVertical: space.m, gap: space.s }}>

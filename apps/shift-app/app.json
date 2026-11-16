@@ -61,7 +61,8 @@
             "enableShrinkResourcesInReleaseBuilds": false
           }
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "backgroundColor": "#0B0F17"
   }
