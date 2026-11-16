@@ -4,6 +4,7 @@ import { FlexWidget, TextWidget } from 'react-native-android-widget';
 import { todayKey, weekday } from '../core/dates';
 import { clock } from '../core/dayline';
 import { dayOn, nextRest, shiftMinutes } from '../core/days';
+import { clockKey } from '../core/now';
 import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 
@@ -14,7 +15,7 @@ export function NextRest({ data, now }: { data: Saved; now: Date }) {
   const rest = nextRest(plan, today);
   const big = day?.kind === 'rest' ? t.today.restToday : rest ? t.today.inDays(rest.inDays) : t.today.noRest;
   const when = rest && day?.kind !== 'rest' ? `${t.days[weekday(rest.key)]}, ${t.monthsShort[Number(rest.key.slice(5, 7)) - 1]} ${Number(rest.key.slice(8))}` : '';
-  const log = data.log[today];
+  const log = data.log[clockKey(data.log, today)];
   const line = log && log.out === null ? t.widget.clockedIn(clock(log.in).text)
     : day?.kind === 'work' ? `${t.widget.today}  ${clock(day.start).text} – ${clock(day.start + shiftMinutes(day)).text}`
     : day?.kind === 'rest' ? t.widget.rest : t.widget.notMarked;
