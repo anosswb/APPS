@@ -82,16 +82,17 @@ export const themes: { dark: Theme; light: Theme } = {
     backdrop: ['#CFDCEA', '#E2E8F0', '#EDF0F4'],
     track: '#D9DDE4',
     sky: {
-      night: ['#1B2A4A', '#3A5488', '#8FA6CC', '#E9ECF1'],
-      dawn: ['#4E6F9A', '#7FA0C4', '#BFD0E2', '#E9ECF1'],
-      day: ['#5B88AE', '#86ABC9', '#C3D6E6', '#E9ECF1'],
-      dusk: ['#3F4F86', '#6F80B4', '#B9C3DE', '#E9ECF1'],
+      // Darker at the top than before: white text sits there and must stay readable (checked 16 Nov: 4.5:1 or more).
+      night: ['#1E3358', '#2E4E78', '#8FA6CC', '#E9ECF1'],
+      dawn: ['#2E4E78', '#3F6290', '#A9BDD8', '#E9ECF1'],
+      day: ['#2F5580', '#40668F', '#B3C8DE', '#E9ECF1'],
+      dusk: ['#2B3A6A', '#3D4F86', '#B0BAD9', '#E9ECF1'],
     },
   },
 };
 export const skyStops = [0, 0.35, 0.68, 1] as const;
 /** Text that sits on the top of the sky, in both modes. */
-export const onSky = { text: '#FFFFFF', soft: 'rgba(255,255,255,0.72)' } as const;
+export const onSky = { text: '#FFFFFF', soft: 'rgba(255,255,255,0.84)' } as const;
 
 export const font = {
   display: 'BricolageGrotesque_600SemiBold', // big words and numbers

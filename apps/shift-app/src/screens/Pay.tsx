@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { addDays, monthWeeks, weekday } from '../core/dates';
 import { clock } from '../core/dayline';
+import { clockKey } from '../core/now';
 import { payByRules, RulePay } from '../core/payrules';
 import { t } from '../i18n/en';
 import { LogDay, PayNumbers, payPlan, periodAround, rulesOf, Saved } from '../store';
@@ -55,7 +56,9 @@ export function Pay({ data, today, now, top, onChange, onPlus }: { data: Saved; 
   const label = (key: string) => `${t.daysShort[weekday(key)]} ${Number(key.slice(8))}`;
   const mon = (key: string) => `${t.monthsShort[Number(key.slice(5, 7)) - 1]} ${Number(key.slice(8))}`;
   const more = (r: RulePay, all: RulePay) => (all.gross !== null && r.gross !== null && all.gross - r.gross > 0.005 ? t.pay.planned(`+${money(all.gross - r.gross)}`) : '');
-  const todayLog = data.log[today];
+  // A night shift clocked in yesterday stays on this card until clock-out.
+  const ck = clockKey(data.log, today);
+  const todayLog = data.log[ck];
 
   // The pay-stub check: the last finished period by default, arrows to move.
   const cur = periodAround(p, today);
@@ -97,8 +100,8 @@ export function Pay({ data, today, now, top, onChange, onPlus }: { data: Saved; 
             </Text>
             {todayLog && todayLog.out === null && <Text style={[st.small, { color: c.textSoft }]}>{t.pay.worked(wrap(minutes - todayLog.in))}</Text>}
           </View>
-          <GlassButton icon="edit" label={todayLog ? t.pay.edit : t.pay.typeTime} on={typing !== null || open === today}
-            onPress={() => { if (todayLog) setOpen(open === today ? null : today); else setTyping(typing === null ? minutes : null); }} />
+          <GlassButton icon="edit" label={todayLog ? t.pay.edit : t.pay.typeTime} on={typing !== null || open === ck}
+            onPress={() => { if (todayLog) setOpen(open === ck ? null : ck); else setTyping(typing === null ? minutes : null); }} />
         </View>
         {typing !== null && !todayLog && (
           <View>
@@ -110,9 +113,9 @@ export function Pay({ data, today, now, top, onChange, onPlus }: { data: Saved; 
             </View>
           </View>
         )}
-        {open === today && todayLog && dayEditor(today, todayLog)}
+        {open === ck && todayLog && dayEditor(ck, todayLog)}
         {!todayLog && typing === null && <GlassPill icon="login" label={t.pay.clockIn} right={clock(minutes).text} onPress={() => setLog(today, { in: minutes, out: null })} />}
-        {todayLog && todayLog.out === null && open !== today && <GlassPill icon="logout" tone="blue" label={t.pay.clockOut} right={clock(minutes).text} onPress={() => setLog(today, { ...todayLog, out: minutes })} />}
+        {todayLog && todayLog.out === null && open !== ck && <GlassPill icon="logout" tone="blue" label={t.pay.clockOut} right={clock(minutes).text} onPress={() => setLog(ck, { ...todayLog, out: minutes })} />}
       </Glass>
 
       <Glass style={{ gap: space.xs }}>
@@ -172,7 +175,7 @@ export function Pay({ data, today, now, top, onChange, onPlus }: { data: Saved; 
                   </View>
                 )}
               </Pressable>
-              {open === k && l && k !== today && dayEditor(k, l)}
+              {open === k && l && k !== ck && dayEditor(k, l)}
             </View>
           );
         })}

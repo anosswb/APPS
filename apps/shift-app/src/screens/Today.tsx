@@ -5,7 +5,8 @@ import React from 'react';
 import { Alert, Platform, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { addDays, weekday } from '../core/dates';
 import { clock, dayLine } from '../core/dayline';
-import { Day, dayOn, nextRest, nextWorkDay, shiftMinutes, workedInRow } from '../core/days';
+import { Day, dayOn, nextRest, nextWorkDay, workedInRow } from '../core/days';
+import { nowOf } from '../core/now';
 import { t } from '../i18n/en';
 import { planOf, Saved } from '../store';
 import { font, onSky, radius, size, skyStops, space, type } from '../theme/tokens';
@@ -44,12 +45,11 @@ export function Today({ data, today, now, top, onCycle, onChange }: { data: Save
 
   // What is happening now: one line, one number, one bar.
   let nowLeft: string, nowRight = '', bar = -1;
-  if (todayDay?.kind === 'work') {
-    const start = todayDay.start, end = start + shiftMinutes(todayDay);
-    if (minutes < start) { nowLeft = t.today.now.clockIn(clock(start).text); nowRight = t.today.now.inTime(start - minutes); bar = 0; }
-    else if (minutes < end) { nowLeft = t.today.now.clockOut(clock(end).text); nowRight = t.today.now.left(end - minutes); bar = (minutes - start) / (end - start); }
-    else { nowLeft = t.today.now.done; bar = 1; if (work?.inDays === 1) nowRight = t.today.now.sleepBy(clock(dayLine(work.day, data.habits).sleepBy).text); }
-  } else if (todayDay?.kind === 'rest') {
+  const n = nowOf(plan, today, minutes);
+  if (n.kind === 'before') { nowLeft = t.today.now.clockIn(clock(n.day.start).text); nowRight = t.today.now.inTime(n.startsIn); bar = 0; }
+  else if (n.kind === 'during') { nowLeft = t.today.now.clockOut(clock(n.clockOut).text); nowRight = t.today.now.left(n.left); bar = n.part; }
+  else if (n.kind === 'done') { nowLeft = t.today.now.done; bar = 1; if (work?.inDays === 1) nowRight = t.today.now.sleepBy(clock(dayLine(work.day, data.habits).sleepBy).text); }
+  else if (n.kind === 'rest') {
     nowLeft = t.today.now.restDay;
     if (work) nowRight = t.today.now.back(work.inDays === 1 ? 'tomorrow' : t.daysShort[weekday(work.key)], clock(work.day.start).text);
   } else { nowLeft = t.today.now.notMarked; nowRight = t.today.now.tapIt; }
