@@ -209,7 +209,7 @@ export const t = {
     monthly: 'Monthly',
     price: { yearly: '$24.99 a year', monthly: '$3.99 a month', yearlyNote: 'About $2.08 a month' },
     test: 'Test build: no charge. This unlocks Plus on this phone only.',
-    buy: 'Try Plus',
+    buy: 'Get Plus',
     later: 'Continue free',
     restore: 'Restore purchases',
     terms: 'Terms',
@@ -230,6 +230,6 @@ export const t = {
       ['day', 'Plan around the shift', 'My day gives wake-up, leave and sleep times from your own numbers.'],
       ['pay', 'Track your pay', 'Clock in and out each day. Your rate, your overtime, your weekly and monthly total.'],
     ] as const,
-    start: 'Get started',
+    start: 'Set up my shifts',
   },
 };
