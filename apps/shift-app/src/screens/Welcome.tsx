@@ -32,7 +32,7 @@ export function Welcome({ top, bottom, onStart }: { top: number; bottom: number;
         </Glass>
       </ScrollView>
       <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
-        <GlassPill icon="right" label={t.welcome.start} onPress={onStart} />
+        <GlassPill solid icon="right" label={t.welcome.start} onPress={onStart} />
       </View>
     </View>
   );

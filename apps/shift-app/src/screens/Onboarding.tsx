@@ -37,7 +37,7 @@ export function Quiz({ data, top, bottom, onDone }: { data: Saved; top: number; 
         <View style={st.bar}>{Array.from({ length: total }, (_, i) => <View key={i} style={[st.seg, { backgroundColor: i <= step ? onSky.text : 'rgba(255,255,255,0.28)' }]} />)}</View>
         <Text style={st.count}>{t.quiz.step(step + 1, total)}</Text>
         <Text style={st.q}>{q ? q.q : t.quiz.start}</Text>
-        <Glass style={{ gap: space.s, padding: space.m }}>
+        <View style={{ gap: space.s }}>
           {q ? q.options.map(([id, label]) => {
             const val = q.id === 'hours' ? Number(id) : id;
             const on = a[q.id as keyof Answers] === val && (q.id !== 'hours' || a.hours !== 12 || id === '12');
@@ -51,11 +51,11 @@ export function Quiz({ data, top, bottom, onDone }: { data: Saved; top: number; 
             );
           }) : (
             <>
-              <TimeField label={t.quiz.startLabel} value={start} onChange={setStart} />
-              <GlassPill icon="right" label={t.quiz.next} onPress={finish} />
+              <Glass style={{ paddingVertical: space.s }}><TimeField label={t.quiz.startLabel} value={start} onChange={setStart} /></Glass>
+              <GlassPill solid icon="right" label={t.quiz.next} onPress={finish} />
             </>
           )}
-        </Glass>
+        </View>
       </ScrollView>
       {step > 0 && <View style={{ paddingHorizontal: space.l, paddingBottom: Math.max(bottom, space.m) }}><Link label={t.quiz.back} muted onPress={() => setStep(step - 1)} /></View>}
     </View>
@@ -87,7 +87,7 @@ export function Result({ data, top, bottom, onNext }: { data: Saved; top: number
         </Glass>
       </ScrollView>
       <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
-        <GlassPill icon="right" label={t.result.next} onPress={onNext} />
+        <GlassPill solid icon="right" label={t.result.next} onPress={onNext} />
       </View>
     </View>
   );
@@ -99,7 +99,7 @@ const st = StyleSheet.create({
   seg: { flex: 1, height: 4, borderRadius: 2 },
   count: { fontFamily: font.textBold, fontSize: type.small.size, color: onSky.soft, paddingHorizontal: space.s },
   q: { fontFamily: font.display, fontSize: type.title.size + 2, lineHeight: type.title.line + 4, letterSpacing: type.title.tracking, color: onSky.text, paddingHorizontal: space.s, marginBottom: space.s },
-  opt: { minHeight: size.tap + 6, borderRadius: radius.inner, borderWidth: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.m, gap: space.s },
+  opt: { minHeight: size.tap + 10, borderRadius: radius.inner, borderWidth: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.m, gap: space.s },
   optText: { flex: 1, fontFamily: font.textBold, fontSize: type.body.size + 1 },
   body: { fontFamily: font.text, fontSize: type.body.size, lineHeight: type.body.line + 2 },
   help: { flexDirection: 'row', alignItems: 'center', gap: space.m },

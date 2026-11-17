@@ -40,9 +40,19 @@ export function GlassButton({ icon, label, on, onPress, s = size.glassBtn }: { i
 }
 
 /** A glass capsule with a lit circle on the left, like the Focus switch. The main action of a panel. */
-export function GlassPill({ icon, label, right, onPress, tone = 'green' }: { icon: IconName; label: string; right?: string; onPress: () => void; tone?: 'green' | 'blue' | 'plain' }) {
+export function GlassPill({ icon, label, right, onPress, tone = 'green', solid }: { icon: IconName; label: string; right?: string; onPress: () => void; tone?: 'green' | 'blue' | 'plain'; solid?: boolean }) {
   const c = useTheme();
   const dot = tone === 'green' ? c.glass.on : tone === 'blue' ? c.blue : c.raised;
+  // Solid: the one main action of a page (first-open pages, buying Plus). White on dark, black on light.
+  if (solid) {
+    return (
+      <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={right ? `${label} ${right}` : label}
+        style={({ pressed }) => [st.pill, { backgroundColor: c.primary, borderColor: c.primary, justifyContent: 'center', paddingStart: space.l, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+        <Text style={[st.solidText, { color: c.onPrimary }]} numberOfLines={1}>{label}</Text>
+        {right && <Text style={[st.pillRight, { color: c.onPrimary, opacity: 0.7 }]}>{right}</Text>}
+      </Pressable>
+    );
+  }
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={right ? `${label} ${right}` : label}
       style={({ pressed }) => [st.pill, { backgroundColor: c.glass.fill, borderColor: c.glass.edge, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
@@ -120,7 +130,7 @@ export function TimeField({ label, value, onChange }: { label: string; value: nu
   useEffect(() => { if (parseTime(digits, pm) !== value) setDigits(digitsOf(value)); }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
   const ampm = (p: boolean) => (
     <Pressable onPress={() => { const m = parseTime(digits, p); if (m !== null) onChange(m); }} accessibilityRole="button" accessibilityState={{ selected: pm === p }}
-      style={[st.ampm, pm === p && { backgroundColor: c.raised }]}><Text style={[st.ampmText, { color: pm === p ? c.text : c.muted }]}>{p ? 'PM' : 'AM'}</Text></Pressable>
+      style={[st.ampm, pm === p && { backgroundColor: c.blue }]}><Text style={[st.ampmText, { color: pm === p ? '#FFFFFF' : c.textSoft }]}>{p ? 'PM' : 'AM'}</Text></Pressable>
   );
   return (
     <View style={[st.row, { borderTopColor: c.line }]}>
@@ -149,6 +159,7 @@ const st = StyleSheet.create({
   pill: { height: size.button + 8, borderRadius: radius.pill, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: space.m, paddingStart: 6, paddingEnd: space.l, overflow: 'hidden' },
   dot: { width: size.button - 4, height: size.button - 4, borderRadius: (size.button - 4) / 2, alignItems: 'center', justifyContent: 'center' },
   pillText: { flex: 1, fontFamily: font.textHeavy, fontSize: type.body.size + 1 },
+  solidText: { flexShrink: 1, fontFamily: font.textHeavy, fontSize: type.body.size + 1 },
   pillRight: { fontFamily: font.textBold, fontSize: type.body.size },
   seg: { flexDirection: 'row', borderRadius: radius.inner, borderWidth: 1, padding: 4 },
   segBtn: { flex: 1, height: size.step, borderRadius: radius.inner - 4, alignItems: 'center', justifyContent: 'center' },

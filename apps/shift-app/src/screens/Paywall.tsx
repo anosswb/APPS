@@ -60,7 +60,7 @@ export function Paywall({ top, bottom, onBuy, onLater, laterLabel }: { top: numb
         </View>
       </ScrollView>
       <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s, gap: space.xs }}>
-        <GlassPill icon="check" label={t.plus.buy} right={plan === 'yearly' ? t.plus.price.yearly : t.plus.price.monthly} onPress={onBuy} />
+        <GlassPill solid icon="check" label={t.plus.buy} right={plan === 'yearly' ? t.plus.price.yearly : t.plus.price.monthly} onPress={onBuy} />
         <Pressable onPress={onLater} accessibilityRole="button" style={st.later}><Text style={[st.laterText, { color: c.text }]}>{laterLabel ?? t.plus.later}</Text></Pressable>
       </View>
     </View>
