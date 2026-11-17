@@ -1,12 +1,12 @@
 /** What is kept on the phone, and how an old save is read safely after an update. */
-import { ChallengeSave, freshChallenges, INK, RACE } from '../game/challenge';
+import { ChallengeKind, ChallengeRun, ChallengeSave, freshChallenges, INK, RACE } from '../game/challenge';
 import { freshRecords, Records } from '../game/records';
 import { MoneyState } from '../money/rules';
 import { DEFAULT_REMINDER_TIME, REMINDER_HOURS, ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative · 7: challenge · 8: records */
-export const SCHEMA = 8;
+/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative · 7: challenge · 8: records · 9: runs (challenges in progress) */
+export const SCHEMA = 9;
 
 export interface GameSave {
   marks: number[];
@@ -36,6 +36,8 @@ export interface Save {
   challenge: ChallengeSave;
   /** personal bests: best clean time per grid size, win runs in the challenges */
   records: Records;
+  /** a challenge attempt in progress, per mode: leaving and coming back never refills the pot or the clock */
+  runs: Partial<Record<ChallengeKind, ChallengeRun>>;
   /** the daily note: off until the player says yes */
   reminder: ReminderState;
 }
@@ -59,6 +61,7 @@ export function freshSave(now: number = Date.now()): Save {
     reminder: { on: false, time: DEFAULT_REMINDER_TIME, asked: false },
     challenge: freshChallenges(),
     records: freshRecords(),
+    runs: {},
   };
 }
 
@@ -70,7 +73,7 @@ function isObject(x: unknown): x is Record<string, unknown> {
 export function migrate(raw: unknown, now: number = Date.now()): Save {
   const base = freshSave(now);
   if (!isObject(raw)) return base;
-  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats }, reminder: { ...base.reminder }, challenge: { race: { ...base.challenge.race }, ink: { ...base.challenge.ink } }, records: freshRecords() };
+  const out: Save = { ...base, settings: { ...base.settings }, book: { ...base.book }, money: { ...base.money, unlockedDays: [] }, stats: { ...base.stats }, reminder: { ...base.reminder }, challenge: { race: { ...base.challenge.race }, ink: { ...base.challenge.ink } }, records: freshRecords(), runs: {} };
   if (isObject(raw.settings)) {
     const s = raw.settings;
     if (s.theme === 'system' || s.theme === 'light' || s.theme === 'dark') out.settings.theme = s.theme;
@@ -140,6 +143,24 @@ export function migrate(raw: unknown, now: number = Date.now()): Save {
       }
     }
   }
+  if (isObject(raw.runs)) {
+    for (const kind of ['race', 'ink'] as const) {
+      const run = readRun(raw.runs[kind]);
+      if (run) out.runs[kind] = run;
+    }
+  }
   out.schema = SCHEMA;
   return out;
+}
+
+const count = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x) && x >= 0;
+
+/** A saved attempt is used only if every field is sound; a broken one is dropped (the player just starts the level). */
+function readRun(raw: unknown): ChallengeRun | null {
+  if (!isObject(raw)) return null;
+  const { level, room, marks, ms, used, extra, continues, failed, lossCounted } = raw;
+  if (!count(level) || level < 1 || !count(room) || room <= 0 || !count(ms) || !count(used) || !count(extra) || !count(continues)) return null;
+  if (!Array.isArray(marks) || marks.length > 400 || !marks.every((m) => m === 0 || m === 1 || m === 2)) return null;
+  if (typeof failed !== 'boolean' || typeof lossCounted !== 'boolean') return null;
+  return { level: Math.floor(level), room, marks: marks as number[], ms, used: Math.floor(used), extra, continues: Math.floor(continues), failed, lossCounted };
 }

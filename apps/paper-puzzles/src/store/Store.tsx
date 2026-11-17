@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 
 import { SAVE_KEY } from '../config/app';
 import { bookSpec, nextPace } from '../game/book';
-import { afterInk, afterRace, ChallengeKind } from '../game/challenge';
+import { afterInk, afterRace, ChallengeKind, ChallengeRun } from '../game/challenge';
 import { dailySpec } from '../game/daily';
 import { recordChallenge, recordSolve } from '../game/records';
 import { ReminderState } from '../reminder/plan';
@@ -27,6 +27,8 @@ interface StoreApi {
   setReminder: (change: Partial<ReminderState>) => void;
   /** a challenge attempt ended. helped = won only after extra time or ink */
   finishChallenge: (kind: ChallengeKind, won: boolean, helped: boolean, raceSolve?: { n: number; ms: number }) => void;
+  /** keep (or with null, clear) the challenge attempt in progress */
+  keepRun: (kind: ChallengeKind, run: ChallengeRun | null) => void;
 }
 
 const Ctx = createContext<StoreApi | null>(null);
@@ -138,12 +140,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const keepRun = useCallback((kind: ChallengeKind, run: ChallengeRun | null) => {
+    setSave((s) => {
+      const runs = { ...s.runs };
+      if (run) runs[kind] = run;
+      else delete runs[kind];
+      return { ...s, runs };
+    });
+  }, []);
+
   const markAdShown = useCallback((now: number) => {
     setSave((s) => ({ ...s, money: { ...s.money, lastAdAt: now } }));
   }, []);
 
   return (
-    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn, setReminder, finishChallenge }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn, setReminder, finishChallenge, keepRun }}>{children}</Ctx.Provider>
   );
 }
 

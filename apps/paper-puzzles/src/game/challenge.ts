@@ -33,6 +33,27 @@ export interface ChallengeSave {
   ink: InkState;
 }
 
+/**
+ * A challenge attempt in progress, kept on the phone so that leaving and coming back changes nothing
+ * (Anass, 17 Nov 2026: quitting used to give a fresh, full pot). `room` is the clock (ms) or the pot (drops)
+ * fixed when the attempt started. Cleared by a win or by "Try again".
+ */
+export interface ChallengeRun {
+  level: number;
+  room: number;
+  marks: number[];
+  /** time spent on this attempt, counted only while it was open */
+  ms: number;
+  /** drops of ink used */
+  used: number;
+  /** ms or drops added by videos */
+  extra: number;
+  continues: number;
+  failed: boolean;
+  /** the loss was already counted (it is counted once, when the player leaves or tries again) */
+  lossCounted: boolean;
+}
+
 export const RACE = { start: 3, min: 1, max: 4, win: 0.92, loss: 1.2 } as const;
 export const INK = { start: 4, min: 1, max: 6, win: -1, loss: 2 } as const;
 

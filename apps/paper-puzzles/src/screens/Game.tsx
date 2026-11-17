@@ -48,6 +48,10 @@ interface Props {
   onRetry?: () => void;
   /** the attempt ended without a win. right/total = tents in the right place */
   onLost?: (right: number, total: number, ms: number) => void;
+  /** a challenge attempt saved earlier: the ink used, the extra room, a lost state. Marks and time come in `initial` */
+  resume?: { used: number; extra: number; continues: number; failed: boolean; lossCounted: boolean };
+  /** keeps the challenge attempt on the phone at every change; null = nothing to keep (won, or started again) */
+  onKeepRun?: (run: { marks: number[]; ms: number; used: number; extra: number; continues: number; failed: boolean; lossCounted: boolean } | null) => void;
   onKeep: (game: GameSave) => void;
   /** helped = solved only after extra time or ink (challenges) */
   onSolved: (ms: number, hints: number, helped: boolean) => void;
@@ -60,7 +64,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, bestBefore, challenge, canContinue, onContinue, onRetry, onLost, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, bestBefore, challenge, canContinue, onContinue, onRetry, onLost, resume, onKeepRun, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -75,6 +79,8 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
   const [solved, setSolved] = useState(() => !!alreadySolved || (!!initial && isSolved(puzzle, initial.marks)));
   const [finalMs, setFinalMs] = useState(initial?.ms ?? 0);
   const freshWin = useRef(false);
+  // Saves the challenge attempt; filled in below, called from the effects that need it.
+  const keepRun = useRef<() => void>(() => {});
 
   // Time on the puzzle, counted only while the app is open. Kept for the solved line, never shown as pressure.
   const banked = useRef(initial?.ms ?? 0);
@@ -86,6 +92,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       else {
         banked.current += Date.now() - since.current;
         since.current = Date.now();
+        keepRun.current();
       }
     });
     return () => sub.remove();
@@ -112,10 +119,10 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
   useEffect(() => () => sound.hush(), []);
 
   // ---- Challenges: a clock or a pot of ink, and a way to lose ----
-  const [failed, setFailed] = useState(false);
-  const [extra, setExtra] = useState(0); // ms or drops added by "keep playing"
-  const [continues, setContinues] = useState(0);
-  const [used, setUsed] = useState(0); // drops of ink used
+  const [failed, setFailed] = useState(resume?.failed ?? false);
+  const [extra, setExtra] = useState(resume?.extra ?? 0); // ms or drops added by "keep playing"
+  const [continues, setContinues] = useState(resume?.continues ?? 0);
+  const [used, setUsed] = useState(resume?.used ?? 0); // drops of ink used
   const [leftMs, setLeftMs] = useState(challenge?.kind === 'race' ? challenge.room : 0);
   const [busy, setBusy] = useState(false);
   const room = (challenge?.room ?? 0) + extra;
@@ -144,16 +151,32 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
           onLost(right, tentsWanted, elapsed());
         }
       : null;
-  const lostTold = useRef(false);
+  const lostTold = useRef(resume?.lossCounted ?? false);
+  const startedAgain = useRef(false);
   const reportLost = useCallback(() => {
     if (lostTold.current) return;
     lostTold.current = true;
     lostRef.current?.();
   }, []);
-  useEffect(() => () => reportLost(), [reportLost]);
+  // Leaving and coming back must not refill the pot or reset the clock: the attempt is kept at every change.
+  keepRun.current = () => {
+    if (!challenge || !onKeepRun) return;
+    if (solved || startedAgain.current) onKeepRun(null);
+    else onKeepRun({ marks, ms: elapsed(), used, extra, continues, failed, lossCounted: lostTold.current });
+  };
+  useEffect(() => keepRun.current(), [marks, used, extra, continues, failed, solved]);
+  useEffect(
+    () => () => {
+      reportLost();
+      keepRun.current();
+    },
+    [reportLost],
+  );
   // "Try again" reports the loss first, so the next attempt already has the extra room the algorithm gives.
   const tryAgain = useCallback(() => {
     reportLost();
+    startedAgain.current = true;
+    keepRun.current();
     onRetry?.();
   }, [onRetry, reportLost]);
 

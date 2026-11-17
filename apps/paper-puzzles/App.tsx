@@ -173,9 +173,17 @@ function Screens() {
     [puzzle, store],
   );
 
+  // A challenge attempt left half-way is picked up again exactly as it was (same pot, same clock).
+  const challengeRun = useMemo(() => {
+    if (route.name !== 'challenge' || !puzzle) return undefined;
+    const run = save.runs[route.kind];
+    return run && run.level === route.level && run.marks.length === puzzle.n * puzzle.n ? run : undefined;
+  }, [route]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // A challenge: the clock or the pot is fixed when the attempt starts, from what the algorithm allows this player.
   const challengeRoom = useMemo(() => {
     if (route.name !== 'challenge' || !puzzle) return 0;
+    if (challengeRun) return challengeRun.room;
     return route.kind === 'race'
       ? raceLimitMs(puzzle.n, puzzle.grade, save.challenge.race.factor)
       : inkDrops(puzzle.solution.filter(Boolean).length, save.challenge.ink.slack);
@@ -330,6 +338,9 @@ function Screens() {
         puzzle={puzzle}
         title={t.challenge.title[kind](route.level)}
         challenge={{ kind, room: challengeRoom }}
+        initial={challengeRun ? { marks: challengeRun.marks, ms: challengeRun.ms, hints: 0 } : undefined}
+        resume={challengeRun}
+        onKeepRun={(run) => store.keepRun(kind, run ? { ...run, level: route.level, room: challengeRoom } : null)}
         bestBefore={save.records.best[String(puzzle.n)]}
         afterLine={save.records[kind].streak >= 2 ? t.records.run(save.records[kind].streak, save.records[kind].best) : undefined}
         canContinue={MONEY_MODE === 'ads'}
