@@ -58,6 +58,9 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Ads only at a good moment** (Anass got an ad on his first win after opening): a full-screen ad needs 3 games since opening or since the last ad, and the last 2 won. Never after a loss. Tested (101 tests); not yet seen on a phone. The Settings status block shows the count.
 - Test build run 43775764360 (ink as the main game) built fine.
 
+## Done (17 Nov 2026)
+- **No more free refill by quitting** (Anass found it): a challenge in progress is saved (board, ink, clock time, lost state). Leaving and coming back, even after closing the app, gives the same pot. Save format version 9. 104 tests green. Seen in the browser: 6 of 9 drops stayed 6 after leaving and after a reload; an empty pot came back as "The ink ran dry". The race clock was not checked by hand.
+
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 

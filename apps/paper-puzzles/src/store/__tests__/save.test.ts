@@ -144,3 +144,25 @@ describe('reading a save', () => {
     expect(migrate(JSON.parse(JSON.stringify(s)), NOW).money).toEqual(s.money);
   });
 });
+
+describe('a challenge in progress (version 9)', () => {
+  const run = { level: 4, room: 9, marks: [0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ms: 41000, used: 7, extra: 0, continues: 0, failed: false, lossCounted: false };
+
+  test('the ink used and the board survive a save and a reload', () => {
+    const s = freshSave(NOW);
+    s.runs = { ink: run };
+    expect(migrate(JSON.parse(JSON.stringify(s)), NOW).runs).toEqual({ ink: run });
+  });
+
+  test('an old save has no attempt in progress and keeps everything else', () => {
+    const v8 = { ...JSON.parse(JSON.stringify(freshSave(NOW))), schema: 8, runs: undefined, book: { level: 12, relief: 0, solved: 11, fast: 0 } };
+    const out = migrate(v8, NOW);
+    expect(out.runs).toEqual({});
+    expect(out.book.level).toBe(12);
+  });
+
+  test('a broken attempt is dropped, never half-read', () => {
+    const s = { ...JSON.parse(JSON.stringify(freshSave(NOW))), runs: { ink: { ...run, used: -3 }, race: { ...run, marks: [7] } } };
+    expect(migrate(s, NOW).runs).toEqual({});
+  });
+});
