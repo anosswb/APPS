@@ -63,6 +63,27 @@ He said: write the tap rule; My numbers did not change the app; "just a calendar
 - Sun/moon light-dark button on Today.
 - **Next:** his feedback on the phone; backup button (biggest review complaint); prices (his decision); real purchases need the Apple account ($99/yr) and RevenueCat or StoreKit; ad consent (UMP) before live ads; Terms and Privacy pages (free page, no domain needed: research/2026-11-15-free-stores.md).
 
+## Done (16–17 Nov 2026) — night work
+- Night shifts across midnight (Today, Pay clock-out, widget): `src/core/now.ts`, tested. PR #33.
+- Backup to a file and restore on a new phone (My day → Backup): `src/backup.ts`, tested. PR #33.
+- Light-mode sky darker at the top so white text reads (measured). PR #33.
+- Draft privacy policy and terms: `site/privacy.html`, `site/terms.html` (need Anass's email and a US native read). PR #33.
+- First-open pages after a slop check: solid main buttons, "Get Plus", clear AM/PM. PR #34.
+- Work-day notes planned by a tested pure function; a night shift's note survives opening the app after midnight. PR #35.
+- 52 tests pass.
+
+## Next (in order)
+1. Anass's notes from the phone on the latest APK.
+2. Prices for Plus (his call) and the Apple account when he is ready; then real purchases (RevenueCat or StoreKit).
+3. Real AdMob IDs and the ad consent screen (UMP) before live ads.
+4. Publish the privacy and terms pages (free page, no domain): needs his contact email.
+5. Name check (needs a session that can open the stores) and the store listing.
+6. Ideas not built: a live Today preview on the setup page; "add my shifts to my phone calendar"; take-home % from his own pay stub.
+
+## Blocked
+- Firecrawl research: api.firecrawl.dev is not allowed in this cloud environment; Anass must save his key in the secure form (it also opens the host). Context.dev has 0 credits until 4 Dec.
+- `.claude/settings.json` asks before every `git push`; at night that freezes the session. Only Anass can change it (the safety system blocks me from editing my own permissions).
+
 ## Not done on these screens yet (be honest in the next session)
 `/slop-check` not run · night shifts: the "now" line does not follow a shift that started yesterday · pay period and payday not on the Pay tab (week and month only) · "days I mark" pay rule has no screen · no change note on a day · no share-the-month picture · the sun and sky do not animate · no first-time teaching beyond one hint line · largest font size and small phones not checked · shift times cannot be set per day (only the usual shift) · night shifts over midnight not looked at on screen · iPhone alarm path is only a help message · no tests for `src/store.ts`.
 
