@@ -34,32 +34,43 @@ export async function ask(): Promise<boolean> {
 
 const at = (key: string, minutes: number) => { const [y, m, d] = key.split('-').map(Number); return new Date(y, m - 1, d, 0, minutes); };
 
+export interface Note { when: Date; title: string; body: string }
+
+/** The notes for the next 7 days, in time order, only those still ahead of `now`. Pure, so it is tested. */
+export function planNotes(data: Saved, now: Date): Note[] {
+  const out: Note[] = [];
+  if (!data.remind.lunch && !data.remind.twoLeft) return out;
+  const plan = planOf(data);
+  const today = todayKey(now);
+  for (let i = -1; i < 7; i++) {
+    const key = addDays(today, i);
+    const day = dayOn(plan, key);
+    if (day?.kind !== 'work') continue;
+    const pick = (list: readonly string[]) => list[dayNumber(key) % list.length];
+    const line = dayLine(day, data.habits);
+    const notes: [boolean, number, string, string][] = [
+      [data.remind.lunch, line.eat, t.notes.lunchTitle, pick(t.notes.lunch)],
+      [data.remind.twoLeft && shiftMinutes(day) > 180, line.clockOut - 120, t.notes.twoTitle, pick(t.notes.two)],
+    ];
+    for (const [on, minute, title, body] of notes) {
+      const when = at(key, minute);
+      if (on && when > now) out.push({ when, title, body });
+    }
+  }
+  return out.sort((x, y) => x.when.getTime() - y.when.getTime());
+}
+
 export async function schedule(data: Saved, now: Date = new Date()): Promise<void> {
   if (Platform.OS === 'web') return;
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
     if (!data.remind.lunch && !data.remind.twoLeft) return;
     if (!(await allowed())) return;
-    const plan = planOf(data);
-    const today = todayKey(now);
-    for (let i = 0; i < 7; i++) {
-      const key = addDays(today, i);
-      const day = dayOn(plan, key);
-      if (day?.kind !== 'work') continue;
-      const pick = (list: readonly string[]) => list[dayNumber(key) % list.length];
-      const line = dayLine(day, data.habits);
-      const notes: [boolean, number, string, string][] = [
-        [data.remind.lunch, line.eat, t.notes.lunchTitle, pick(t.notes.lunch)],
-        [data.remind.twoLeft && shiftMinutes(day) > 180, line.clockOut - 120, t.notes.twoTitle, pick(t.notes.two)],
-      ];
-      for (const [on, minute, title, body] of notes) {
-        const when = at(key, minute);
-        if (!on || when <= now) continue;
-        await Notifications.scheduleNotificationAsync({
-          content: { title, body },
-          trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: when, channelId: CHANNEL },
-        });
-      }
+    for (const n of planNotes(data, now)) {
+      await Notifications.scheduleNotificationAsync({
+        content: { title: n.title, body: n.body },
+        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: n.when, channelId: CHANNEL },
+      });
     }
   } catch (e) {
     console.warn('Could not schedule the notes', e);
