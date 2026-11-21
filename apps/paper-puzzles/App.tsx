@@ -19,7 +19,7 @@ import { t } from './src/i18n/en';
 import { ads } from './src/money/ads';
 import { purchases } from './src/money/purchases';
 import { adMood } from './src/money/mood';
-import { bookLocked, interstitialDue, puzzlesFinished } from './src/money/rules';
+import { bookLocked, bottleShopOpen, interstitialDue, puzzlesFinished } from './src/money/rules';
 import { planReminders, shouldAsk } from './src/reminder/plan';
 import { ReminderAsk } from './src/reminder/ReminderAsk';
 import { reminders } from './src/reminder/reminders';
@@ -340,6 +340,9 @@ function Screens() {
         challenge={{ kind, room: challengeRoom }}
         initial={challengeRun ? { marks: challengeRun.marks, ms: challengeRun.ms, hints: 0 } : undefined}
         resume={challengeRun}
+        bottles={save.bottles}
+        onBottle={() => store.changeBottles(-1)}
+        onShop={bottleShopOpen(MONEY_MODE, canSell) ? () => setRoute({ name: 'full', back: route }) : undefined}
         onKeepRun={(run) => store.keepRun(kind, run ? { ...run, level: route.level, room: challengeRoom } : null)}
         bestBefore={save.records.best[String(puzzle.n)]}
         afterLine={save.records[kind].streak >= 2 ? t.records.run(save.records[kind].streak, save.records[kind].best) : undefined}
@@ -373,7 +376,7 @@ function Screens() {
         onRules={() => setRoute({ name: 'rules', back: { name: 'home' } })}
         onArchive={() => setRoute({ name: 'archive', month: monthOf(today) })}
         onSettings={() => setRoute({ name: 'settings' })}
-        onFullEdition={canSell && !save.money.fullEdition ? () => setRoute({ name: 'full', back: { name: 'home' } }) : undefined}
+        onFullEdition={canSell ? () => setRoute({ name: 'full', back: { name: 'home' } }) : undefined}
         bookIsLocked={bookIsLocked}
       />
     );

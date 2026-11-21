@@ -1,4 +1,4 @@
-import { afterGame, AdMood, archiveLocked, bookLocked, freshMood, goodMoment, interstitialDue, MoneyState, oldestFreeDay, puzzlesFinished } from '../rules';
+import { afterGame, AdMood, archiveLocked, bookLocked, bottleShopOpen, freshMood, goodMoment, interstitialDue, MoneyState, oldestFreeDay, puzzlesFinished } from '../rules';
 
 const MIN = 60 * 1000;
 const base: MoneyState = { fullEdition: false, unlockedDays: [], lastAdAt: 0, firstOpenAt: 0 };
@@ -103,5 +103,14 @@ describe('full-screen ads', () => {
     const m = { ...base, lastAdAt: 100 * MIN };
     expect(interstitialDue('ads', 20, 103 * MIN, m, happy)).toBe(false);
     expect(interstitialDue('ads', 20, 104 * MIN, m, happy)).toBe(true);
+  });
+});
+
+describe('ink bottle shop', () => {
+  test('only on iPhone, and only when a real store answers', () => {
+    expect(bottleShopOpen('iap', true)).toBe(true);
+    expect(bottleShopOpen('iap', false)).toBe(false);
+    expect(bottleShopOpen('ads', true)).toBe(false);
+    expect(bottleShopOpen('none', true)).toBe(false);
   });
 });

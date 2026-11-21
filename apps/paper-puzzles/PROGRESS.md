@@ -65,6 +65,8 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 - **Foldables and tablets:** store rules checked (`research/2026-11-21-foldables-large-screens.md`). The board now fits the height, so an open foldable or tablet on its side shows the whole puzzle. Seen in the browser at cover screen (344 wide), open portrait (712 x 830), open landscape (830 x 712), tablet landscape (1180 x 820). Not tried on a real foldable.
 - Still to do for the stores: 3 foldable screenshots + 1 phone screenshot on Google Play (games, from Apr 2027); a 13-inch iPad screenshot on the App Store (we say we support iPad); build the iPhone app with the iOS 27 SDK so it fills the iPhone Duo screen.
 
+- **Ink bottles** built: 3 free, used on the lost screen, a shop page with 10 for $1.99 and 30 for $4.99 (iPhone, switched off until the Apple account). Save format version 10. 107 tests green. Seen in the browser with the pretend shop: lose, use 3 bottles, run out, "Get ink bottles", buy 30, back to the same board with 30 bottles.
+
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 

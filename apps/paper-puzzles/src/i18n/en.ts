@@ -115,11 +115,20 @@ export const t = {
     onUs: 'No video is ready right now, so this one is on us.',
   },
 
+  shop: {
+    title: 'Ink bottles',
+    blurb: 'When the ink or the clock runs out, one bottle gives you 3 more drops or 30 more seconds, and your board stays as it is. Trying again is always free.',
+    have: (n: number) => `You have ${n} ${n === 1 ? 'bottle' : 'bottles'}.`,
+    pack: (n: number, price: string | null) => (price ? `${n} bottles · ${price}` : `${n} bottles`),
+    added: (n: number) => `${n} bottles added. Good luck.`,
+    kept: 'Bottles are kept on this phone.',
+  },
+
   full: {
     title: 'The full edition',
     promise: 'One payment. Yours for good. No subscription.',
     items: [
-      'The whole Book: every puzzle after No. 30, with no end.',
+      'All of free play: every puzzle after No. 30, with no end.',
       'Every past puzzle, back to the first edition.',
       'No ads. There are none on iPhone, and there never will be.',
     ],
@@ -133,7 +142,8 @@ export const t = {
     thanks: 'Thank you. The full edition is yours.',
     terms: 'Terms',
     privacy: 'Privacy',
-    homeLink: 'The full edition',
+    homeLink: 'Shop',
+    back: 'Back',
     bookEnd: 'Puzzle No. 30 was the last free one in free play. The rest is in the full edition.',
   },
 
@@ -253,6 +263,8 @@ export const t = {
     closeness: (right: number, total: number) => `${right} of ${total} tents were in the right place.`,
     more: { race: (seconds: number) => `Watch a video: ${seconds} more seconds`, ink: (drops: number) => `Watch a video: ${drops} more drops` },
     again: 'Try again',
+    bottle: { race: (left: number) => `Use an ink bottle: 30 more seconds (${left} left)`, ink: (left: number) => `Use an ink bottle: 3 more drops (${left} left)` },
+    getBottles: 'Get ink bottles',
     won: {
       race: (time: string) => `Solved with ${time} left on the clock.`,
       ink: (left: number) => (left === 0 ? 'Solved with the very last drop.' : `Solved with ${left === 1 ? '1 drop' : `${left} drops`} of ink to spare.`),

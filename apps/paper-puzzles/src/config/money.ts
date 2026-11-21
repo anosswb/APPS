@@ -28,5 +28,15 @@ export const AD_QUIET_START_MS = 10 * 60 * 1000;
 /** ...and never more often than once every four minutes. */
 export const AD_MIN_GAP_MS = 4 * 60 * 1000;
 
+/** Ink bottles (Anass, 21 Nov 2026): one bottle gives a lost challenge more room, instead of a video. */
+export const FREE_BOTTLES = 3;
+export const BOTTLE_DROPS = 3;
+export const BOTTLE_MS = 30 * 1000;
+/** iPhone only (Google pays no sellers in Morocco). Product ids must match App Store Connect. Prices are set there. */
+export const BOTTLE_PACKS = [
+  { id: 'ink_bottles_10', bottles: 10 },
+  { id: 'ink_bottles_30', bottles: 30 },
+] as const;
+
 /** Shown on the paywall. They must be real pages before purchases go live (docs/store.md). */
 export const LEGAL = { privacy: '', terms: '' };
