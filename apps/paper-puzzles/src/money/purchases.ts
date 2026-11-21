@@ -4,9 +4,10 @@
  * on iPhone (see `canSell` in rules.ts). The real iPhone version goes in `purchases.ios.ts`
  * once the Apple account and the product exist (steps in docs/money.md).
  */
-import { MONEY_PREVIEW } from '../config/money';
+import { BOTTLE_PACKS, MONEY_PREVIEW } from '../config/money';
 
 export type BuyResult = 'bought' | 'cancelled' | 'failed';
+export type BottlePackId = (typeof BOTTLE_PACKS)[number]['id'];
 
 export interface Purchases {
   /** true only when a real purchase can be made right now */
@@ -23,6 +24,10 @@ export interface Purchases {
   buy(): Promise<BuyResult>;
   /** true if a past purchase was found */
   restore(): Promise<boolean>;
+  /** ink bottles: a consumable, bought again and again. The price as the store formats it, or null */
+  bottlePrice(id: BottlePackId): Promise<string | null>;
+  /** 'bought' only once the store has charged; the caller then adds the bottles */
+  buyBottles(id: BottlePackId): Promise<BuyResult>;
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -34,6 +39,8 @@ const off: Purchases = {
   price: async () => null,
   buy: async () => 'failed',
   restore: async () => false,
+  bottlePrice: async () => null,
+  buyBottles: async () => 'failed',
 };
 
 /** Preview only: a pretend shop where buying always works, so the screens can be seen in a browser. */
@@ -49,6 +56,11 @@ const pretend: Purchases = {
     return 'bought';
   },
   restore: async () => pretendOwned,
+  bottlePrice: async (id) => (id === 'ink_bottles_10' ? '$1.99' : '$4.99'),
+  buyBottles: async () => {
+    await wait(500);
+    return 'bought';
+  },
 };
 
 export const purchases: Purchases = MONEY_PREVIEW === 'iap' ? pretend : off;

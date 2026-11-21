@@ -2,25 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { LEGAL } from '../config/money';
+import { BOTTLE_PACKS, LEGAL } from '../config/money';
 import { t } from '../i18n/en';
-import { purchases } from '../money/purchases';
+import { BottlePackId, purchases } from '../money/purchases';
 import { useStore } from '../store/Store';
 import { useTheme } from '../theme/ThemeContext';
 import { space, tapMin } from '../theme/tokens';
 import { Btn } from '../ui/Btn';
-import { Chevron } from '../ui/Glyphs';
+import { Chevron, InkPot } from '../ui/Glyphs';
 import { Rule } from '../ui/Rule';
 import { Stamp } from '../ui/Stamp';
 import { Type } from '../ui/Type';
 
 type Note = 'none' | 'failed' | 'restored' | 'nothing';
 
-/** The one paywall. Reached only by choice: from the end of the free Book, an older day, or the front page link. */
+/** The shop (iPhone): ink bottles, then the full edition. Reached only by choice: a lost challenge, the end of the free Book, an older day, or the front page link. */
 export function FullEdition({ onExit }: { onExit: () => void }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { save, setFullEdition } = useStore();
+  const { save, setFullEdition, changeBottles } = useStore();
+  const [packPrices, setPackPrices] = useState<Partial<Record<BottlePackId, string | null>>>({});
+  const [added, setAdded] = useState(0);
   const [price, setPrice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<Note>('none');
@@ -34,10 +36,36 @@ export function FullEdition({ onExit }: { onExit: () => void }) {
         if (alive) setPrice(p);
       })
       .catch((error) => console.warn('Could not read the price', error));
+    for (const pack of BOTTLE_PACKS) {
+      purchases
+        .bottlePrice(pack.id)
+        .then((p) => {
+          if (alive) setPackPrices((old) => ({ ...old, [pack.id]: p }));
+        })
+        .catch((error) => console.warn('Could not read the price', error));
+    }
     return () => {
       alive = false;
     };
   }, []);
+
+  const buyPack = async (id: BottlePackId, bottles: number) => {
+    setBusy(true);
+    setNote('none');
+    setAdded(0);
+    try {
+      const result = await purchases.buyBottles(id);
+      if (result === 'bought') {
+        changeBottles(bottles);
+        setAdded(bottles);
+      } else if (result === 'failed') setNote('failed');
+    } catch (error) {
+      console.warn('Purchase error', error);
+      setNote('failed');
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const buy = async () => {
     setBusy(true);
@@ -79,11 +107,37 @@ export function FullEdition({ onExit }: { onExit: () => void }) {
       contentContainerStyle={[styles.page, { paddingTop: insets.top + space.s, paddingBottom: insets.bottom + space.xxl }]}
     >
       <View style={styles.column}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t.game.back} onPress={onExit} hitSlop={8} style={styles.back}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t.full.back} onPress={onExit} hitSlop={8} style={styles.back}>
           <Chevron size={20} color={c.text} />
-          <Type variant="label">{t.game.back}</Type>
+          <Type variant="label">{t.full.back}</Type>
         </Pressable>
         <Rule strong />
+        <View style={styles.bottleHead}>
+          <Type variant="title" accessibilityRole="header" style={styles.flex}>
+            {t.shop.title}
+          </Type>
+          <InkPot size={44} color={c.text} accent={c.accent} paper={c.bg} />
+        </View>
+        <Type tone="muted">{t.shop.blurb}</Type>
+        <Type variant="label" tone="accent" style={styles.have} accessibilityLiveRegion="polite">
+          {added ? t.shop.added(added) : t.shop.have(save.bottles)}
+        </Type>
+        {BOTTLE_PACKS.map((pack, i) => (
+          <Btn
+            key={pack.id}
+            label={t.shop.pack(pack.bottles, packPrices[pack.id] ?? null)}
+            kind={i === BOTTLE_PACKS.length - 1 ? 'ink' : 'outline'}
+            onPress={() => void buyPack(pack.id, pack.bottles)}
+            disabled={busy}
+            style={styles.pack}
+          />
+        ))}
+        <Type variant="bodyItalic" tone="muted" style={[styles.center, styles.kept]}>
+          {t.shop.kept}
+        </Type>
+
+        <View style={styles.gap} />
+        <Rule double />
         <Type variant="title" accessibilityRole="header" style={styles.title}>
           {t.full.title}
         </Type>
@@ -136,6 +190,12 @@ const styles = StyleSheet.create({
   column: { width: '100%', maxWidth: 520 },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.xs, minHeight: tapMin, alignSelf: 'flex-start', paddingEnd: space.m },
   title: { marginTop: space.l },
+  bottleHead: { flexDirection: 'row', alignItems: 'center', gap: space.l, marginTop: space.l, marginBottom: space.s },
+  flex: { flex: 1 },
+  have: { marginTop: space.l },
+  pack: { marginTop: space.m },
+  kept: { marginTop: space.m },
+  gap: { height: space.xl },
   promise: { marginTop: space.xs, marginBottom: space.l },
   item: { marginVertical: space.m },
   free: { marginTop: space.l },

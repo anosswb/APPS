@@ -166,3 +166,19 @@ describe('a challenge in progress (version 9)', () => {
     expect(migrate(s, NOW).runs).toEqual({});
   });
 });
+
+describe('ink bottles (version 10)', () => {
+  test('a new player starts with 3 free bottles, and so does an old save', () => {
+    expect(freshSave(NOW).bottles).toBe(3);
+    const v9 = { ...JSON.parse(JSON.stringify(freshSave(NOW))), schema: 9, bottles: undefined };
+    expect(migrate(v9, NOW).bottles).toBe(3);
+  });
+
+  test('bought bottles survive a reload; broken counts are ignored', () => {
+    const s = { ...JSON.parse(JSON.stringify(freshSave(NOW))), bottles: 27 };
+    expect(migrate(s, NOW).bottles).toBe(27);
+    expect(migrate({ ...s, bottles: 0 }, NOW).bottles).toBe(0);
+    expect(migrate({ ...s, bottles: -5 }, NOW).bottles).toBe(3);
+    expect(migrate({ ...s, bottles: 'lots' }, NOW).bottles).toBe(3);
+  });
+});

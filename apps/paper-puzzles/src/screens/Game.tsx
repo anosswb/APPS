@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BOTTLE_DROPS, BOTTLE_MS } from '../config/money';
 import { INK_EXTRA, MAX_CONTINUES, raceExtraMs } from '../game/challenge';
 import { getHint, Hint, isSolved, visibleProblems } from '../game/hints';
 import { pick, praiseFor } from '../game/praise';
@@ -48,6 +49,11 @@ interface Props {
   onRetry?: () => void;
   /** the attempt ended without a win. right/total = tents in the right place */
   onLost?: (right: number, total: number, ms: number) => void;
+  /** ink bottles the player holds; one gives a lost challenge more room without a video */
+  bottles?: number;
+  onBottle?: () => void;
+  /** opens the bottle shop (iPhone, when buying works). The attempt waits, nothing is counted as lost */
+  onShop?: () => void;
   /** a challenge attempt saved earlier: the ink used, the extra room, a lost state. Marks and time come in `initial` */
   resume?: { used: number; extra: number; continues: number; failed: boolean; lossCounted: boolean };
   /** keeps the challenge attempt on the phone at every change; null = nothing to keep (won, or started again) */
@@ -64,7 +70,7 @@ interface Props {
   onRules: () => void;
 }
 
-export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, bestBefore, challenge, canContinue, onContinue, onRetry, onLost, resume, onKeepRun, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
+export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLabel, afterLine, afterExtra, bestBefore, challenge, canContinue, onContinue, onRetry, onLost, bottles = 0, onBottle, onShop, resume, onKeepRun, onKeep, onSolved, onHint: reportHint, onStuck, onNext, onExit, onRules }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -165,9 +171,11 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     else onKeepRun({ marks, ms: elapsed(), used, extra, continues, failed, lossCounted: lostTold.current });
   };
   useEffect(() => keepRun.current(), [marks, used, extra, continues, failed, solved]);
+  // Going to the shop is not giving up: the attempt waits there, and nothing is counted as lost.
+  const toShop = useRef(false);
   useEffect(
     () => () => {
-      reportLost();
+      if (!toShop.current) reportLost();
       keepRun.current();
     },
     [reportLost],
@@ -186,15 +194,29 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     const ok = await onContinue().catch(() => false);
     setBusy(false);
     if (!ok) return;
-    if (challenge.kind === 'race') {
+    giveMore(challenge.kind === 'race' ? raceExtraMs(challenge.room) : INK_EXTRA);
+  }, [busy, challenge, onContinue]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** More room after a loss (a video or a bottle). The board stays as it is. */
+  function giveMore(amount: number) {
+    if (challenge?.kind === 'race') {
       // The old time is spent; the clock starts again with exactly the extra time.
       banked.current = room;
       since.current = Date.now();
-      setExtra((e) => e + raceExtraMs(challenge.room));
-    } else setExtra((e) => e + INK_EXTRA);
+    }
+    setExtra((e) => e + amount);
     setContinues((n) => n + 1);
     setFailed(false);
-  }, [busy, challenge, onContinue, room]);
+  }
+  const spendBottle = () => {
+    if (!challenge || !onBottle || bottles < 1) return;
+    onBottle();
+    giveMore(challenge.kind === 'race' ? BOTTLE_MS : BOTTLE_DROPS);
+  };
+  const goShop = () => {
+    toShop.current = true;
+    onShop?.();
+  };
 
   // Personal best: compared with the best time the player had when this puzzle was opened.
   const bestAtStart = useRef(bestBefore);
@@ -434,15 +456,18 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
                   tentsWanted,
                 )}
               </Type>
+              {bottles > 0 && onBottle ? <Btn label={t.challenge.bottle[challenge.kind](bottles)} onPress={spendBottle} style={styles.afterBtn} /> : null}
               {canContinue && onContinue && continues < MAX_CONTINUES ? (
                 <Btn
+                  kind={bottles > 0 && onBottle ? 'outline' : 'ink'}
                   label={challenge.kind === 'race' ? t.challenge.more.race(raceExtraMs(challenge.room) / 1000) : t.challenge.more.ink(INK_EXTRA)}
                   onPress={() => void keepPlaying()}
                   disabled={busy}
                   style={styles.afterBtn}
                 />
               ) : null}
-              {onRetry ? <Btn label={t.challenge.again} kind={canContinue && continues < MAX_CONTINUES ? 'outline' : 'ink'} onPress={tryAgain} style={styles.afterBtn} /> : null}
+              {bottles < 1 && onShop ? <Btn label={t.challenge.getBottles} kind="outline" onPress={goShop} style={styles.afterBtn} /> : null}
+              {onRetry ? <Btn label={t.challenge.again} kind={(canContinue && continues < MAX_CONTINUES) || (bottles > 0 && onBottle) ? 'outline' : 'ink'} onPress={tryAgain} style={styles.afterBtn} /> : null}
               <Btn label={t.game.home} kind="outline" onPress={onExit} style={styles.afterBtn} />
             </View>
           ) : hint ? (

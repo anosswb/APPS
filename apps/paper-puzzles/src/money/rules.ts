@@ -72,6 +72,11 @@ export function goodMoment(mood: AdMood): boolean {
   return mood.games >= AD_GAMES_BETWEEN && mood.results.length >= AD_WINS_IN_A_ROW && mood.results.every(Boolean);
 }
 
+/** Can the player buy ink bottles here? iPhone only, and only when a real store answers (Android: Google pays no sellers in Morocco). */
+export function bottleShopOpen(mode: MoneyMode, canSell: boolean): boolean {
+  return mode === 'iap' && canSell;
+}
+
 /** How many puzzles a player has finished in the three level-by-level modes. Each level starts at 1. */
 export function puzzlesFinished(levels: { book: number; ink: number; race: number }): number {
   return Math.max(0, levels.book - 1) + Math.max(0, levels.ink - 1) + Math.max(0, levels.race - 1);

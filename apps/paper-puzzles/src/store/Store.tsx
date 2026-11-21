@@ -29,6 +29,8 @@ interface StoreApi {
   finishChallenge: (kind: ChallengeKind, won: boolean, helped: boolean, raceSolve?: { n: number; ms: number }) => void;
   /** keep (or with null, clear) the challenge attempt in progress */
   keepRun: (kind: ChallengeKind, run: ChallengeRun | null) => void;
+  /** add bought bottles, or spend one (-1) */
+  changeBottles: (by: number) => void;
 }
 
 const Ctx = createContext<StoreApi | null>(null);
@@ -149,12 +151,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const changeBottles = useCallback((by: number) => {
+    setSave((s) => ({ ...s, bottles: Math.max(0, s.bottles + by) }));
+  }, []);
+
   const markAdShown = useCallback((now: number) => {
     setSave((s) => ({ ...s, money: { ...s.money, lastAdAt: now } }));
   }, []);
 
   return (
-    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn, setReminder, finishChallenge, keepRun }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ save, ready, keepGame, finishDaily, finishBook, setTheme, setHapticsOn, setSoundOn, setSeenRules, unlockDay, setFullEdition, markAdShown, setStatsOn, setReminder, finishChallenge, keepRun, changeBottles }}>{children}</Ctx.Provider>
   );
 }
 

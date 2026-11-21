@@ -1,12 +1,13 @@
 /** What is kept on the phone, and how an old save is read safely after an update. */
 import { ChallengeKind, ChallengeRun, ChallengeSave, freshChallenges, INK, RACE } from '../game/challenge';
 import { freshRecords, Records } from '../game/records';
+import { FREE_BOTTLES } from '../config/money';
 import { MoneyState } from '../money/rules';
 import { DEFAULT_REMINDER_TIME, REMINDER_HOURS, ReminderState } from '../reminder/plan';
 import { ThemeChoice } from '../theme/ThemeContext';
 
-/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative · 7: challenge · 8: records · 9: runs (challenges in progress) */
-export const SCHEMA = 9;
+/** 2: added settings.sound · 3: added money · 4: added stats · 5: added reminder · 6: book.fast, relief may be negative · 7: challenge · 8: records · 9: runs (challenges in progress) · 10: ink bottles */
+export const SCHEMA = 10;
 
 export interface GameSave {
   marks: number[];
@@ -38,6 +39,8 @@ export interface Save {
   records: Records;
   /** a challenge attempt in progress, per mode: leaving and coming back never refills the pot or the clock */
   runs: Partial<Record<ChallengeKind, ChallengeRun>>;
+  /** ink bottles the player holds: free ones at the start, more bought on iPhone */
+  bottles: number;
   /** the daily note: off until the player says yes */
   reminder: ReminderState;
 }
@@ -62,6 +65,7 @@ export function freshSave(now: number = Date.now()): Save {
     challenge: freshChallenges(),
     records: freshRecords(),
     runs: {},
+    bottles: FREE_BOTTLES,
   };
 }
 
@@ -149,6 +153,8 @@ export function migrate(raw: unknown, now: number = Date.now()): Save {
       if (run) out.runs[kind] = run;
     }
   }
+  // A save from before bottles existed gets the free ones too.
+  if (typeof raw.bottles === 'number' && Number.isFinite(raw.bottles) && raw.bottles >= 0) out.bottles = Math.min(9999, Math.floor(raw.bottles));
   out.schema = SCHEMA;
   return out;
 }

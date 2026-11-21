@@ -33,6 +33,18 @@ Today the app shows **Google's test ads**. That is on purpose: tapping your own 
 4. Fill `LEGAL` in `src/config/money.ts` with the live Terms and Privacy pages.
 5. Test with a sandbox account: buy, delete the app, reinstall, Restore. Only then ship.
 
+## Ink bottles (Anass, 21 Nov 2026) — built, buying switched OFF
+- Every player starts with **3 free bottles** (Android and iPhone). On a lost ink or clock puzzle, one bottle gives **3 more drops or 30 more seconds**, and the board stays as it is. Bottles have no limit per puzzle; videos still stop at 2. "Try again" stays free.
+- **iPhone only, to buy:** `ink_bottles_10` (10 bottles, $1.99) and `ink_bottles_30` (30 bottles, $4.99), on the shop page above the full edition. "Get ink bottles" shows on the lost screen when the player has none. Going to the shop does not count the attempt as lost.
+- Android cannot sell (Google pays no sellers in Morocco). Android players only have the 3 free bottles; the video stays their way to more room.
+- Bottles are kept on the phone (a consumable: Apple does not restore them). The shop says so.
+
+### To switch on bottles (with the full edition, after the Apple account exists)
+1. App Store Connect › the app › **In-App Purchases › +** › **Consumable** › product ID `ink_bottles_10`, price $1.99. Again for `ink_bottles_30`, $4.99.
+2. RevenueCat › **Offerings** › add both products (no entitlement: they are consumables).
+3. Claude writes `bottlePrice` and `buyBottles` in `src/money/purchases.ios.ts` (same file as the full edition).
+4. Sandbox test: buy, see the count go up, use a bottle, kill the app, reopen: the count is still right.
+
 ## Seeing the money screens without a phone
 `EXPO_PUBLIC_MONEY_PREVIEW=iap` or `=ads` builds a web preview with a pretend shop or pretend videos:
 ```bash
