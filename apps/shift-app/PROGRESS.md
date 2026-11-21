@@ -72,6 +72,12 @@ He said: write the tap rule; My numbers did not change the app; "just a calendar
 - Work-day notes planned by a tested pure function; a night shift's note survives opening the app after midnight. PR #35.
 - 52 tests pass.
 
+## Done (21 Nov 2026)
+- Plus page shows on Android test builds; "Erase everything and start over" in My day shows the first pages again.
+- Folding phones and tablets: any orientation, readable width in the middle (checked in a browser at 840×700 and 900×420, not on a real fold). Facts: `research/2026-11-21-foldables.md`.
+- App icon: logo A, the day ring (`docs/logo/logo-options.png` shows A, B, C). **Waiting for his pick; A is in the app now.**
+- 52 tests pass.
+
 ## Next (in order)
 1. Anass's notes from the phone on the latest APK.
 2. Prices for Plus (his call) and the Apple account when he is ready; then real purchases (RevenueCat or StoreKit).

@@ -89,7 +89,7 @@ export function Pay({ data, today, now, top, onChange, onPlus }: { data: Saved; 
   );
 
   return (
-    <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
+    <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled" contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
       <Text style={[st.title, { color: c.text }]}>{t.pay.title}</Text>
 
       <Glass style={{ gap: space.m }}>

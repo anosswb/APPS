@@ -24,7 +24,7 @@ export function Calendar({ data, today, top, onCycle }: { data: Saved; today: st
     <View style={st.sum} key={label}>{dot && <View style={[st.dot, { backgroundColor: dot }]} />}<Text style={[st.sumText, { color: c.textSoft }]}>{label}</Text></View>
   );
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
       <View style={st.head}>
         <View style={{ flex: 1 }}>
           <Text style={[st.title, { color: c.text }]}>{t.months[ym.m - 1]}</Text>

@@ -33,7 +33,7 @@ export function Quiz({ data, top, bottom, onDone }: { data: Saved; top: number; 
   return (
     <View style={{ flex: 1 }}>
       <Sky top={top} />
-      <ScrollView contentContainerStyle={{ paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
+      <ScrollView contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
         <View style={st.bar}>{Array.from({ length: total }, (_, i) => <View key={i} style={[st.seg, { backgroundColor: i <= step ? onSky.text : 'rgba(255,255,255,0.28)' }]} />)}</View>
         <Text style={st.count}>{t.quiz.step(step + 1, total)}</Text>
         <Text style={st.q}>{q ? q.q : t.quiz.start}</Text>
@@ -57,7 +57,7 @@ export function Quiz({ data, top, bottom, onDone }: { data: Saved; top: number; 
           )}
         </View>
       </ScrollView>
-      {step > 0 && <View style={{ paddingHorizontal: space.l, paddingBottom: Math.max(bottom, space.m) }}><Link label={t.quiz.back} muted onPress={() => setStep(step - 1)} /></View>}
+      {step > 0 && <View style={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingHorizontal: space.l, paddingBottom: Math.max(bottom, space.m) }}><Link label={t.quiz.back} muted onPress={() => setStep(step - 1)} /></View>}
     </View>
   );
 }
@@ -70,7 +70,7 @@ export function Result({ data, top, bottom, onNext }: { data: Saved; top: number
   return (
     <View style={{ flex: 1 }}>
       <Sky top={top} />
-      <ScrollView contentContainerStyle={{ paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
+      <ScrollView contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
         <Text style={[st.q, { paddingHorizontal: space.s }]}>{t.result.title}</Text>
         <Glass style={{ gap: space.m }}>
           <Text style={[st.body, { color: c.text }]}>{first}</Text>
@@ -86,7 +86,7 @@ export function Result({ data, top, bottom, onNext }: { data: Saved; top: number
           ))}
         </Glass>
       </ScrollView>
-      <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
+      <View style={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
         <GlassPill solid icon="right" label={t.result.next} onPress={onNext} />
       </View>
     </View>

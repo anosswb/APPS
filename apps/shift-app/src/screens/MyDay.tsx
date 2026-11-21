@@ -7,7 +7,7 @@ import { weekday } from '../core/dates';
 import { clock, dayLine, Habits } from '../core/dayline';
 import { dayOn, nextWorkDay, shiftMinutes, WorkDay } from '../core/days';
 import { t } from '../i18n/en';
-import { planOf, Saved } from '../store';
+import { FRESH, planOf, Saved } from '../store';
 import { font, radius, size, space, type } from '../theme/tokens';
 import { Look, useTheme } from '../theme/useTheme';
 import { canBackup, pickBackup, saveBackup } from '../backup';
@@ -72,7 +72,7 @@ export function MyDay({ data, today, now, top, onChange }: { data: Saved; today:
   const rows: [number, string, boolean][] = [[line.wake, t.myDay.rows.wake, false], [line.leave, t.myDay.rows.leave, false], [line.clockIn, t.myDay.rows.clockIn, true], [line.eat, t.myDay.rows.eat, false], [line.clockOut, t.myDay.rows.clockOut, true], [line.home, t.myDay.rows.home, false], [line.sleepBy + 1440, t.myDay.rows.sleepBy, false]];
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
       <View style={st.head}>
         <Text style={[st.title, { color: c.text }]}>{t.myDay.title}</Text>
         <Text style={[st.date, { color: c.muted }]}>{isToday ? `${t.daysShort[d.getDay()]}, ${t.monthsShort[d.getMonth()]} ${d.getDate()}` : next ? t.myDay.nextShift(t.days[weekday(next.key)]) : t.myDay.usual}</Text>
@@ -133,6 +133,11 @@ export function MyDay({ data, today, now, top, onChange }: { data: Saved; today:
         <Caps>{t.myDay.look}</Caps>
         <Segment options={LOOKS.map((l) => [l, t.myDay.looks[l]] as [Look, string])} value={data.look} onChange={(l) => onChange({ ...data, look: l })} />
         <Link label={t.myDay.guide} onPress={() => onChange({ ...data, welcomed: false })} />
+        <Link label={t.myDay.erase} muted onPress={() => {
+          const go = () => onChange({ ...FRESH, look: data.look });
+          if (Platform.OS === 'web') return go();
+          Alert.alert(t.myDay.eraseTitle, t.myDay.eraseBody, [{ text: t.myDay.cancel, style: 'cancel' }, { text: t.myDay.eraseYes, style: 'destructive', onPress: go }]);
+        }} />
       </Glass>
     </ScrollView>
   );
