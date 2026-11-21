@@ -1,5 +1,9 @@
 # PROGRESS.md — Dinkline (pickleball open play)
 
+## Download the test app
+Newest APK (blue style v2, board, winners split, one-tap back in): https://github.com/anosswb/APPS/actions/runs/44963456129 → Artifacts → **dinkline-test-apk**. Steps: `docs/builds.md`.
+Checked: emulator launch test on the same commit passed (app alive after 45 s, Courts screen shown): https://github.com/anosswb/APPS/actions/runs/44963458635
+
 ## Where it stands (21 Nov 2026, night)
 Version 1 is built and runs: the line, fair rotation onto 1–8 courts, the big scorer, players, settings, saved on the phone. 37 tests pass. Screens checked in a phone-size browser (`docs/screens/`). Android test APK: see "Builds" below.
 
@@ -15,7 +19,9 @@ Version 1 is built and runs: the line, fair rotation onto 1–8 courts, the big 
 - Winners-split rotation rule, with tests (41 tests now).
 - Style pass v2 after Anass's message: blue scoreboard header, painted kitchens and net, paddle-rack line, italic numbers, black tab bar, court lines in the scorer (`docs/world.md`).
 - Store listing draft (`store/listing.md`).
-- Emulator launch test passed for v1 (app alive after 45 s, Courts screen on screen).
+- Emulator launch test passed for v1, for the style branch and for main.
+- One-tap "back in" buttons for players sitting out, above the add bar (PR #48).
+- Pull requests #46, #47, #48 merged after green checks.
 
 ## Next (needs Anass)
 1. Try the APK at a real court (or with 8 names at home): add names, end games, score one game. Tell me what felt slow or wrong.
