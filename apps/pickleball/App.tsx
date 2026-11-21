@@ -5,7 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useFonts, BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold } from '@expo-google-fonts/barlow-condensed';
+import { useFonts, BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold, BarlowCondensed_800ExtraBold_Italic } from '@expo-google-fonts/barlow-condensed';
 import { Archivo_500Medium, Archivo_700Bold } from '@expo-google-fonts/archivo';
 import { t } from './src/i18n/en';
 import { finishGame, scoreRally, setFirstServe, undoRally } from './src/logic/session';
@@ -24,7 +24,7 @@ SplashScreen.preventAutoHideAsync().catch((e) => console.warn(`[splash] ${String
 type Tab = 'courts' | 'players' | 'settings';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({ BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold, Archivo_500Medium, Archivo_700Bold });
+  const [fontsLoaded] = useFonts({ BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold, BarlowCondensed_800ExtraBold_Italic, Archivo_500Medium, Archivo_700Bold });
   const { ready, session, act, undo, canUndo, prefs, setPrefs } = useSession();
   const [tab, setTab] = useState<Tab>('courts');
   const [scoring, setScoring] = useState<number | null>(null);
@@ -87,7 +87,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <SafeAreaView style={s.root} edges={['top', 'left', 'right']}>
         <View style={{ flex: 1 }}>
           {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} openScorer={setScoring} openBoard={() => setBoard(true)} buzz={buzz} /> : null}
@@ -106,7 +106,7 @@ export default function App() {
             return (
               <Pressable key={key} style={s.tab} onPress={() => setTab(key)} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={label}>
                 <View style={[s.tabMark, on && s.tabMarkOn]} />
-                <Icon name={icon} tint={on ? color.ink : color.mute} />
+                <Icon name={icon} tint={on ? color.ball : color.barMute} />
                 <Text style={[s.tabText, on && s.tabTextOn]}>{label}</Text>
               </Pressable>
             );
@@ -118,11 +118,11 @@ export default function App() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.ground },
-  tabs: { flexDirection: 'row', backgroundColor: color.card, borderTopWidth: 1, borderColor: color.hair },
+  root: { flex: 1, backgroundColor: color.court },
+  tabs: { flexDirection: 'row', backgroundColor: color.bar },
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 62, paddingBottom: space.xs },
   tabMark: { height: 3, width: 36, marginBottom: 6, backgroundColor: 'transparent' },
-  tabMarkOn: { backgroundColor: color.ink },
-  tabText: { fontFamily: font.body, fontSize: 14, color: color.inkSoft, marginTop: 2 },
-  tabTextOn: { fontFamily: font.bodyBold, color: color.ink },
+  tabMarkOn: { backgroundColor: color.ball },
+  tabText: { fontFamily: font.body, fontSize: 14, color: color.barMute, marginTop: 2 },
+  tabTextOn: { fontFamily: font.bodyBold, color: color.ball },
 });

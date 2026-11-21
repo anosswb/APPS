@@ -14,6 +14,15 @@ Linda, 58, runs Tuesday-morning open play at a city park in Arizona. 14 people, 
 | C | Park Paint: court green everywhere, white paint, orange action | Readable, but white-on-green text is weaker than black-on-light outdoors, and it looks like a generic sports app. |
 Picked by Claude on 21 Nov 2026 while Anass slept, by the rule "readable in bright sun at arm's length". To switch: change `src/theme/tokens.ts` only.
 
+## Style pass v2 (21 Nov 2026, Anass: "I prefer the blue one, make it more stylish, it looks so simple, but not AI slop")
+Every new detail comes from a real court, nothing decorative:
+- **Blue scoreboard header** on every tab with a white baseline under it, white italic title, a yellow "11 HERE · 2 COURTS" chip.
+- **Court drawing:** lighter-blue painted kitchens, a dark net with posts that sticks out over the green surround, the score call as a yellow chip.
+- **"COURT 1" tab** in black italic, like the number signs on court fences.
+- **The line is a paddle rack:** each waiting player is a paddle (face + taped handle); the next four are yellow paddles.
+- **Italic Barlow Condensed** for titles and all numbers (scoreboard energy).
+- **Black tab bar** with a yellow active tab. **Scorer** sits on the green surround with real kitchen and centre lines in each half.
+
 ## Decisions per axis
 - **Colour:** ground `#F3F2EC`, ink `#111214`, court blue `#2147C9`, surround green `#3F7D55`, ball yellow `#D8F23A` (fills only, always with black text on it, never as text on light), stop red `#B42318`.
 - **Mode:** light only in v1 (outdoor use). The scorer is dark around the courts so the giant white numbers pop.

@@ -35,12 +35,15 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
     const pts = team === 'A' ? sc.a : sc.b;
     return (
       <Pressable
-        style={({ pressed }) => [s.half, pressed && !sc.winner && s.pressed, sc.winner && sc.winner !== team && s.lost]}
+        style={({ pressed }) => [s.half, team === 'A' ? { paddingBottom: KITCHEN } : { paddingTop: KITCHEN }, pressed && !sc.winner && s.pressed, sc.winner && sc.winner !== team && s.lost]}
         onPress={() => onRally(team)}
         disabled={!!sc.winner}
         accessibilityRole="button"
         accessibilityLabel={t.a11y.teamWon(names(team).join(' and '))}
       >
+        {/* Court paint: the kitchen sits next to the net (the middle of the screen), the centre line runs to the baseline. */}
+        <View pointerEvents="none" style={[s.kitchen, team === 'A' ? { bottom: 0 } : { top: 0 }]} />
+        <View pointerEvents="none" style={[s.centerLine, team === 'A' ? { top: 0, bottom: KITCHEN } : { bottom: 0, top: KITCHEN }]} />
         <Text style={s.names} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}>
           {names(team).join(' & ').toUpperCase()}
         </Text>
@@ -102,27 +105,31 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
   );
 }
 
+const KITCHEN = 64;
+
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.ink },
+  root: { flex: 1, backgroundColor: color.courtOut },
   bar: { alignItems: 'center', justifyContent: 'center', minHeight: 44 },
   bottom: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.s },
   bottomBtn: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: touch.big, paddingHorizontal: space.l },
   bottomText: { fontFamily: font.bodyBold, fontSize: size.body + 1, color: color.ground },
   barText: { fontFamily: font.label, fontSize: 19, letterSpacing: 1, color: color.ground },
-  half: { flex: 1, backgroundColor: color.court, borderWidth: line.court, borderColor: color.paint, marginHorizontal: space.s, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.m },
+  kitchen: { position: 'absolute', left: 0, right: 0, height: KITCHEN, backgroundColor: color.kitchenFill, borderColor: color.paint, borderTopWidth: 2, borderBottomWidth: 2 },
+  centerLine: { position: 'absolute', left: '50%', width: 2, marginLeft: -1, backgroundColor: color.kitchen },
+  half: { flex: 1, overflow: 'hidden', backgroundColor: color.court, borderWidth: line.court, borderColor: color.paint, marginHorizontal: space.s, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.m },
   pressed: { backgroundColor: color.courtDeep },
   lost: { opacity: 0.45 },
-  names: { fontFamily: font.display, fontSize: size.name + 4, color: color.paint, letterSpacing: 0.5 },
-  points: { fontFamily: font.display, fontSize: size.scoreGiant, lineHeight: size.scoreGiant * 1.02, color: color.paint, includeFontPadding: false },
-  status: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: 40 },
+  names: { fontFamily: font.display, fontSize: size.name + 4, color: color.paint, letterSpacing: 0.5, backgroundColor: color.court, paddingHorizontal: space.s },
+  points: { fontFamily: font.displayItalic, fontSize: size.scoreGiant, lineHeight: size.scoreGiant * 1.02, color: color.paint, includeFontPadding: false },
+  status: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: 40, backgroundColor: color.court, paddingHorizontal: space.s },
   statusText: { fontFamily: font.display, fontSize: 24, letterSpacing: 1, color: color.paint },
   serveFirst: { borderWidth: 2, borderColor: color.paint, paddingHorizontal: space.m, minHeight: 40, justifyContent: 'center', borderRadius: 4 },
   serveFirstText: { fontFamily: font.bodyBold, fontSize: size.small, color: color.paint },
   gp: { fontFamily: font.display, fontSize: size.body + 2, letterSpacing: 1, color: color.ballInk, backgroundColor: color.ball, paddingHorizontal: space.s, paddingVertical: 2, overflow: 'hidden' },
-  callBand: { alignItems: 'center', paddingVertical: space.s },
-  call: { fontFamily: font.display, fontSize: size.call, color: color.ball, letterSpacing: 3, lineHeight: size.call + 4 },
+  callBand: { alignItems: 'center', paddingVertical: space.xs, backgroundColor: color.net, marginHorizontal: 0 },
+  call: { fontFamily: font.displayItalic, fontSize: size.call, color: color.ball, letterSpacing: 3, lineHeight: size.call + 4 },
   hint: { fontFamily: font.body, fontSize: size.small, color: color.hair, minHeight: 18 },
   winBox: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: color.ground, padding: space.l, paddingBottom: space.xxl, gap: space.m, borderTopWidth: 3, borderColor: color.ball },
-  winText: { fontFamily: font.display, fontSize: size.title, color: color.ink },
+  winText: { fontFamily: font.displayItalic, fontSize: size.title, color: color.ink },
   row: { flexDirection: 'row', gap: space.s },
 });

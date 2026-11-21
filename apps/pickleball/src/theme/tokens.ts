@@ -11,6 +11,11 @@ export const color = {
   courtDeep: '#1A3AA6',
   courtOut: '#3F7D55', // the green surround of a US hard court
   kitchen: 'rgba(255,255,255,0.75)',
+  kitchenFill: '#3A64E6', // the non-volley zone is painted a lighter blue on many courts
+  net: '#0B0D12',
+  onCourt: 'rgba(255,255,255,0.78)', // small text on the blue
+  bar: '#111214', // tab bar
+  barMute: '#9A9DA3',
   paint: '#FFFFFF', // court lines and names painted on the court
   ball: '#D8F23A', // optic yellow: fills only, always with ink on top
   ballInk: '#111214',
@@ -20,6 +25,7 @@ export const color = {
 
 export const font = {
   display: 'BarlowCondensed_800ExtraBold',
+  displayItalic: 'BarlowCondensed_800ExtraBold_Italic',
   label: 'BarlowCondensed_600SemiBold',
   body: 'Archivo_500Medium',
   bodyBold: 'Archivo_700Bold',
