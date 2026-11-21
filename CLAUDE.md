@@ -68,6 +68,8 @@ Follow `CHEATSHEET.md` step by step (`/make-app`). It is the path from the idea 
 ## Skills (type the name)
 `/make-app` · `/find-ideas` · `/score-idea` · `/mine-reviews` · `/new-app` · `/app-world` · `/slop-check` · `/retention-plan` · `/money-plan` · `/release-check` · `/wrap-up`
 
+`/arena` (outside tool, MIT, by Jake Schincariol, from github.com/Jakeschincariol/arena-skill, added 21 Nov 2026): many helpers answer the same task, attack each other, a judge keeps the best. **It costs a lot:** the default is 100 helpers and 595 calls. Use `--quick` (16 helpers, 91 calls) or `--agents 4` (19 calls), and only for an answer that matters. Work goes in `.arena/` (not committed). The skill's own tests: `cd .claude/skills/arena && python3 -m unittest discover -s tests` (one path line changed so they run from this folder).
+
 ## Token rules (details in playbook/12)
 - Do not read a playbook file "just in case". Use the table above.
 - Search and long reading go to a subagent on a cheaper model; you keep only its summary.
