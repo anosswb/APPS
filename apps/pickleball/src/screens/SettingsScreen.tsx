@@ -6,6 +6,7 @@ import { MAX_COURTS, newSession, restartSession, Session, updateSettings } from 
 import { Prefs } from '../state/storage';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/Icon';
+import { Header } from '../ui/Header';
 import { color, font, radius, size, space, touch } from '../theme/tokens';
 
 interface Props {
@@ -26,8 +27,9 @@ export function SettingsScreen({ session, act, prefs, setPrefs }: Props) {
   };
 
   return (
-    <ScrollView style={s.root} contentContainerStyle={s.pad}>
-      <Text style={s.title}>{t.settings.title.toUpperCase()}</Text>
+    <View style={s.root}>
+      <Header title={t.settings.title} />
+      <ScrollView style={s.root} contentContainerStyle={s.pad}>
 
       <Text style={s.label}>{t.settings.courts}</Text>
       <View style={s.box}>
@@ -48,6 +50,8 @@ export function SettingsScreen({ session, act, prefs, setPrefs }: Props) {
         <Choice on={st.rule === 'all-off'} title={t.settings.allOff} help={t.settings.allOffHelp} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'all-off' }, now))} />
         <View style={s.hair} />
         <Choice on={st.rule === 'winners-stay'} title={t.settings.winnersStay} help={t.settings.winnersStayHelp(st.maxWins)} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'winners-stay' }, now))} />
+        <View style={s.hair} />
+        <Choice on={st.rule === 'winners-split'} title={t.settings.winnersSplit} help={t.settings.winnersSplitHelp} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'winners-split' }, now))} />
       </View>
 
       <Text style={s.label}>{t.settings.scoring}</Text>
@@ -80,7 +84,8 @@ export function SettingsScreen({ session, act, prefs, setPrefs }: Props) {
       <Text style={s.foot}>{t.settings.privacy}</Text>
       <Text style={s.foot}>{t.settings.version(Constants.expoConfig?.version ?? '1.0.0')}</Text>
       <View style={{ height: 40 }} />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -120,7 +125,7 @@ function Toggle({ label, on, set }: { label: string; on: boolean; set: (v: boole
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.ground },
-  pad: { paddingHorizontal: space.l, paddingTop: space.m },
+  pad: { paddingHorizontal: space.l, paddingTop: space.xs },
   title: { fontFamily: font.display, fontSize: size.hero, color: color.ink },
   label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.inkSoft, marginTop: space.xl, marginBottom: space.s },
   box: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m },

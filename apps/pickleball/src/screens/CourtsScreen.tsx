@@ -8,6 +8,7 @@ import { Button } from '../ui/Button';
 import { CourtSurface } from '../ui/CourtSurface';
 import { Icon } from '../ui/Icon';
 import { LineTag } from '../ui/LineTag';
+import { Header } from '../ui/Header';
 import { color, font, radius, size, space, touch } from '../theme/tokens';
 
 interface Props {
@@ -16,10 +17,11 @@ interface Props {
   undo: () => void;
   canUndo: boolean;
   openScorer: (court: number) => void;
+  openBoard: () => void;
   buzz: (kind: 'tap' | 'done') => void;
 }
 
-export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: Props) {
+export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoard, buzz }: Props) {
   const now = useNow();
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
@@ -68,18 +70,18 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: 
 
   return (
     <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={s.top}>
-        <View>
-          <Text style={s.title}>{t.courts.title.toUpperCase()}</Text>
-          <Text style={s.meta}>{t.courts.here(here, session.courts.length)}</Text>
-        </View>
-        {canUndo ? (
-          <Pressable onPress={undo} style={s.undo} accessibilityRole="button" accessibilityLabel={t.a11y.undo}>
-            <Icon name="undo" size={22} />
-            <Text style={s.undoText}>{t.courts.undo}</Text>
-          </Pressable>
-        ) : null}
-      </View>
+      <Header
+        title={t.courts.title}
+        chip={t.courts.here(here, session.courts.length)}
+        right={
+          canUndo ? (
+            <Pressable onPress={undo} style={s.undo} accessibilityRole="button" accessibilityLabel={t.a11y.undo}>
+              <Icon name="undo" size={22} tint={color.paint} />
+              <Text style={s.undoText}>{t.courts.undo}</Text>
+            </Pressable>
+          ) : undefined
+        }
+      />
 
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         {nobody ? (
@@ -95,7 +97,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: 
               return (
                 <View key={`open-${i}`} style={s.card}>
                   <View style={s.chead}>
-                    <Text style={s.label}>{t.courts.court(i + 1)}</Text>
+                    <Text style={s.courtTab}>{t.courts.court(i + 1)}</Text>
                     <Text style={s.label}>{t.courts.open.toUpperCase()}</Text>
                   </View>
                   <CourtSurface left={[]} right={[]} height={70} dim />
@@ -108,8 +110,8 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: 
             return (
               <View key={g.id} style={s.card}>
                 <View style={s.chead}>
-                  <Text style={s.label}>{t.courts.court(i + 1)}</Text>
-                  <Text style={s.label}>{t.courts.minutes(minutesSince(g.startedAt, now))}</Text>
+                  <Text style={s.courtTab}>{t.courts.court(i + 1)}</Text>
+                  <Text style={s.label}>{t.courts.minutes(minutesSince(g.startedAt, now)).toUpperCase()}</Text>
                 </View>
                 <CourtSurface
                   left={g.teamA.map(name)}
@@ -118,8 +120,8 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: 
                   height={92}
                 />
                 {leaving.length ? <Text style={s.leaving}>{leaving.map(name).join(', ')} {t.courts.leavingAfter}</Text> : null}
-                <View style={s.row}>
-                  <Button label={t.courts.score} onPress={() => openScorer(i)} style={s.flex} />
+                <View style={[s.row, g.rallies.length ? { marginTop: space.l } : null]}>
+                  <Button label={t.courts.score} kind="ink" onPress={() => openScorer(i)} style={s.flex} />
                   <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.flex} />
                 </View>
               </View>
@@ -129,8 +131,11 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: 
 
         {up.length ? (
           <>
-            <View style={s.sectionHead}>
+            <View style={[s.sectionHead, s.headRow]}>
               <Text style={s.label}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Text>
+              <Pressable onPress={openBoard} style={s.boardBtn} accessibilityRole="button">
+                <Text style={s.boardText}>{t.board.open}</Text>
+              </Pressable>
             </View>
             <View style={s.stack}>
               {up.map((id, k) => (
@@ -221,10 +226,11 @@ const s = StyleSheet.create({
   title: { fontFamily: font.display, fontSize: size.hero, color: color.ink, letterSpacing: 0.5, lineHeight: size.hero + 2 },
   meta: { fontFamily: font.body, fontSize: size.body, color: color.inkSoft },
   undo: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: touch.min, paddingHorizontal: space.m },
-  undoText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.ink },
-  scroll: { paddingHorizontal: space.l, paddingTop: space.xs },
+  undoText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.paint },
+  scroll: { paddingHorizontal: space.l, paddingTop: space.l },
   card: { marginBottom: space.l + 2 },
-  chead: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: space.s },
+  chead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  courtTab: { fontFamily: font.displayItalic, fontSize: 18, letterSpacing: 1.5, color: color.paint, backgroundColor: color.ink, paddingHorizontal: space.m, paddingTop: 3, paddingBottom: 1 },
   label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.inkSoft },
   row: { flexDirection: 'row', gap: space.s, marginTop: space.s },
   flex: { flex: 1 },
@@ -232,8 +238,11 @@ const s = StyleSheet.create({
   leaving: { fontFamily: font.body, fontSize: size.body, color: color.ink, marginTop: space.s },
   sectionHead: { marginTop: space.m, marginBottom: space.s, paddingHorizontal: 2 },
   stack: { gap: 6 },
+  headRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  boardBtn: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.s },
+  boardText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.court, textDecorationLine: 'underline' },
   empty: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m },
-  emptyTitle: { fontFamily: font.display, fontSize: size.title, color: color.ink, marginTop: space.l },
+  emptyTitle: { fontFamily: font.displayItalic, fontSize: size.title, color: color.ink, marginTop: space.l },
   emptyBody: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.inkSoft, marginTop: space.xs },
   addBtn: { marginHorizontal: space.l, marginVertical: space.m, height: touch.big, borderRadius: radius.box, backgroundColor: color.ink, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l + 2, gap: space.s },
   addText: { fontFamily: font.bodyBold, fontSize: size.body + 2, color: color.ground },

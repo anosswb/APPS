@@ -131,6 +131,28 @@ describe('winners stay', () => {
   });
 });
 
+describe('winners split', () => {
+  const sp = { ...DEFAULT_SETTINGS, courts: 1, rule: 'winners-split' as const };
+  it('winners stay on opposite teams with two new partners, losers go to the back', () => {
+    let s = fillCourts(withPlayers(8, sp), 0);
+    const g = s.courts[0]!;
+    s = finishGame(s, 0, 'A', 10);
+    const g2 = s.courts[0]!;
+    expect(g2.teamA[0]).toBe(g.teamA[0]);
+    expect(g2.teamB[0]).toBe(g.teamA[1]);
+    expect(names(s, [g2.teamA[1], g2.teamB[1]])).toEqual(['P5', 'P6']);
+    expect(s.queue.slice(-2)).toEqual(g.teamB);
+  });
+  it('after the split game everyone comes off', () => {
+    let s = fillCourts(withPlayers(8, sp), 0);
+    s = finishGame(s, 0, 'A', 10);
+    const g2 = s.courts[0]!;
+    s = finishGame(s, 0, 'B', 20);
+    const on = [...s.courts[0]!.teamA, ...s.courts[0]!.teamB];
+    for (const id of [...g2.teamA, ...g2.teamB]) expect(on).not.toContain(id);
+  });
+});
+
 describe('courts and undo-like actions', () => {
   it('cancel puts the four back at the front in order', () => {
     let s = fillCourts(withPlayers(6, { ...DEFAULT_SETTINGS, courts: 1 }), 0);
@@ -155,6 +177,15 @@ describe('courts and undo-like actions', () => {
     expect(Object.keys(r.players)).toHaveLength(6);
     expect(r.results).toHaveLength(0);
     expect(r.courts.every((c) => c === null)).toBe(true);
+  });
+});
+
+describe('fairness with winners staying', () => {
+  it.each(['winners-stay', 'winners-split'] as const)('%s: over 40 games nobody runs away with the court (winners play a bit more by design)', (rule) => {
+    let s = fillCourts(withPlayers(10, { ...DEFAULT_SETTINGS, courts: 2, rule }), 0);
+    for (let round = 0; round < 40; round++) s = finishGame(s, round % 2, round % 4 === 0 ? 'B' : 'A', round + 1);
+    const games = Object.values(s.players).map((p) => p.games);
+    expect(Math.max(...games) - Math.min(...games)).toBeLessThanOrEqual(5);
   });
 });
 

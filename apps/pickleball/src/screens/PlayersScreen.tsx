@@ -2,6 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { t } from '../i18n/en';
 import { checkIn, checkOut, moveUp, Player, removePlayer, Session } from '../logic/session';
 import { Icon } from '../ui/Icon';
+import { Header } from '../ui/Header';
 import { color, font, radius, size, space } from '../theme/tokens';
 
 interface Props {
@@ -17,8 +18,9 @@ export function PlayersScreen({ session, act }: Props) {
   const courtOf = (id: string) => session.courts.findIndex((g) => g && [...g.teamA, ...g.teamB].includes(id)) + 1;
 
   return (
-    <ScrollView style={s.root} contentContainerStyle={s.pad}>
-      <Text style={s.title}>{t.players.title.toUpperCase()}</Text>
+    <View style={s.root}>
+      <Header title={t.players.title} />
+      <ScrollView style={s.root} contentContainerStyle={s.pad}>
       {all.length === 0 ? <Text style={s.empty}>{t.players.empty}</Text> : null}
 
       {waiting.length ? <Text style={s.label}>{t.players.waiting}</Text> : null}
@@ -54,7 +56,8 @@ export function PlayersScreen({ session, act }: Props) {
         </Row>
       ))}
       <View style={{ height: 40 }} />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -84,7 +87,7 @@ function Small({ label, onPress, strong, quiet }: { label: string; onPress: () =
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.ground },
-  pad: { paddingHorizontal: space.l, paddingTop: space.m },
+  pad: { paddingHorizontal: space.l, paddingTop: space.xs },
   title: { fontFamily: font.display, fontSize: size.hero, color: color.ink, marginBottom: space.s },
   label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.inkSoft, marginTop: space.l, marginBottom: space.s },
   empty: { fontFamily: font.body, fontSize: size.body, color: color.inkSoft, marginTop: space.l },
