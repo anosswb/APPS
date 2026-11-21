@@ -25,6 +25,7 @@ Anass. Solo founder in Morocco. Works 12-hour shifts, so his time and energy are
 9. **Disagree when you should.** Say why in two lines, then follow Anass's call and log it in DECISIONS.md.
 
 ## Hard rules
+- **Every new app stands alone (Anass, 21 Nov 2026).** "We are not having a brand, we are creators." A new idea is never linked to, inspired by or scored against our other apps: no shared users, look, loop or cross-promotion. Judge it only on its own users and its own market.
 - **US first.** Every app is made for users in the United States, in English. No Arabic, no Darija, no app built around Morocco or its language or culture (Anass, 13 Nov 2026). Other languages only later, when the numbers ask for them (playbook/09).
 - No spending, no account opening and no store submission without Anass's yes. Git has its own rules below.
 - No medical, financial or legal claims in any app or listing.
@@ -68,10 +69,10 @@ Follow `CHEATSHEET.md` step by step (`/make-app`). It is the path from the idea 
 ## Skills (type the name)
 `/make-app` · `/find-ideas` · `/score-idea` · `/mine-reviews` · `/new-app` · `/app-world` · `/slop-check` · `/retention-plan` · `/money-plan` · `/release-check` · `/wrap-up`
 
-`/arena` (outside tool, MIT, by Jake Schincariol, from github.com/Jakeschincariol/arena-skill, added 21 Nov 2026): many helpers answer the same task, attack each other, a judge keeps the best. **It costs a lot:** the default is 100 helpers and 595 calls. Use `--agents 10` (55 calls) at most, every helper on Sonnet, and ask Anass first (see the limit rule below). Work goes in `.arena/` (not committed). The skill's own tests: `cd .claude/skills/arena && python3 -m unittest discover -s tests` (one path line changed so they run from this folder).
+Web research: Firecrawl (`api.firecrawl.dev`) is connected in the cloud environment (key saved 21 Nov 2026, Anass's credits are limited). Use it to read store pages, Reddit and the web when the network blocks them directly. Save what you learn in `research/`.
 
 ## Token rules (details in playbook/12)
-- **Anass's limit rule (21 Nov 2026, after a 40-agent run pushed his plan from 60% to 80% and hit the 5-hour limit):** before any job that could use a big part of his limit (many helpers, `/arena`, long research), say its size in calls and that it may hit the limit, and wait for his yes. Helpers run on Sonnet (`model: sonnet`), never on the main model; the main model only writes the goal and checks the result.
+- **Anass's limit rule (21 Nov 2026, after a 40-agent run pushed his plan from 60% to 80% and hit the 5-hour limit):** before any job that could use a big part of his limit (many helpers, long research), say its size in calls and that it may hit the limit, and wait for his yes. Helpers run on Sonnet (`model: sonnet`), never on the main model; the main model only writes the goal and checks the result.
 - Do not read a playbook file "just in case". Use the table above.
 - Search and long reading go to a subagent on a cheaper model; you keep only its summary.
 - Web facts are saved once in `research/` with the date. Read there before searching again.
