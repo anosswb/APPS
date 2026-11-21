@@ -6,6 +6,10 @@
 - **Dock load:** checked and parked (the block-puzzle store is full). The two reports stay in `research/ideas/`.
 - **How Anass works:** one session per app. Short, simple English. Show pictures. He decides fast and wants things built, not discussed.
 
+## Pickleball open play (21 Nov 2026, night) — newest
+- **Dinkline** (`apps/pickleball/`, working title): queue, fair rotation onto 1–8 courts, big scorer, full-screen board. Built overnight with Anass's yes. Blue court look, made more stylish after his message ("I prefer the blue one, make it more stylish"). Android test APK from GitHub: see `apps/pickleball/docs/builds.md`. Details and next steps: `apps/pickleball/PROGRESS.md`.
+- Firecrawl credits used this night: about 36 of the 1,000 Anass allowed (32 by the review helper, 4 name searches).
+
 ## Done
 - 2026-11-13: repo created. Playbook (14 pages), research file, roadmap, tools, starter template, skills and agents.
 - 2026-11-13: `CHEATSHEET.md` (15 steps from "make me an app" to the stores, with `/make-app`) and `IDEAS.md` with 20 apps (scores are guesses).
