@@ -49,6 +49,14 @@ export const t = {
     sideout: 'Side-out scoring',
     to: (n: number) => `Game to ${n}`,
   },
+  board: {
+    open: 'Show the board',
+    next: 'NEXT ON COURT',
+    after: 'THEN',
+    playing: 'PLAYING NOW',
+    nobody: 'Nobody in line.',
+    close: 'Close the board',
+  },
   players: {
     title: 'Players',
     waiting: 'IN LINE',
@@ -75,6 +83,8 @@ export const t = {
     allOffHelp: 'Like a paddle rack: after each game the four go to the back of the line.',
     winnersStay: 'Winners stay',
     winnersStayHelp: (n: number) => `Winners stay for up to ${n} wins in a row, then everyone comes off.`,
+    winnersSplit: 'Winners split',
+    winnersSplitHelp: 'The two winners stay for one game on opposite sides, each with a new partner. Then all four off.',
     scoring: 'SCORING',
     sideout: 'Side-out',
     rally: 'Rally',

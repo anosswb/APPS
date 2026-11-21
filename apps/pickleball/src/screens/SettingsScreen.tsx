@@ -48,6 +48,8 @@ export function SettingsScreen({ session, act, prefs, setPrefs }: Props) {
         <Choice on={st.rule === 'all-off'} title={t.settings.allOff} help={t.settings.allOffHelp} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'all-off' }, now))} />
         <View style={s.hair} />
         <Choice on={st.rule === 'winners-stay'} title={t.settings.winnersStay} help={t.settings.winnersStayHelp(st.maxWins)} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'winners-stay' }, now))} />
+        <View style={s.hair} />
+        <Choice on={st.rule === 'winners-split'} title={t.settings.winnersSplit} help={t.settings.winnersSplitHelp} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'winners-split' }, now))} />
       </View>
 
       <Text style={s.label}>{t.settings.scoring}</Text>

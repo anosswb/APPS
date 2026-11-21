@@ -16,10 +16,11 @@ interface Props {
   undo: () => void;
   canUndo: boolean;
   openScorer: (court: number) => void;
+  openBoard: () => void;
   buzz: (kind: 'tap' | 'done') => void;
 }
 
-export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: Props) {
+export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoard, buzz }: Props) {
   const now = useNow();
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
@@ -129,8 +130,11 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, buzz }: 
 
         {up.length ? (
           <>
-            <View style={s.sectionHead}>
+            <View style={[s.sectionHead, s.headRow]}>
               <Text style={s.label}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Text>
+              <Pressable onPress={openBoard} style={s.boardBtn} accessibilityRole="button">
+                <Text style={s.boardText}>{t.board.open}</Text>
+              </Pressable>
             </View>
             <View style={s.stack}>
               {up.map((id, k) => (
@@ -232,6 +236,9 @@ const s = StyleSheet.create({
   leaving: { fontFamily: font.body, fontSize: size.body, color: color.ink, marginTop: space.s },
   sectionHead: { marginTop: space.m, marginBottom: space.s, paddingHorizontal: 2 },
   stack: { gap: 6 },
+  headRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  boardBtn: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.s },
+  boardText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.court, textDecorationLine: 'underline' },
   empty: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m },
   emptyTitle: { fontFamily: font.display, fontSize: size.title, color: color.ink, marginTop: space.l },
   emptyBody: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.inkSoft, marginTop: space.xs },

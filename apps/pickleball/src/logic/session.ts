@@ -2,7 +2,7 @@
 // Pure functions only: each takes a session and returns a new one. `now` is passed in so tests are exact.
 import { DEFAULT_RULES, ScoreRules, scoreFromRallies, Team } from './scoring';
 
-export type RotationRule = 'all-off' | 'winners-stay';
+export type RotationRule = 'all-off' | 'winners-stay' | 'winners-split';
 export type PlayerStatus = 'waiting' | 'playing' | 'resting';
 
 export interface Player {
@@ -252,7 +252,18 @@ export function finishGame(s: Session, court: number, winner: Team, now: number)
     !winners.some((id) => next.players[id].leaving) &&
     next.queue.length >= 2;
 
-  if (winnersCanStay) {
+  const canSplit =
+    next.settings.rule === 'winners-split' &&
+    g.streakA === 0 &&
+    !winners.some((id) => next.players[id].leaving) &&
+    next.queue.length >= 2;
+
+  if (canSplit) {
+    // Winners split up: each one plays with a new partner, against the other. One game, then all four off.
+    const [c1, c2] = next.queue.slice(0, 2);
+    next = startGame(next, court, [winners[0], c1], [winners[1], c2], now, 1);
+    next = backToLine(next, losers, now);
+  } else if (winnersCanStay) {
     const challengers = next.queue.slice(0, 2) as [string, string];
     next = startGame(next, court, winners, challengers, now, streak);
     next = backToLine(next, losers, now);
