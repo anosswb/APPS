@@ -59,3 +59,4 @@ Long explanations · being asked the same thing twice · being asked to pay earl
 - 2026-11-13: commits must be in his own name with no AI credit lines; he opens and merges the pull requests himself (he wants the GitHub activity to be his).
 - 2026-11-13: approved the newspaper look of Paper Pines after seeing the screenshots ("it looks like a newspaper").
 - 2026-11-14 (Shift app): a screen with many colours, numbers and texts at once feels distracting to him, even when he loves the look. One job per screen, few colours, few words. He also asks for a font that feels special to the app.
+- 2026-11-21: had the arena skill removed ("burns usage for nothing good"). Wants new ideas proven with real store data and scored high, and every new app judged on its own, never tied to Paper Pines or the Shift app ("we are creators, not a brand"). Many helpers at once hit his usage limit: ask before any big job.
