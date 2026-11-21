@@ -61,6 +61,10 @@ Path: `CHEATSHEET.md` at the repo root. Anass said "choose the best app and star
 ## Done (17 Nov 2026)
 - **No more free refill by quitting** (Anass found it): a challenge in progress is saved (board, ink, clock time, lost state). Leaving and coming back, even after closing the app, gives the same pot. Save format version 9. 104 tests green. Seen in the browser: 6 of 9 drops stayed 6 after leaving and after a reload; an empty pot came back as "The ink ran dry". The race clock was not checked by hand.
 
+## Done (21 Nov 2026)
+- **Foldables and tablets:** store rules checked (`research/2026-11-21-foldables-large-screens.md`). The board now fits the height, so an open foldable or tablet on its side shows the whole puzzle. Seen in the browser at cover screen (344 wide), open portrait (712 x 830), open landscape (830 x 712), tablet landscape (1180 x 820). Not tried on a real foldable.
+- Still to do for the stores: 3 foldable screenshots + 1 phone screenshot on Google Play (games, from Apr 2027); a 13-inch iPad screenshot on the App Store (we say we support iPad); build the iPhone app with the iOS 27 SDK so it fills the iPhone Duo screen.
+
 ## Not checked (needs a real phone)
 **The reminder has never run on a phone.** The rules are tested and the code compiles against the real library, but no real note has been seen. Steps to try it: `docs/builds.md`. · 
 **The ads code has never run on a phone.** It compiles against the real library; the first test build will show if ads load and close properly. · 
