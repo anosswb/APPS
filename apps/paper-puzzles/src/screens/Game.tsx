@@ -326,7 +326,12 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
   const because = hint?.kind === 'step' ? hint.step.because : undefined;
   const line = hint?.kind === 'step' ? hint.step.line : hint?.kind === 'mistake' ? hint.line : undefined;
 
-  const boardWidth = Math.min(window.width - space.l * 2, 520);
+  // The board is square, so on a short screen (a phone or an open foldable on its side, a tablet in landscape)
+  // its height decides: everything above and below it must still fit, because the page does not scroll in play.
+  const chrome = CHROME_HEIGHT + (challenge ? GAUGE_HEIGHT : 0) + insets.top + insets.bottom;
+  const boardWidth = Math.max(BOARD_MIN, Math.min(window.width - space.l * 2, 520, window.height - chrome));
+  // A very short window (split screen, top and bottom) cannot fit even the smallest board: then the page scrolls.
+  const tooShort = window.height - chrome < BOARD_MIN;
   const empty = !marks.some((m) => m === GRASS || m === TENT);
 
   const tentsWanted = useMemo(() => puzzle.solution.filter(Boolean).length, [puzzle]);
@@ -337,7 +342,7 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
       <ScrollView
         style={styles.screen}
         contentContainerStyle={[styles.page, { paddingTop: insets.top + space.s, paddingBottom: space.xl + (solved || failed ? insets.bottom : 0) }]}
-        scrollEnabled={solved || failed || !!hint}
+        scrollEnabled={solved || failed || !!hint || tooShort}
       >
         <View style={[styles.column, { width: boardWidth }]}>
           <View style={styles.bar}>
@@ -477,6 +482,13 @@ export function Game({ puzzle, title, initial, alreadySolved, showLegend, nextLa
     </View>
   );
 }
+
+/** Height of the back bar, title, size line and the Undo/Hint bar together (measured in the web build). */
+const CHROME_HEIGHT = 236;
+/** Height of the ink or clock gauge in a challenge. */
+const GAUGE_HEIGHT = 72;
+/** Never smaller than this, even on a very short window: below it the squares are too small to tap. */
+const BOARD_MIN = 280;
 
 const styles = StyleSheet.create({
   page: { alignItems: 'center', paddingHorizontal: space.l },
