@@ -1,0 +1,7 @@
+# RIGHTS.md — art, sound, fonts and text we did not make from nothing
+
+| Asset | Where it is used | Source (URL) | Licence | Tool, date and prompt (if generated) | Credit needed |
+|---|---|---|---|---|---|
+| Barlow Condensed (600, 800) | all screens: names, numbers, labels | https://fonts.google.com/specimen/Barlow+Condensed via @expo-google-fonts/barlow-condensed | SIL Open Font License 1.1 (node_modules/@expo-google-fonts/barlow-condensed/LICENSE_FONT) | — | No (keep licence text in the app's licences page before store) |
+| Archivo (500, 700) | body text, buttons | https://fonts.google.com/specimen/Archivo via @expo-google-fonts/archivo | SIL Open Font License 1.1 | — | No (same) |
+| App icon, splash, icons in src/ui/Icon.tsx | icon, tab bar, buttons | drawn by code in this repo (Python/PIL script in the 21 Nov 2026 session; SVG paths by hand) | ours | — | No |

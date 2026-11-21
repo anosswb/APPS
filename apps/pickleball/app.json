@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Dinkline",
+    "slug": "dinkline",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.anosswb.dinkline"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#3F7D55",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anosswb.dinkline"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#3F7D55",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": false,
+            "enableShrinkResourcesInReleaseBuilds": false
+          }
+        }
+      ]
+    ]
+  }
+}
