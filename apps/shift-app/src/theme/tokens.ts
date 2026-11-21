@@ -114,5 +114,5 @@ export const type = {
 
 export const space = { xs: 6, s: 10, m: 16, l: 22, xl: 34 } as const;
 export const radius = { card: 28, inner: 18, pill: 999 } as const;
-export const size = { tap: 50, button: 56, ring: 20, ringR: 100, ringSmall: 58, icon: 22, iconBig: 24, dot: 6, sun: 9, sky: 430, skyPart: 0.62, nav: 64, navSpace: 104, glassBtn: 52, glassIcon: 40, step: 44, bar: 6, timeCol: 108, valCol: 92, dayPill: 78, chart: 72, chartBar: 18 } as const;
+export const size = { tap: 50, button: 56, ring: 20, ringR: 100, ringSmall: 58, icon: 22, iconBig: 24, dot: 6, sun: 9, sky: 430, skyPart: 0.62, nav: 64, navSpace: 104, maxContent: 600, maxNav: 520, glassBtn: 52, glassIcon: 40, step: 44, bar: 6, timeCol: 108, valCol: 92, dayPill: 78, chart: 72, chartBar: 18 } as const;
 export const motion = { quick: 160, soft: 420 } as const;

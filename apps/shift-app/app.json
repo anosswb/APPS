@@ -3,7 +3,7 @@
     "name": "Shift app",
     "slug": "shift-app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -12,7 +12,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0B0F17",
+        "backgroundColor": "#0F1E38",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -64,6 +64,6 @@
       ],
       "expo-sharing"
     ],
-    "backgroundColor": "#0B0F17"
+    "backgroundColor": "#0F1E38"
   }
 }

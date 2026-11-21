@@ -122,8 +122,8 @@ export default function App() {
 
 const st = StyleSheet.create({
   fill: { flex: 1 },
-  navWrap: { position: 'absolute', left: space.m, right: space.m },
-  nav: { flexDirection: 'row', height: size.nav + 8, borderRadius: (size.nav + 8) / 2, borderWidth: 1, padding: 4, overflow: 'hidden' },
+  navWrap: { position: 'absolute', left: space.m, right: space.m, alignItems: 'center' },
+  nav: { width: '100%', maxWidth: size.maxNav, flexDirection: 'row', height: size.nav + 8, borderRadius: (size.nav + 8) / 2, borderWidth: 1, padding: 4, overflow: 'hidden' },
   tab: { flex: 1, borderRadius: size.nav / 2, alignItems: 'center', justifyContent: 'center', gap: 4 },
   tabText: { fontFamily: font.textBold, fontSize: type.caps.size },
 });

@@ -77,8 +77,8 @@ export function Today({ data, today, now, top, onCycle, onChange }: { data: Save
 
   return (
     <View style={{ flex: 1 }}>
-      <LinearGradient colors={[colors[0], colors[1], colors[2], c.dark ? 'rgba(10,15,21,0)' : 'rgba(226,232,240,0)']} locations={[...skyStops]} style={[st.sky, { height: Math.round(height * size.skyPart) }]} />
-      <ScrollView bounces={false} contentContainerStyle={{ paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
+      <LinearGradient colors={[colors[0], colors[1], colors[2], c.dark ? 'rgba(10,15,21,0)' : 'rgba(226,232,240,0)']} locations={[...skyStops]} style={[st.sky, { height: Math.min(Math.round(height * size.skyPart), 620) }]} />
+      <ScrollView bounces={false} contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.l, paddingHorizontal: space.m, paddingBottom: size.navSpace, gap: space.m }}>
         <View style={st.head}>
           <View style={{ flex: 1 }}>
             <Text style={st.title}>{t.today.title}</Text>

@@ -14,7 +14,7 @@ export function Welcome({ top, bottom, onStart }: { top: number; bottom: number;
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <LinearGradient colors={[s[0], s[1], s[2], c.dark ? 'rgba(10,15,21,0)' : 'rgba(226,232,240,0)']} locations={[...skyStops]} style={[st.sky, { height: size.sky + top }]} />
-      <ScrollView contentContainerStyle={{ paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
+      <ScrollView contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
         <View style={{ paddingHorizontal: space.s, gap: space.s, marginBottom: space.s }}>
           <Text style={st.title}>{t.welcome.title}</Text>
           <Text style={st.sub}>{t.welcome.sub}</Text>
@@ -31,7 +31,7 @@ export function Welcome({ top, bottom, onStart }: { top: number; bottom: number;
           ))}
         </Glass>
       </ScrollView>
-      <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
+      <View style={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s }}>
         <GlassPill solid icon="right" label={t.welcome.start} onPress={onStart} />
       </View>
     </View>

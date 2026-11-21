@@ -30,7 +30,7 @@ export function Paywall({ top, bottom, onBuy, onLater, laterLabel }: { top: numb
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <LinearGradient colors={[s[0], s[1], s[2], c.dark ? 'rgba(10,15,21,0)' : 'rgba(226,232,240,0)']} locations={[...skyStops]} style={[st.sky, { height: size.sky + top }]} />
-      <ScrollView contentContainerStyle={{ paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
+      <ScrollView contentContainerStyle={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingTop: top + space.xl, paddingHorizontal: space.m, paddingBottom: space.l, gap: space.m }}>
         <View style={{ paddingHorizontal: space.s, gap: space.xs }}>
           <Text style={st.title}>{t.plus.title}</Text>
           <Text style={st.sub}>{t.plus.sub}</Text>
@@ -59,7 +59,7 @@ export function Paywall({ top, bottom, onBuy, onLater, laterLabel }: { top: numb
           <Link label={t.plus.privacy} muted onPress={() => {}} />
         </View>
       </ScrollView>
-      <View style={{ paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s, gap: space.xs }}>
+      <View style={{ width: '100%', maxWidth: size.maxContent, alignSelf: 'center', paddingHorizontal: space.m, paddingBottom: Math.max(bottom, space.m), paddingTop: space.s, gap: space.xs }}>
         <GlassPill solid icon="check" label={t.plus.buy} right={plan === 'yearly' ? t.plus.price.yearly : t.plus.price.monthly} onPress={onBuy} />
         <Pressable onPress={onLater} accessibilityRole="button" style={st.later}><Text style={[st.laterText, { color: c.text }]}>{laterLabel ?? t.plus.later}</Text></Pressable>
       </View>
