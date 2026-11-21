@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { t } from '../i18n/en';
 import { scoreCall, scoreFromRallies, Team } from '../logic/scoring';
-import { addPlayer, cancelGame, counts, fillCourts, findByName, finishGame, gamesToWait, Session } from '../logic/session';
+import { addPlayer, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, Session } from '../logic/session';
 import { minutesSince, useNow } from '../state/useNow';
 import { Button } from '../ui/Button';
 import { CourtSurface } from '../ui/CourtSurface';
@@ -52,6 +52,18 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
     const pos = next.queue.indexOf(p.id) + 1;
     if (pos === 0) setToast(t.courts.nextUpNow(p.name));
     else setToast(known ? t.courts.back(p.name, pos) : t.courts.added(p.name, pos));
+    buzz('tap');
+  };
+
+  const resting = Object.values(session.players)
+    .filter((p) => p.status === 'resting')
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const bringBack = (id: string, who: string) => {
+    const next = fillCourts(checkIn(session, id, now), now);
+    act((s2, at) => fillCourts(checkIn(s2, id, at), at));
+    const pos = next.queue.indexOf(id) + 1;
+    setToast(pos > 0 ? t.courts.back(who, pos) : t.courts.nextUpNow(who));
     buzz('tap');
   };
 
@@ -160,13 +172,23 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
       </ScrollView>
 
       {toast ? (
-        <Pressable onPress={() => setToast(null)} style={s.toast} accessibilityRole="text">
+        <Pressable onPress={() => setToast(null)} style={[s.toast, adding && { bottom: resting.length ? 150 : 92 }]} accessibilityRole="text">
           <Text style={s.toastText} numberOfLines={2}>
             {toast}
           </Text>
         </Pressable>
       ) : null}
 
+      {adding && resting.length ? (
+        <ScrollView horizontal keyboardShouldPersistTaps="always" style={s.chips} contentContainerStyle={s.chipsPad}>
+          <Text style={s.chipsLabel}>{t.courts.backIn}</Text>
+          {resting.map((p) => (
+            <Pressable key={p.id} style={s.chip} onPress={() => bringBack(p.id, p.name)} accessibilityRole="button" accessibilityLabel={`${t.courts.backIn} ${p.name}`}>
+              <Text style={s.chipText}>{p.name.toUpperCase()}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      ) : null}
       {adding ? (
         <View style={s.addBar}>
           <TextInput
@@ -247,7 +269,12 @@ const s = StyleSheet.create({
   addBtn: { marginHorizontal: space.l, marginVertical: space.m, height: touch.big, borderRadius: radius.box, backgroundColor: color.ink, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l + 2, gap: space.s },
   addText: { fontFamily: font.bodyBold, fontSize: size.body + 2, color: color.ground },
   addBar: { flexDirection: 'row', gap: space.s, padding: space.m, backgroundColor: color.card, borderTopWidth: 2, borderColor: color.ink },
-  input: { flex: 1, minHeight: touch.min, borderWidth: 2, borderColor: color.ink, borderRadius: radius.box, paddingHorizontal: space.m, fontFamily: font.display, fontSize: size.name, color: color.ink },
+  chips: { flexGrow: 0, backgroundColor: color.card, borderTopWidth: 2, borderColor: color.ink },
+  chipsPad: { alignItems: 'center', gap: space.s, paddingHorizontal: space.m, paddingVertical: space.s },
+  chipsLabel: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.2, color: color.inkSoft },
+  chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.m, backgroundColor: color.ball, borderWidth: 2, borderColor: color.ink, borderRadius: 22 },
+  chipText: { fontFamily: font.display, fontSize: 20, color: color.ballInk },
+  input: { flex: 1, minWidth: 0, minHeight: touch.min, borderWidth: 2, borderColor: color.ink, borderRadius: radius.box, paddingHorizontal: space.m, fontFamily: font.display, fontSize: size.name, color: color.ink },
   doneBtn: { width: 88 },
   toast: { position: 'absolute', left: space.l, right: space.l, bottom: touch.big + space.m * 2 + space.s, backgroundColor: color.ball, borderRadius: radius.box, paddingVertical: space.m, paddingHorizontal: space.l, borderWidth: 2, borderColor: color.ink },
   toastText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.ballInk },

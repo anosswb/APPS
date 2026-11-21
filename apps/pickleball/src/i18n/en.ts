@@ -26,6 +26,7 @@ export const t = {
     back: (name: string, pos: number) => `${name} is back, #${pos} in line`,
     already: (name: string) => `${name} is already here`,
     done: 'Done',
+    backIn: 'BACK IN:',
     undo: 'Undo',
     whoWon: 'Who won on court',
     cancelGame: 'Take this game off the court',
