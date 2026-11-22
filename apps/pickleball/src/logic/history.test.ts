@@ -1,4 +1,4 @@
-import { allSessions, clock, gamesIn, stats, toRecord } from './history';
+import { allSessions, clock, gamesIn, hoursMinutes, sessionLength, stats, toRecord } from './history';
 import { addPlayer, DEFAULT_SETTINGS, fillCourts, finishGame, newSession, scoreRally } from './session';
 import { maxDeficit, DEFAULT_RULES, Team } from './scoring';
 
@@ -59,6 +59,13 @@ describe('stats', () => {
   });
   it('empty is all zeros', () => {
     expect(stats([])).toMatchObject({ games: 0, avgMs: 0, longestMs: 0, players: 0 });
+  });
+  it('time played in a session', () => {
+    const r = session('s', day, games);
+    expect(sessionLength(r)).toBe(60 * MIN);
+    expect(hoursMinutes(60 * MIN)).toBe('1h 00m');
+    expect(hoursMinutes(134 * MIN)).toBe('2h 14m');
+    expect(hoursMinutes(48 * MIN)).toBe('48m');
   });
   it('clock', () => {
     expect(clock(14 * MIN + 32000)).toBe('14:32');

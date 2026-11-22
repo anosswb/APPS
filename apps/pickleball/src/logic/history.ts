@@ -109,6 +109,16 @@ export function stats(games: GameRecord[]): Stats {
   };
 }
 
+/** How long a session lasted, from the first game's start to the last game's end. */
+export const sessionLength = (r: SessionRecord) => Math.max(0, r.endedAt - r.startedAt);
+
+/** "2h 14m" or "48m": the way running apps show time played. */
+export function hoursMinutes(ms: number): string {
+  const m = Math.round(ms / 60000);
+  const h = Math.floor(m / 60);
+  return h > 0 ? `${h}h ${String(m % 60).padStart(2, '0')}m` : `${m}m`;
+}
+
 /** "14:32" for minutes and seconds, "1:02:10" past an hour. */
 export function clock(ms: number): string {
   const total = Math.round(ms / 1000);

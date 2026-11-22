@@ -153,6 +153,8 @@ export const t = {
     when: (t: number) => `${dayFmt(t)} · ${timeFmt(t)}`,
     wins: (n: number) => `${n} ${n === 1 ? 'WIN' : 'WINS'}`,
     top: 'TOP PLAYER',
+    played: 'Played',
+    groupPhoto: 'Group photo',
     feed: 'Past sessions',
     addPhoto: 'Add photo',
     changePhoto: 'Photo',
