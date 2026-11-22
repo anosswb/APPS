@@ -77,10 +77,10 @@ export function Chip({ children, style, onPress, a11y }: { children: ReactNode; 
 
 const useS = themed((c) => ({
   section: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.l + 4, marginTop: space.xl, marginBottom: space.s + 2 },
-  sectionText: { fontFamily: font.bodyBold, fontSize: 21, color: c.text },
-  label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.8, color: c.mute },
+  sectionText: { fontFamily: font.heading, fontSize: 15, color: c.text, letterSpacing: 0.3 },
+  label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1, color: c.mute },
   statPad: { paddingHorizontal: space.l, paddingTop: space.m + 2, paddingBottom: space.m },
-  statValue: { fontFamily: font.display, fontSize: size.stat, lineHeight: size.stat + 4, color: c.text },
+  statValue: { fontFamily: font.num, fontSize: size.stat, lineHeight: size.stat + 4, color: c.text },
   statUnit: { fontFamily: font.label, fontSize: 16, letterSpacing: 1, color: c.mute },
   solid: { backgroundColor: c.solid, borderRadius: radius.glass - 2 },
   solidText: { color: c.solidText },

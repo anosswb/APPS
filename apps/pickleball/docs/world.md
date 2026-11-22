@@ -14,6 +14,9 @@ Linda, 58, runs Tuesday-morning open play at a city park in Arizona. 14 people, 
 | C | Park Paint: court green everywhere, white paint, orange action | Readable, but white-on-green text is weaker than black-on-light outdoors, and it looks like a generic sports app. |
 Picked by Claude on 21 Nov 2026 while Anass slept, by the rule "readable in bright sun at arm's length". To switch: change `src/theme/tokens.ts` only.
 
+## v4: Any Distance-like type (22 Nov 2026)
+Inter (text, names), Spline Sans Mono (numbers, uppercase labels), Michroma (titles). Black, #1A1A1A cards, white type, grey labels, one accent (ball yellow). No italics, no condensed type. Inspired by Any Distance's style only (its code and fonts may not be used commercially).
+
 ## v3.1: true black (22 Nov 2026, after Anass's phone test)
 Pure black background, dark grey panels (#141416) with a thin edge and a fine top line, white type, one accent (ball yellow #D8F23A). Court colours only on the court. No coloured light behind the screens. Light mode is plain iOS-style grey (#F2F2F7) and white. Glass is plain views (Android drew SVG see-through gradients as black).
 

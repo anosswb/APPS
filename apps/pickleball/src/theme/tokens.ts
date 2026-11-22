@@ -19,8 +19,8 @@ export const dark = {
   mode: 'dark' as 'dark' | 'light',
   ...court,
   bg: '#000000',
-  card: '#141416',
-  cardHi: '#1C1C1F',
+  card: '#1A1A1A', // 10% white, like the best dark sports apps
+  cardHi: '#252527',
   edge: 'rgba(255,255,255,0.09)',
   edgeHi: 'rgba(255,255,255,0.16)',
   text: '#FFFFFF',
@@ -72,24 +72,29 @@ export const light: Palette = {
 };
 
 export const font = {
-  display: 'BarlowCondensed_800ExtraBold',
-  displayItalic: 'BarlowCondensed_800ExtraBold_Italic',
-  label: 'BarlowCondensed_600SemiBold',
-  body: 'Archivo_500Medium',
-  bodyBold: 'Archivo_700Bold',
+  /** Wide, technical: screen titles and the big moments (Michroma, SIL OFL). */
+  heading: 'Michroma_400Regular',
+  /** Every number: scores, clocks, stats (Spline Sans Mono, SIL OFL: a plain zero, like the best sports apps). */
+  num: 'SplineSansMono_600SemiBold',
+  /** Small uppercase labels like GAMES, LONGEST. */
+  label: 'SplineSansMono_500Medium',
+  /** Player names. */
+  name: 'Inter_700Bold',
+  body: 'Inter_500Medium',
+  bodyBold: 'Inter_600SemiBold',
 } as const;
 
 export const size = {
-  hero: 40,
-  title: 30,
-  name: 26,
-  nameSmall: 21,
+  hero: 25, // screen titles (wide heading font)
+  title: 19, // sheet titles
+  name: 20,
+  nameSmall: 17,
   body: 16,
   small: 14,
-  label: 14,
-  scoreGiant: 168,
-  call: 44,
-  stat: 40,
+  label: 11.5,
+  scoreGiant: 132,
+  call: 34,
+  stat: 32,
 } as const;
 
 export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 } as const;

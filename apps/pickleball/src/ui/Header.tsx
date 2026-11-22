@@ -19,6 +19,6 @@ export function Header({ title, sub, right }: { title: string; sub?: string; rig
 
 const useS = themed((c) => ({
   row: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: space.l + 4, paddingTop: space.m, paddingBottom: space.m },
-  title: { fontFamily: font.displayItalic, fontSize: size.hero, lineHeight: size.hero + 4, color: c.text, letterSpacing: 0.4 },
+  title: { fontFamily: font.heading, fontSize: size.hero, lineHeight: size.hero + 4, color: c.text, letterSpacing: 0.2 },
   sub: { fontFamily: font.body, fontSize: size.small + 1, color: c.mute, marginTop: 2 },
 }));

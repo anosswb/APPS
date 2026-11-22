@@ -88,7 +88,7 @@ const TEXT_FROM = {
   'Apache-2.0': '@iabtcf/core/LICENSE',
   ISC: '@ungap/structured-clone/LICENSE',
   'BSD-3-Clause': 'hyphenate-style-name/LICENSE',
-  'OFL-1.1': '@expo-google-fonts/barlow-condensed/LICENSE_FONT',
+  'OFL-1.1': '@expo-google-fonts/inter/LICENSE_FONT',
 };
 function body(file) {
   const paragraphs = fs
@@ -106,8 +106,9 @@ for (const p of packages) {
   }
 }
 /** The fonts are files we ship as they are, so their own copyright lines are shown on the page. */
-const fonts = ['barlow-condensed', 'archivo'].map((f) => ({
-  name: f === 'archivo' ? 'Archivo' : 'Barlow Condensed',
+const FONT_NAMES = { inter: 'Inter', 'spline-sans-mono': 'Spline Sans Mono', michroma: 'Michroma' };
+const fonts = Object.keys(FONT_NAMES).map((f) => ({
+  name: FONT_NAMES[f],
   copyright: fs.readFileSync(path.join(root, 'node_modules', '@expo-google-fonts', f, 'LICENSE_FONT'), 'utf8').split('\n')[0].trim(),
   licence: 'OFL-1.1',
 }));

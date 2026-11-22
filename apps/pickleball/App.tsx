@@ -6,8 +6,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useFonts, BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold, BarlowCondensed_800ExtraBold_Italic } from '@expo-google-fonts/barlow-condensed';
-import { Archivo_500Medium, Archivo_700Bold } from '@expo-google-fonts/archivo';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { SplineSansMono_500Medium, SplineSansMono_600SemiBold } from '@expo-google-fonts/spline-sans-mono';
+import { Michroma_400Regular } from '@expo-google-fonts/michroma';
 import { t } from './src/i18n/en';
 import { AwardId, evaluate, newlyEarned } from './src/logic/achievements';
 import { allSessions } from './src/logic/history';
@@ -38,7 +39,7 @@ SplashScreen.preventAutoHideAsync().catch((e) => console.warn(`[splash] ${String
 type Tab = 'courts' | 'players' | 'history' | 'awards' | 'settings';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({ BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold, BarlowCondensed_800ExtraBold_Italic, Archivo_500Medium, Archivo_700Bold });
+  const [fontsLoaded] = useFonts({ Inter_500Medium, Inter_600SemiBold, Inter_700Bold, SplineSansMono_500Medium, SplineSansMono_600SemiBold, Michroma_400Regular });
   const app = useSession();
   const system = useColorScheme();
   const palette = app.prefs.theme === 'light' || (app.prefs.theme === 'system' && system === 'light') ? light : dark;
@@ -293,8 +294,8 @@ const useS = themed((c) => ({
   banner: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.s },
   bannerCase: { width: 64, height: 72, borderRadius: 18, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
   bannerBadge: { width: 52, height: 64 },
-  bannerKicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 2, color: c.highlight },
-  bannerName: { fontFamily: font.displayItalic, fontSize: 26, color: c.text },
+  bannerKicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 1, color: c.highlight },
+  bannerName: { fontFamily: font.heading, fontSize: 16, color: c.text },
   bannerWho: { fontFamily: font.body, fontSize: 13, color: c.mute },
 }));
 

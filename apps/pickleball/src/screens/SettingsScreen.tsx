@@ -138,7 +138,7 @@ const useS = themed((c) => ({
   padTight: { paddingHorizontal: space.l, paddingVertical: space.s },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   step: { width: touch.big, height: touch.big, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.hair, alignItems: 'center', justifyContent: 'center' },
-  big: { fontFamily: font.display, fontSize: 64, color: c.text, lineHeight: 68 },
+  big: { fontFamily: font.num, fontSize: 55, color: c.text, lineHeight: 58 },
   help: { fontFamily: font.body, fontSize: size.small + 1, lineHeight: 21, color: c.mute, marginTop: 2 },
   hair: { height: 1, backgroundColor: c.hair, marginVertical: space.s },
   choice: { flexDirection: 'row', gap: space.m, alignItems: 'flex-start', minHeight: touch.min, paddingVertical: space.xs },
