@@ -11,12 +11,13 @@ import { Archivo_500Medium, Archivo_700Bold } from '@expo-google-fonts/archivo';
 import { t } from './src/i18n/en';
 import { AwardId, evaluate, newlyEarned } from './src/logic/achievements';
 import { allSessions } from './src/logic/history';
-import { finishGame, scoreRally, setFirstServe, undoRally } from './src/logic/session';
+import { finishGame, scoreRally, setFirstServe, undoRally, updateSettings } from './src/logic/session';
 import { Team } from './src/logic/scoring';
 import { useSession } from './src/state/useSession';
 import { withPhoto, withPlace } from './src/state/storage';
 import { AwardsScreen } from './src/screens/AwardsScreen';
 import { BoardScreen } from './src/screens/BoardScreen';
+import { GuideScreen } from './src/screens/GuideScreen';
 import { CourtsScreen } from './src/screens/CourtsScreen';
 import { HistoryScreen } from './src/screens/HistoryScreen';
 import { LicencesScreen } from './src/screens/LicencesScreen';
@@ -67,6 +68,8 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
   const [adsReady, setAdsReady] = useState(false);
   const [adsAsked, setAdsAsked] = useState(false);
   const [banner, setBanner] = useState<{ id: AwardId; who: string } | null>(null);
+  const [guide, setGuide] = useState(false);
+  const [startAdding, setStartAdding] = useState(false);
 
   // Ads start the first time Players or Settings opens, never on the courts (docs/money.md).
   useEffect(() => {
@@ -123,6 +126,23 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
     buzz('done');
   }, [awards, history.seen, setHistory, buzz]);
 
+  if (guide || !prefs.guideDone) {
+    return (
+      <>
+        <StatusBar style={c.mode === 'dark' ? 'light' : 'dark'} />
+        <GuideScreen
+          settings={session.settings}
+          onDone={(st) => {
+            act((x, now) => updateSettings(x, { courts: st.courts, rule: st.rule, scoring: st.scoring }, now));
+            setPrefs({ ...prefs, guideDone: true });
+            setGuide(false);
+            setTab('courts');
+            setStartAdding(Object.keys(session.players).length === 0);
+          }}
+        />
+      </>
+    );
+  }
   if (licences) {
     return (
       <>
@@ -171,7 +191,7 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
       <StatusBar style={c.mode === 'dark' ? 'light' : 'dark'} />
       <Ambient />
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-        {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} openScorer={setScoring} openBoard={() => setBoard(true)} buzz={buzz} /> : null}
+        {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} openScorer={setScoring} openBoard={() => setBoard(true)} openGuide={() => setGuide(true)} startAdding={startAdding} buzz={buzz} /> : null}
         {tab === 'players' ? <PlayersScreen session={session} act={act} /> : null}
         {tab === 'history' ? (
           <HistoryScreen
@@ -184,7 +204,7 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
           />
         ) : null}
         {tab === 'awards' ? <AwardsScreen awards={awards} sessions={sessions} goals={history.goals} setGoals={(goals) => setHistory((h) => ({ ...h, goals }))} /> : null}
-        {tab === 'settings' ? <SettingsScreen session={session} act={act} closeSession={closeSession} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} /> : null}
+        {tab === 'settings' ? <SettingsScreen session={session} act={act} closeSession={closeSession} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} openGuide={() => setGuide(true)} /> : null}
       </SafeAreaView>
       {adsReady && (tab === 'players' || tab === 'settings') ? (
         <View style={s.ad}>

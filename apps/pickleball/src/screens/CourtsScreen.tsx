@@ -3,10 +3,10 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, Tex
 import { t } from '../i18n/en';
 import { clock } from '../logic/history';
 import { scoreCall, scoreFromRallies, Team } from '../logic/scoring';
-import { addPlayer, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, Session } from '../logic/session';
+import { addPlayer, canOpenCourt, canRemoveCourt, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, MAX_COURTS, RotationRule, Session, updateSettings } from '../logic/session';
 import { minutesSince, useNow } from '../state/useNow';
 import { Button } from '../ui/Button';
-import { Chip, Label } from '../ui/Bits';
+import { Chip, Label, Segments } from '../ui/Bits';
 import { CourtSurface } from '../ui/CourtSurface';
 import { Glass } from '../ui/Glass';
 import { Header } from '../ui/Header';
@@ -22,14 +22,18 @@ interface Props {
   canUndo: boolean;
   openScorer: (court: number) => void;
   openBoard: () => void;
+  openGuide: () => void;
+  /** Opened from the guide's Start button: go straight to adding names. */
+  startAdding?: boolean;
   buzz: (kind: 'tap' | 'done') => void;
 }
 
-export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoard, buzz }: Props) {
+export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoard, openGuide, startAdding, buzz }: Props) {
   const s = useS();
   const c = useTheme();
   const now = useNow(1000);
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(!!startAdding);
+  const [menu, setMenu] = useState(false);
   const [draft, setDraft] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [ending, setEnding] = useState<number | null>(null);
@@ -85,7 +89,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
     <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Header
         title={t.courts.title}
-        sub={t.courts.here(n.waiting + n.playing, session.courts.length)}
+        sub={`${t.courts.here(n.waiting + n.playing, session.courts.length)} · ${t.menu.ruleShort[session.settings.rule]}`}
         right={
           canUndo ? (
             <Chip onPress={undo} a11y={t.a11y.undo}>
@@ -102,6 +106,10 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
               <CourtSurface left={['1', '2']} right={['3', '4']} height={120} />
               <Text style={s.emptyTitle}>{t.courts.emptyTitle}</Text>
               <Text style={s.emptyBody}>{t.courts.emptyBody}</Text>
+              <View style={s.emptyActions}>
+                <Button label={t.menu.addPlayers} kind="go" onPress={() => setAdding(true)} style={{ flex: 1.4 }} />
+                <Button label={t.menu.guideShort} onPress={openGuide} style={{ flex: 1 }} />
+              </View>
             </View>
           </Glass>
         ) : (
@@ -151,6 +159,17 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
           })
         )}
 
+        {canOpenCourt(session) ? (
+          <Pressable onPress={() => { act((s2, at) => updateSettings(s2, { courts: s2.courts.length + 1 }, at)); buzz('tap'); }} style={({ pressed }) => [s.ghost, pressed && { opacity: 0.8 }]} accessibilityRole="button" accessibilityLabel={t.menu.openCourt(session.courts.length + 1)}>
+            <View style={s.ghostPlus}>
+              <Icon name="plus" size={22} tint={c.accentText} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.ghostTitle}>{t.menu.openCourt(session.courts.length + 1)}</Text>
+              <Text style={s.ghostSub}>{t.menu.waitingOffer(session.queue.length)}</Text>
+            </View>
+          </Pressable>
+        ) : null}
         {up.length ? (
           <>
             <View style={s.lineHead}>
@@ -221,16 +240,55 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
             <Button label={t.courts.done} kind="solid" onPress={() => { if (draft.trim()) submit(); setAdding(false); }} style={s.done} />
           </Glass>
         ) : (
-          <Pressable onPress={() => { setAdding(true); setToast(null); }} accessibilityRole="button" accessibilityLabel={t.a11y.add}>
-            <Glass radius={radius.pill} style={s.addBtn}>
-              <View style={s.plus}>
-                <Icon name="plus" size={20} tint={c.accentText} />
-              </View>
-              <Text style={s.addText}>{t.courts.addPlayer}</Text>
-            </Glass>
-          </Pressable>
+          <View style={s.fabRow}>
+            <Pressable onPress={() => { setAdding(true); setToast(null); }} accessibilityRole="button" accessibilityLabel={t.a11y.add} style={{ flex: 1 }}>
+              <Glass radius={radius.pill} style={s.addBtn}>
+                <Icon name="people" size={20} />
+                <Text style={s.addText}>{t.menu.addPlayers}</Text>
+              </Glass>
+            </Pressable>
+            <Pressable onPress={() => setMenu(true)} style={({ pressed }) => [s.fab, pressed && { transform: [{ scale: 0.94 }] }]} accessibilityRole="button" accessibilityLabel={t.menu.open}>
+              <Icon name="plus" size={30} tint={c.accentText} />
+            </Pressable>
+          </View>
         )}
       </View>
+
+      <Modal visible={menu} transparent animationType="slide" onRequestClose={() => setMenu(false)}>
+        <Pressable style={s.scrim} onPress={() => setMenu(false)}>
+          <Pressable style={s.sheet} onPress={() => {}}>
+            <Text style={s.sheetTitle}>{t.menu.title}</Text>
+            <Button label={t.menu.addPlayers} kind="go" onPress={() => { setMenu(false); setAdding(true); }} />
+            <View style={s.menuRow}>
+              <Button
+                label={session.courts.length >= MAX_COURTS ? t.menu.maxCourts : t.menu.openCourt(session.courts.length + 1)}
+                disabled={session.courts.length >= MAX_COURTS}
+                onPress={() => act((s2, at) => updateSettings(s2, { courts: s2.courts.length + 1 }, at))}
+                style={{ flex: 1 }}
+              />
+              {canRemoveCourt(session) ? (
+                <Button label={t.menu.removeCourt(session.courts.length)} onPress={() => act((s2, at) => updateSettings(s2, { courts: s2.courts.length - 1 }, at))} style={{ flex: 1 }} />
+              ) : null}
+            </View>
+            <Label style={s.menuLabel}>{t.settings.rotation}</Label>
+            {(['all-off', 'winners-stay', 'winners-split'] as RotationRule[]).map((r) => {
+              const on = session.settings.rule === r;
+              return (
+                <Pressable key={r} onPress={() => act((s2, at) => updateSettings(s2, { rule: r }, at))} style={[s.rule, on && s.ruleOn]} accessibilityRole="radio" accessibilityState={{ selected: on }}>
+                  <Text style={[s.ruleTitle, on && s.ruleTitleOn]}>{t.menu.ruleShort[r]}</Text>
+                  <Text style={[s.ruleHelp, on && s.ruleHelpOn]}>{t.menu.ruleHelp[r]}</Text>
+                </Pressable>
+              );
+            })}
+            <Label style={s.menuLabel}>{t.settings.scoring}</Label>
+            <Segments<'sideout' | 'rally'> items={[['sideout', t.settings.sideout], ['rally', t.settings.rally]]} value={session.settings.scoring.type} onChange={(v) => act((s2, at) => updateSettings(s2, { scoring: { ...s2.settings.scoring, type: v } }, at))} />
+            <View style={s.menuRow}>
+              <Button label={t.board.open} onPress={() => { setMenu(false); openBoard(); }} style={{ flex: 1 }} />
+              <Button label={t.menu.howItWorks} onPress={() => { setMenu(false); openGuide(); }} style={{ flex: 1 }} />
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       <Modal visible={endingGame != null} transparent animationType="fade" onRequestClose={() => setEnding(null)}>
         <View style={s.scrim}>
@@ -278,7 +336,22 @@ const useS = themed((c) => ({
   chipText: { fontFamily: font.bodyBold, fontSize: size.small, color: c.text },
   stack: { gap: 7 },
   bottom: { paddingHorizontal: space.l, paddingBottom: TAB_SPACE, paddingTop: space.s },
-  addBtn: { flexDirection: 'row', alignItems: 'center', gap: space.m, minHeight: touch.big, paddingHorizontal: space.s + 2 },
+  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, paddingHorizontal: space.l },
+  fabRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
+  fab: { width: touch.big + 4, height: touch.big + 4, borderRadius: (touch.big + 4) / 2, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', borderWidth: c.mode === 'light' ? 1.5 : 0, borderColor: c.accentLine },
+  emptyActions: { flexDirection: 'row', gap: space.s, marginTop: space.l },
+  ghost: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.m + 2, marginBottom: space.m, borderRadius: radius.glass, borderWidth: 1.5, borderStyle: 'dashed', borderColor: c.accent },
+  ghostPlus: { width: 44, height: 44, borderRadius: 22, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' },
+  ghostTitle: { fontFamily: font.displayItalic, fontSize: 24, color: c.text },
+  ghostSub: { fontFamily: font.body, fontSize: size.small, color: c.mute },
+  menuRow: { flexDirection: 'row', gap: space.s },
+  menuLabel: { marginTop: space.s },
+  rule: { borderRadius: 16, borderWidth: 1, borderColor: c.hair, paddingHorizontal: space.l, paddingVertical: space.s + 2 },
+  ruleOn: { backgroundColor: c.solid, borderColor: c.solid },
+  ruleTitle: { fontFamily: font.bodyBold, fontSize: size.body, color: c.text },
+  ruleTitleOn: { color: c.solidText },
+  ruleHelp: { fontFamily: font.body, fontSize: 13, color: c.mute, marginTop: 1 },
+  ruleHelpOn: { color: c.mode === 'dark' ? '#3A3A3C' : '#C7C7CC' },
   plus: { width: 44, height: 44, borderRadius: 22, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' },
   addText: { fontFamily: font.bodyBold, fontSize: size.body + 2, color: c.text },
   addBar: { flexDirection: 'row', alignItems: 'center', gap: space.s, padding: 6 },

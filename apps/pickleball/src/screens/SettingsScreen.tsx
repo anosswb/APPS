@@ -19,9 +19,10 @@ interface Props {
   prefs: Prefs;
   setPrefs: (p: Prefs) => void;
   openLicences: () => void;
+  openGuide: () => void;
 }
 
-export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, openLicences }: Props) {
+export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, openLicences, openGuide }: Props) {
   const s = useS();
   const c = useTheme();
   const st = session.settings;
@@ -85,6 +86,7 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
         </Glass>
 
         <Label style={s.label}>{t.settings.session}</Label>
+        <Button label={t.settings.guide} onPress={openGuide} style={{ marginBottom: space.s }} />
         <View style={{ gap: space.s }}>
           <Button label={confirm === 'fresh' ? t.settings.sure : t.settings.fresh} kind={confirm === 'fresh' ? 'solid' : 'glass'} onPress={() => twice('fresh', () => closeSession((s2, now) => restartSession(s2, now)))} />
           <Text style={s.help}>{t.settings.freshHelp}</Text>

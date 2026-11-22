@@ -1,5 +1,5 @@
 import {
-  addPlayer, bestTeams, cancelGame, checkIn, checkOut, counts, DEFAULT_SETTINGS, fillCourts, finishGame,
+  canOpenCourt, canRemoveCourt, addPlayer, bestTeams, cancelGame, checkIn, checkOut, counts, DEFAULT_SETTINGS, fillCourts, finishGame,
   gamesToWait, moveUp, newSession, removePlayer, renamePlayer, restartSession, scoreRally, Session, setCourtCount, undoRally,
 } from './session';
 
@@ -210,5 +210,26 @@ describe('fairness over a long session', () => {
     const pairs = (n * (n - 1)) / 2;
     const pairings = Object.values(s.partners).reduce((a, b) => a + b, 0);
     expect(Math.max(...Object.values(s.partners))).toBeLessThanOrEqual(Math.ceil(pairings / pairs) + 2);
+  });
+});
+
+describe('opening and closing courts from the courts screen', () => {
+  it('offers a new court when 4 wait and all courts are busy', () => {
+    let s = fillCourts(withPlayers(8, { ...DEFAULT_SETTINGS, courts: 1 }), 0);
+    expect(canOpenCourt(s)).toBe(true);
+    s = setCourtCount(s, 2, 0);
+    expect(s.courts[1]).not.toBeNull();
+    expect(canOpenCourt(s)).toBe(false);
+  });
+  it('no offer with fewer than 4 waiting or with an open court', () => {
+    expect(canOpenCourt(fillCourts(withPlayers(7, { ...DEFAULT_SETTINGS, courts: 1 }), 0))).toBe(false);
+    expect(canOpenCourt(fillCourts(withPlayers(8, { ...DEFAULT_SETTINGS, courts: 3 }), 0))).toBe(false);
+  });
+  it('only an empty last court can be removed', () => {
+    const busy = fillCourts(withPlayers(8), 0);
+    expect(canRemoveCourt(busy)).toBe(false);
+    const open = fillCourts(withPlayers(4), 0);
+    expect(canRemoveCourt(open)).toBe(true);
+    expect(canRemoveCourt(newSession({ ...DEFAULT_SETTINGS, courts: 1 }))).toBe(false);
   });
 });
