@@ -14,9 +14,10 @@ interface Props {
   act: (change: (s: Session, now: number) => Session) => void;
   prefs: Prefs;
   setPrefs: (p: Prefs) => void;
+  openLicences: () => void;
 }
 
-export function SettingsScreen({ session, act, prefs, setPrefs }: Props) {
+export function SettingsScreen({ session, act, prefs, setPrefs, openLicences }: Props) {
   const st = session.settings;
   const [confirm, setConfirm] = useState<'fresh' | 'clear' | null>(null);
   const twice = (which: 'fresh' | 'clear', run: () => void) => {
@@ -82,6 +83,9 @@ export function SettingsScreen({ session, act, prefs, setPrefs }: Props) {
       </View>
 
       <Text style={s.foot}>{t.settings.privacy}</Text>
+      <Pressable onPress={openLicences} style={s.licBtn} accessibilityRole="button">
+        <Text style={s.licText}>{t.licences.open}</Text>
+      </Pressable>
       <Text style={s.foot}>{t.settings.version(Constants.expoConfig?.version ?? '1.0.0')}</Text>
       <View style={{ height: 40 }} />
       </ScrollView>
@@ -144,5 +148,7 @@ const s = StyleSheet.create({
   segOn: { backgroundColor: color.ink },
   segText: { fontFamily: font.display, fontSize: size.nameSmall, color: color.ink },
   toggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: touch.min },
+  licBtn: { minHeight: touch.min, alignItems: 'center', justifyContent: 'center', marginTop: space.s },
+  licText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.court, textDecorationLine: 'underline' },
   foot: { fontFamily: font.body, fontSize: size.small, color: color.mute, textAlign: 'center', marginTop: space.l },
 });

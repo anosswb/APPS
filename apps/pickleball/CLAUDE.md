@@ -27,6 +27,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: th
 | `src/ui/` | Icon set, Button, CourtSurface (the signature), LineTag |
 | `src/screens/` | Courts (home), Scorer, Players, Settings |
 | `scripts/launch-test.sh` | Used by the emulator launch test workflow |
+| `scripts/make-licences.js` | Makes `src/config/licences.json` for the Licenses page. Run it after adding or updating a package (command at the top of the file) |
+| `store/listing.md` | Store listing draft |
 
 ## Hard rules for this app
 - Rules live in `src/logic/` as pure functions with tests. Screens never decide who plays next.

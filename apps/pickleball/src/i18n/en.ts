@@ -102,6 +102,17 @@ export const t = {
     privacy: 'Everything stays on this phone. No account, no sign-in.',
     version: (v: string) => `${APP_NAME} ${v}`,
   },
+  licences: {
+    title: 'Licenses',
+    open: 'Open-source licenses',
+    intro: 'Dinkline is built with free fonts and open-source code made by other people. Their names and licenses are here.',
+    type: 'TYPE',
+    code: (n: number) => `CODE (${n} PACKAGES)`,
+    texts: 'LICENSE TEXTS',
+    show: 'Show',
+    hide: 'Hide',
+    close: 'Close',
+  },
   a11y: {
     add: 'Add a player',
     undo: 'Undo the last action',
