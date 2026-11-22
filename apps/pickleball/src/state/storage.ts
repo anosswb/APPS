@@ -18,8 +18,17 @@ export interface Prefs {
   /** Say the next game out loud when a court opens. */
   voice: boolean;
   theme: ThemeChoice;
+  /** Version of the look settings. 2 = dark became the default (22 Nov 2026). */
+  lookV: number;
 }
-export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, theme: 'system' };
+export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, theme: 'dark', lookV: 2 };
+
+/** Old prefs had "Auto" as the default; Anass chose dark as the main look, so they move to dark once. */
+export function upgradePrefs(raw: Partial<Prefs> | undefined): Prefs {
+  const p = { ...DEFAULT_PREFS, ...raw };
+  if ((raw?.lookV ?? 0) < 2) return { ...p, theme: 'dark', lookV: 2 };
+  return p;
+}
 
 interface Saved {
   v: number;
@@ -79,7 +88,7 @@ export function parseSaved(raw: string | null): { session: Session; prefs: Prefs
     const session = migrate(data as unknown as { v: number; session: Record<string, unknown> });
     return {
       session: { ...session, settings: { ...DEFAULT_SETTINGS, ...session.settings } },
-      prefs: { ...DEFAULT_PREFS, ...data.prefs },
+      prefs: upgradePrefs(data.prefs),
     };
   } catch (e) {
     return { session: newSession(), prefs: DEFAULT_PREFS, problem: `saved data unreadable: ${String(e)}` };

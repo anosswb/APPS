@@ -31,7 +31,7 @@ const useS = themed((c) => ({
   row: { flexDirection: 'row', alignItems: 'center' },
   face: { flex: 1, flexDirection: 'row', alignItems: 'center', minHeight: 56, borderTopLeftRadius: 28, borderBottomLeftRadius: 28, borderTopRightRadius: 16, borderBottomRightRadius: 16, paddingHorizontal: space.l },
   faceStrong: { backgroundColor: c.accent, borderWidth: c.mode === 'light' ? 1.5 : 0, borderColor: c.accentLine },
-  num: { width: 30, fontFamily: font.displayItalic, fontSize: 28, color: c.mode === 'dark' ? c.accent : c.court },
+  num: { width: 30, fontFamily: font.displayItalic, fontSize: 28, color: c.highlight },
   inkText: { color: c.accentText },
   name: { flex: 1, fontFamily: font.display, fontSize: size.name - 1, color: c.text, letterSpacing: 0.3 },
   note: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginLeft: space.s },

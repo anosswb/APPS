@@ -129,7 +129,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
                 <View style={s.pad}>
                   <View style={s.head}>
                     <Label>{t.courts.court(i + 1)}</Label>
-                    <Glass radius={radius.pill} style={s.timer} tint={c.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(11,13,18,0.06)'}>
+                    <Glass radius={radius.pill} style={s.timer} tint={c.cardHi}>
                       <View style={s.live} />
                       <Text style={s.timerText}>{clock(now - g.startedAt)}</Text>
                     </Glass>
@@ -154,7 +154,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         {up.length ? (
           <>
             <View style={s.lineHead}>
-              <Label style={{ color: c.mode === 'dark' ? c.accent : c.court }}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Label>
+              <Label style={{ color: c.highlight }}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Label>
               <Chip onPress={openBoard} a11y={t.board.open}>
                 <Icon name="board" size={18} />
                 <Text style={s.chipText}>{t.board.open}</Text>

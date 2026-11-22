@@ -11,6 +11,7 @@ describe('saved data', () => {
     const out = parseSaved(JSON.stringify({ v: SCHEMA, session: s, prefs: { haptics: false, keepAwake: true } }));
     expect(out.session.players.p1.name).toBe('Dana');
     expect(out.prefs).toEqual({ ...DEFAULT_PREFS, haptics: false });
+    expect(out.prefs.theme).toBe('dark');
     expect(out.problem).toBeUndefined();
   });
   it('a version 1 save is upgraded, not lost', () => {
@@ -24,6 +25,12 @@ describe('saved data', () => {
     expect(out.session.results[0]).toMatchObject({ startedAt: 500, target: 11, maxDeficit: 0 });
     expect(out.session.startedAt).toBe(500);
     expect(typeof out.session.id).toBe('string');
+  });
+  it('the old Auto look moves to dark once; a later choice is kept', () => {
+    const old = parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { theme: 'system' } }));
+    expect(old.prefs).toMatchObject({ theme: 'dark', lookV: 2 });
+    const chosen = parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { theme: 'light', lookV: 2 } }));
+    expect(chosen.prefs.theme).toBe('light');
   });
   it('broken text gives a fresh session and a reason', () => {
     const out = parseSaved('{oops');

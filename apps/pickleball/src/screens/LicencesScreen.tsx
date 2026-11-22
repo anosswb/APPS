@@ -68,7 +68,7 @@ const useS = themed((color) => ({
   pad: { padding: space.l },
   intro: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.textSoft },
   label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.textSoft, marginTop: space.xl, marginBottom: space.s },
-  row: { backgroundColor: color.glassTop, borderRadius: radius.box, padding: space.m, marginBottom: 6 },
+  row: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m, marginBottom: 6 },
   name: { fontFamily: font.display, fontSize: size.nameSmall, color: color.text },
   pkg: { fontFamily: font.bodyBold, fontSize: size.body, color: color.text },
   meta: { fontFamily: font.body, fontSize: size.small, color: color.textSoft, marginTop: 2 },

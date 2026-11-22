@@ -102,7 +102,7 @@ export const t = {
     system: 'Auto',
     dark: 'Dark',
     light: 'Light',
-    lookHelp: 'Light is easier to read in strong sun. Auto follows your phone.',
+    lookHelp: 'Dark is the main look. Light is easier to read in strong sun. Auto follows your phone.',
     feel: 'FEEL',
     voice: 'Call out the next game',
     voiceHelp: 'The phone says who goes on when a court opens.',

@@ -14,6 +14,9 @@ Linda, 58, runs Tuesday-morning open play at a city park in Arizona. 14 people, 
 | C | Park Paint: court green everywhere, white paint, orange action | Readable, but white-on-green text is weaker than black-on-light outdoors, and it looks like a generic sports app. |
 Picked by Claude on 21 Nov 2026 while Anass slept, by the rule "readable in bright sun at arm's length". To switch: change `src/theme/tokens.ts` only.
 
+## v3.1: true black (22 Nov 2026, after Anass's phone test)
+Pure black background, dark grey panels (#141416) with a thin edge and a fine top line, white type, one accent (ball yellow #D8F23A). Court colours only on the court. No coloured light behind the screens. Light mode is plain iOS-style grey (#F2F2F7) and white. Glass is plain views (Android drew SVG see-through gradients as black).
+
 ## v3: dark liquid glass (22 Nov 2026, Anass: "I don't like the design… like Apple Sports… liquid glass… premium iPhone look… we need dark and white mode")
 - Picture he approved: `docs/world/v3/v3-overview.png`. Built: dark default with soft court-coloured light behind everything (blue, green, a hint of ball yellow), glass panels (see-through body, bright rim, top shine), big italic scoreboard numbers, a floating glass tab bar with 5 tabs, a light palette (sun mode) with the same layout.
 - Glass is **drawn**, not blurred: the background light is already soft, so the panels look like frosted glass without a blur library. Same on every phone, no native risk. The liquid-glass-studio repo (MIT) was read but no code was taken.

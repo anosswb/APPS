@@ -13,34 +13,33 @@ const court = {
   ballInk: '#0B0D12',
 };
 
+// Dark is the main look (Anass, 22 Nov 2026): true black, dark grey panels, white type, one accent (ball
+// yellow). Court colours appear only on the court. Light is plain grey and white, no coloured background.
 export const dark = {
   mode: 'dark' as 'dark' | 'light',
   ...court,
-  bg: '#05070B',
-  glow1: '#2147C9',
-  glow2: '#3F7D55',
-  glow3: '#D8F23A',
-  glowOpacity: 0.5,
-  text: '#F4F6FA',
-  textSoft: '#C9CED8',
-  mute: '#8C95A6',
+  bg: '#000000',
+  card: '#141416',
+  cardHi: '#1C1C1F',
+  edge: 'rgba(255,255,255,0.09)',
+  edgeHi: 'rgba(255,255,255,0.16)',
+  text: '#FFFFFF',
+  textSoft: '#D1D1D6',
+  mute: '#8E8E93',
   hair: 'rgba(255,255,255,0.10)',
-  glassTop: 'rgba(255,255,255,0.15)',
-  glassBottom: 'rgba(255,255,255,0.04)',
-  glassRim: 'rgba(255,255,255,0.10)',
-  glassRimHi: 'rgba(255,255,255,0.55)',
-  glassShine: 0.28,
-  solid: '#F4F6FA', // the one bright tile on a screen
-  solidText: '#0B0D12',
+  hairHex: '#FFFFFF', // the same line colour for drawings that need a plain colour plus an opacity
+  hairOpacity: 0.12,
+  solid: '#FFFFFF', // the one bright tile on a screen
+  solidText: '#000000',
   accent: '#D8F23A',
   accentText: '#0B0D12',
   accentLine: '#D8F23A',
+  highlight: '#D8F23A', // numbers that matter, the active tab
   stop: '#FF6B5E',
-  scrim: 'rgba(0,0,0,0.62)',
-  sheet: '#10141C',
+  scrim: 'rgba(0,0,0,0.66)',
+  sheet: '#1C1C1E',
   showcase: '#07090E', // the dark display case behind the award badges, in both modes
-  shadow: 'rgba(0,0,0,0.45)',
-  bar: 'rgba(17,21,30,0.97)', // tab bar and banners: glass you cannot read through
+  bar: 'rgba(24,24,27,0.96)', // tab bar and banners
 };
 
 export type Palette = typeof dark;
@@ -48,31 +47,28 @@ export type Palette = typeof dark;
 export const light: Palette = {
   mode: 'light',
   ...court,
-  bg: '#EAEEF5',
-  glow1: '#7E9CFF',
-  glow2: '#8FD3A8',
-  glow3: '#E6FF5C',
-  glowOpacity: 0.55,
-  text: '#0B0D12',
-  textSoft: '#2B3038',
-  mute: '#59606C',
-  hair: 'rgba(11,13,18,0.10)',
-  glassTop: 'rgba(255,255,255,0.92)',
-  glassBottom: 'rgba(255,255,255,0.62)',
-  glassRim: 'rgba(11,13,18,0.08)',
-  glassRimHi: 'rgba(255,255,255,1)',
-  glassShine: 0.6,
-  solid: '#0B0D12',
-  solidText: '#F4F6FA',
+  bg: '#F2F2F7',
+  card: '#FFFFFF',
+  cardHi: '#FFFFFF',
+  edge: 'rgba(0,0,0,0.06)',
+  edgeHi: 'rgba(0,0,0,0.10)',
+  text: '#000000',
+  textSoft: '#2C2C2E',
+  mute: '#6C6C70',
+  hair: 'rgba(0,0,0,0.08)',
+  hairHex: '#000000',
+  hairOpacity: 0.08,
+  solid: '#000000',
+  solidText: '#FFFFFF',
   accent: '#D8F23A',
   accentText: '#0B0D12',
   accentLine: '#0B0D12', // a yellow fill on a light screen needs an ink edge to read in sun
+  highlight: '#2147C9',
   stop: '#C8261C',
-  scrim: 'rgba(11,13,18,0.45)',
-  sheet: '#F7F8FB',
+  scrim: 'rgba(0,0,0,0.40)',
+  sheet: '#FFFFFF',
   showcase: '#07090E',
-  shadow: 'rgba(30,40,70,0.18)',
-  bar: 'rgba(255,255,255,0.95)',
+  bar: 'rgba(255,255,255,0.96)',
 };
 
 export const font = {
