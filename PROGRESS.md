@@ -7,7 +7,7 @@
 - **How Anass works:** one session per app. Short, simple English. Show pictures. He decides fast and wants things built, not discussed.
 
 ## Pickleball open play (21 Nov 2026, night) — newest
-- **Dinkline** (`apps/pickleball/`, working title): queue, fair rotation onto 1–8 courts, big scorer, full-screen board. Built overnight with Anass's yes. Blue court look, made more stylish after his message ("I prefer the blue one, make it more stylish"). Android test APK: https://github.com/anosswb/APPS/actions/runs/44963456129 (Artifacts → dinkline-test-apk); emulator launch test passed. Details and next steps: `apps/pickleball/PROGRESS.md`.
+- **Dinkline** (`apps/pickleball/`, working title): queue, fair rotation onto 1–8 courts, big scorer, full-screen board. Built overnight with Anass's yes. Blue court look, made more stylish after his message ("I prefer the blue one, make it more stylish"). Android test APK: https://github.com/anosswb/APPS/actions/runs/44976336516 (Artifacts → dinkline-test-apk); emulator launch test passed. Details and next steps: `apps/pickleball/PROGRESS.md`.
 - Firecrawl credits used this night: about 36 of the 1,000 Anass allowed (32 by the review helper, 4 name searches).
 
 ## Done
