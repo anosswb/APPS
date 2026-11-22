@@ -19,9 +19,10 @@ interface Props {
   prefs: Prefs;
   setPrefs: (p: Prefs) => void;
   openLicences: () => void;
+  openGuide: () => void;
 }
 
-export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, openLicences }: Props) {
+export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, openLicences, openGuide }: Props) {
   const s = useS();
   const c = useTheme();
   const st = session.settings;
@@ -85,6 +86,7 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
         </Glass>
 
         <Label style={s.label}>{t.settings.session}</Label>
+        <Button label={t.settings.guide} onPress={openGuide} style={{ marginBottom: space.s }} />
         <View style={{ gap: space.s }}>
           <Button label={confirm === 'fresh' ? t.settings.sure : t.settings.fresh} kind={confirm === 'fresh' ? 'solid' : 'glass'} onPress={() => twice('fresh', () => closeSession((s2, now) => restartSession(s2, now)))} />
           <Text style={s.help}>{t.settings.freshHelp}</Text>
@@ -124,7 +126,7 @@ function Toggle({ label, help, on, set }: { label: string; help?: string; on: bo
         <Text style={s.choiceTitle}>{label}</Text>
         {help ? <Text style={s.help}>{help}</Text> : null}
       </View>
-      <Switch value={on} onValueChange={set} trackColor={{ true: c.mode === 'dark' ? '#7FA526' : c.court, false: c.hair }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={label} />
+      <Switch value={on} onValueChange={set} trackColor={{ true: c.on, false: c.hair }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={label} />
     </View>
   );
 }
@@ -136,7 +138,7 @@ const useS = themed((c) => ({
   padTight: { paddingHorizontal: space.l, paddingVertical: space.s },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   step: { width: touch.big, height: touch.big, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.hair, alignItems: 'center', justifyContent: 'center' },
-  big: { fontFamily: font.display, fontSize: 64, color: c.text, lineHeight: 68 },
+  big: { fontFamily: font.figure, fontSize: 45, color: c.text, lineHeight: 58 },
   help: { fontFamily: font.body, fontSize: size.small + 1, lineHeight: 21, color: c.mute, marginTop: 2 },
   hair: { height: 1, backgroundColor: c.hair, marginVertical: space.s },
   choice: { flexDirection: 'row', gap: space.m, alignItems: 'flex-start', minHeight: touch.min, paddingVertical: space.xs },

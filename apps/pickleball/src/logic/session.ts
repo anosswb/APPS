@@ -359,3 +359,13 @@ export function counts(s: Session): { waiting: number; playing: number; resting:
     resting: all.filter((p) => p.status === 'resting').length,
   };
 }
+
+/** Four or more are waiting, every court is busy and there is room for another court: offer to open one. */
+export function canOpenCourt(s: Session): boolean {
+  return s.courts.length < MAX_COURTS && s.courts.every((g) => g !== null) && s.queue.length >= 4;
+}
+
+/** A court can be removed only when the last one is empty (never stop a game in progress). */
+export function canRemoveCourt(s: Session): boolean {
+  return s.courts.length > 1 && s.courts[s.courts.length - 1] === null;
+}

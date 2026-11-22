@@ -20,8 +20,10 @@ export interface Prefs {
   theme: ThemeChoice;
   /** Version of the look settings. 2 = dark became the default (22 Nov 2026). */
   lookV: number;
+  /** The first-run guide was finished or skipped. */
+  guideDone: boolean;
 }
-export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, theme: 'dark', lookV: 2 };
+export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, theme: 'dark', lookV: 2, guideDone: false };
 
 /** Old prefs had "Auto" as the default; Anass chose dark as the main look, so they move to dark once. */
 export function upgradePrefs(raw: Partial<Prefs> | undefined): Prefs {

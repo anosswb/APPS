@@ -41,5 +41,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: fi
 - Dark and light mode (light = sun mode). Colours only from the palettes in `src/theme/tokens.ts`, styles through `themed()` in `src/theme/theme.tsx`. Targets 56 pt minimum.
 - Awards are worked out again from the session records every time (`src/logic/achievements.ts`); never store "earned" flags that can get out of step. Only `seen` (banner already shown) is stored.
 
+## Anass approves the look first (22 Nov 2026)
+Before pushing any change he can see, send him screenshots of the changed screens and wait for his OK. Push only after he approves.
+
 ## Checks before saying "done"
 `npx tsc --noEmit` · `npx jest` · `npx expo export --platform web`, then open it at 390×844 and look at the screen you changed.

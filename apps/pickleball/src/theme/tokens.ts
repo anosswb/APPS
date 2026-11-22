@@ -1,100 +1,146 @@
 // The one token file. Every colour, size, radius and duration in the app comes from here (docs/world.md).
 // Two palettes, dark and light (the light one doubles as "sun mode"), same keys. Court paint is the same in both.
 
+// Court paint in the Dark Athletic style (Anass, 22 Nov 2026): a night court. Dark grey court, white lines,
+// a black surround, one bright ball. The same in dark and light mode.
 const court = {
-  court: '#2147C9', // hard-court blue
-  courtDeep: '#1A3AA6',
-  courtOut: '#3F7D55', // the green surround of a US hard court
-  kitchenFill: '#3A64E6', // the non-volley zone, painted a lighter blue
+  court: '#1C1C1E',
+  courtDeep: '#2C2C2E', // the half you are pressing
+  courtOut: '#0B0B0C',
+  kitchenFill: '#2A2A2D', // the non-volley zone, one step lighter
   kitchen: 'rgba(255,255,255,0.75)',
-  net: '#0B0D12',
+  net: '#000000',
   paint: '#FFFFFF',
-  ball: '#D8F23A', // optic yellow: fills only, always with dark ink on top
-  ballInk: '#0B0D12',
+  ball: '#F8E84A', // spectrum yellow: fills only, always with dark ink on top
+  ballInk: '#000000',
 };
 
-// Dark is the main look (Anass, 22 Nov 2026): true black, dark grey panels, white type, one accent (ball
-// yellow). Court colours appear only on the court. Light is plain grey and white, no coloured background.
+/** The spectral accent (design system 2026-11-22). Only small: a line, a ring, award moments. Never behind text. */
+export const spectrum = {
+  cyan: '#00D9FF',
+  blue: '#315BFF',
+  violet: '#873CFF',
+  magenta: '#FF35B8',
+  coral: '#FF5A55',
+  orange: '#FF9B32',
+  yellow: '#F8E84A',
+  green: '#43E58B',
+};
+export const spectral = {
+  full: [spectrum.cyan, spectrum.blue, spectrum.violet, spectrum.magenta, spectrum.coral, spectrum.orange, spectrum.yellow, spectrum.green],
+  cool: [spectrum.cyan, spectrum.blue, spectrum.violet],
+  warm: [spectrum.orange, spectrum.coral, spectrum.magenta],
+} as const;
+
+// Dark Athletic (Anass, 22 Nov 2026): pure black canvas, white type in three strengths, cards of 10% white,
+// white for every "selected" and every main button, colour only as a small spectral accent.
 export const dark = {
   mode: 'dark' as 'dark' | 'light',
   ...court,
   bg: '#000000',
-  card: '#141416',
-  cardHi: '#1C1C1F',
-  edge: 'rgba(255,255,255,0.09)',
-  edgeHi: 'rgba(255,255,255,0.16)',
+  card: 'rgba(255,255,255,0.10)', // surface-glass
+  cardHi: 'rgba(255,255,255,0.14)', // surface-glass-strong
+  edge: 'rgba(255,255,255,0.06)',
+  edgeHi: 'rgba(255,255,255,0.12)',
   text: '#FFFFFF',
-  textSoft: '#D1D1D6',
-  mute: '#8E8E93',
-  hair: 'rgba(255,255,255,0.10)',
+  textSoft: 'rgba(255,255,255,0.65)',
+  mute: 'rgba(255,255,255,0.45)',
+  hair: 'rgba(255,255,255,0.12)',
   hairHex: '#FFFFFF', // the same line colour for drawings that need a plain colour plus an opacity
   hairOpacity: 0.12,
-  solid: '#FFFFFF', // the one bright tile on a screen
+  solid: '#FFFFFF', // selected surfaces and the main button
   solidText: '#000000',
-  accent: '#D8F23A',
-  accentText: '#0B0D12',
-  accentLine: '#D8F23A',
-  highlight: '#D8F23A', // numbers that matter, the active tab
-  stop: '#FF6B5E',
-  scrim: 'rgba(0,0,0,0.66)',
-  sheet: '#1C1C1E',
-  showcase: '#07090E', // the dark display case behind the award badges, in both modes
-  bar: 'rgba(24,24,27,0.96)', // tab bar and banners
+  solidMute: 'rgba(0,0,0,0.55)',
+  accent: '#FFFFFF',
+  accentText: '#000000',
+  accentLine: '#FFFFFF',
+  accentSoft: 'rgba(255,255,255,0.14)', // the active tab's pill
+  highlight: '#FFFFFF', // numbers that matter
+  live: spectrum.green,
+  on: spectrum.green, // switch track when on
+  stop: spectrum.coral,
+  scrim: 'rgba(0,0,0,0.72)',
+  sheet: '#1A1A1A', // surface-1
+  showcase: '#090909', // canvas-raised: the case behind the award badges, in both modes
+  bar: 'rgba(26,26,26,0.96)', // tab bar and banners
+  handle: '#242424', // surface-2: the taped paddle handle in the line
+  handleWrap: '#3A3A3C',
 };
 
 export type Palette = typeof dark;
 
+// Light ("sun mode"): the same system turned over. White cards on light grey, black for selected and main buttons.
 export const light: Palette = {
   mode: 'light',
   ...court,
-  bg: '#F2F2F7',
+  bg: '#F2F2F4',
   card: '#FFFFFF',
   cardHi: '#FFFFFF',
   edge: 'rgba(0,0,0,0.06)',
   edgeHi: 'rgba(0,0,0,0.10)',
   text: '#000000',
-  textSoft: '#2C2C2E',
-  mute: '#6C6C70',
+  textSoft: 'rgba(0,0,0,0.70)',
+  mute: 'rgba(0,0,0,0.50)',
   hair: 'rgba(0,0,0,0.08)',
   hairHex: '#000000',
   hairOpacity: 0.08,
   solid: '#000000',
   solidText: '#FFFFFF',
-  accent: '#D8F23A',
-  accentText: '#0B0D12',
-  accentLine: '#0B0D12', // a yellow fill on a light screen needs an ink edge to read in sun
-  highlight: '#2147C9',
+  solidMute: 'rgba(255,255,255,0.6)',
+  accent: '#000000',
+  accentText: '#FFFFFF',
+  accentLine: '#000000',
+  accentSoft: 'rgba(0,0,0,0.08)',
+  highlight: '#000000',
+  live: '#1E9E4A',
+  on: '#000000',
   stop: '#C8261C',
   scrim: 'rgba(0,0,0,0.40)',
   sheet: '#FFFFFF',
-  showcase: '#07090E',
+  showcase: '#090909',
   bar: 'rgba(255,255,255,0.96)',
+  handle: '#1C1C1E',
+  handleWrap: '#3A3A3C',
 };
 
+// Fonts (Anass, 22 Nov 2026: "use those fonts"). Presicav and Neumatic Compressed are paid fonts, here only
+// for test builds. They must be licensed for apps before any store release (RIGHTS.md).
 export const font = {
-  display: 'BarlowCondensed_800ExtraBold',
-  displayItalic: 'BarlowCondensed_800ExtraBold_Italic',
-  label: 'BarlowCondensed_600SemiBold',
-  body: 'Archivo_500Medium',
-  bodyBold: 'Archivo_700Bold',
+  /** Athletic display: the giant score and hero figures (Presicav Heavy). */
+  display: 'Presicav-Heavy',
+  /** Screen titles and section titles (Presicav Bold). */
+  heading: 'Presicav-Bold',
+  /** Key figures on cards: stats, scores on court cards (Presicav Bold). */
+  figure: 'Presicav-Bold',
+  /** Small data: clocks, score calls, units (Spline Sans Mono, SIL OFL). */
+  num: 'SplineSansMono_600SemiBold',
+  /** Big condensed uppercase labels, 20 and up (Neumatic Compressed Semi-Bold). Unreadable smaller. */
+  label: 'NeumaticCompressed-SemiBold',
+  /** Small uppercase labels and metadata like GAMES, LONGEST (Spline Sans Mono, SIL OFL). */
+  micro: 'SplineSansMono_500Medium',
+  /** Player names (Neumatic Compressed Bold). */
+  name: 'NeumaticCompressed-Bold',
+  body: 'Inter_500Medium',
+  bodyBold: 'Inter_600SemiBold',
 } as const;
 
 export const size = {
-  hero: 40,
-  title: 30,
-  name: 26,
-  nameSmall: 21,
+  hero: 25, // screen titles (wide heading font)
+  title: 19, // sheet titles
+  name: 26, // condensed names need more size than a normal face
+  nameSmall: 22,
   body: 16,
   small: 14,
-  label: 14,
-  scoreGiant: 168,
-  call: 44,
-  stat: 40,
+  label: 11.5,
+  scoreGiant: 124,
+  call: 34,
+  stat: 28,
 } as const;
 
 export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 } as const;
 
-export const radius = { box: 6, tag: 24, glass: 24, pill: 999, chip: 16 } as const;
+/** Card radius 18 (design system), large surfaces 24. */
+export const radius = { box: 8, tag: 18, glass: 18, xl: 24, pill: 999, chip: 12 } as const;
 
 /** Tap targets: 56 minimum (sweaty hands, outdoor glare, older players). */
 export const touch = { min: 56, big: 64 } as const;
@@ -107,7 +153,7 @@ export const motion = { quick: 140, slide: 220, courtIn: 560, ballFlight: 760, s
 export const courtTilt = 22;
 
 /** Glass on the court paint (drawn, not blurred: the same on every phone). */
-export const glass = { tint: 'rgba(26,58,166,0.72)', sweep: 0.42 } as const;
+export const glass = { tint: 'rgba(0,0,0,0.72)', sweep: 0.32 } as const;
 
 /** Space the floating tab bar takes at the bottom of every tab. */
 export const TAB_SPACE = 104;

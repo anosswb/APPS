@@ -1,5 +1,6 @@
-// The signature: a game is drawn as a top-down US hard court (green surround, blue court, lighter-blue
-// kitchens, dark net with posts) with the players' names painted on it.
+// The signature: a game is drawn as a top-down night court (black surround, dark court, lighter kitchens,
+// white lines, a black net with posts) with the players' names painted on it. A live game gets a thin
+// spectral line under the court.
 // When a game starts, the court swoops down into place, a ball flies over the net, a glass shine sweeps
 // across and the names float in. Once per game, and never when the phone asks for reduced motion.
 import { useEffect, useRef, useState } from 'react';
@@ -7,6 +8,7 @@ import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { courtTilt, dark as color, font, glass, line, motion, size } from '../theme/tokens';
 import { Glass } from './Glass';
+import { Spectrum } from './Spectrum';
 import { useReduceMotion } from './useReduceMotion';
 
 interface Props {
@@ -120,6 +122,7 @@ export function CourtSurface({ left, right, call, live = false, height = 122, di
           <Animated.View pointerEvents="none" style={[s.ball, { top: mid }, ballStyle]} />
         </>
       ) : null}
+      {live ? <Spectrum height={2} style={s.liveLine} /> : null}
       {call || live ? (
         <Glass style={s.tag} radius={14} tint={glass.tint}>
           <View style={s.tagRow}>
@@ -177,12 +180,13 @@ function LiveDot() {
 
 const s = StyleSheet.create({
   out: { backgroundColor: color.courtOut, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 14 },
+  liveLine: { position: 'absolute', left: 14, right: 14, bottom: 3 },
   dim: { opacity: 0.4 },
   court: { flexDirection: 'row', alignItems: 'stretch', backgroundColor: color.court, borderWidth: line.court, borderColor: color.paint, overflow: 'visible' },
   half: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   names: { alignItems: 'center' },
   center: { position: 'absolute', left: 0, right: 0, top: '50%', height: 2, backgroundColor: color.kitchen },
-  name: { fontFamily: font.display, fontSize: size.name, lineHeight: size.name + 4, color: color.paint, letterSpacing: 0.4 },
+  name: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name, lineHeight: size.name + 4, color: color.paint, letterSpacing: 0.4 },
   kitchen: { width: 24, backgroundColor: color.kitchenFill },
   kitchenL: { borderLeftWidth: 2, borderColor: color.paint },
   kitchenR: { borderRightWidth: 2, borderColor: color.paint },
@@ -195,8 +199,8 @@ const s = StyleSheet.create({
   ballShadow: { position: 'absolute', left: 0, width: 16, height: 6, marginLeft: -8, borderRadius: 4, backgroundColor: color.net },
   tag: { position: 'absolute', right: 10, bottom: -14, paddingHorizontal: 12, paddingVertical: 3 },
   tagRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  call: { fontFamily: font.displayItalic, fontSize: 20, color: color.paint, letterSpacing: 1.5 },
+  call: { fontFamily: font.num, fontSize: 16, color: color.paint, letterSpacing: 0.8 },
   dotBox: { width: 10, height: 10, alignItems: 'center', justifyContent: 'center' },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: color.ball },
-  dotRing: { position: 'absolute', width: 10, height: 10, borderRadius: 5, borderWidth: 2, borderColor: color.ball },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: color.live },
+  dotRing: { position: 'absolute', width: 10, height: 10, borderRadius: 5, borderWidth: 2, borderColor: color.live },
 });

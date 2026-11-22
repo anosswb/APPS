@@ -27,6 +27,58 @@ if [ -z "$PID" ]; then
   echo "==== THE APP DIED ===="
   exit 1
 fi
+# Tap the first thing on screen whose text matches $1. Reads a fresh screen dump; tries 6 times
+# (the dump can fail while an animation runs). Prints the words it saw when it gives up.
+tap_text() {
+  local B=""
+  for try in 1 2 3 4 5 6; do
+    adb shell uiautomator dump /sdcard/ui.xml 2>&1 | tail -1
+    B=$(adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o "text=\"$1[^\"]*\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]' | head -1)
+    [ -n "$B" ] && break
+    sleep 2
+  done
+  if [ -z "$B" ]; then
+    echo "---- words seen while looking for '$1' ----"
+    adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -30
+    return 1
+  fi
+  read X1 Y1 X2 Y2 <<<"$(echo "$B" | tr -d '[]' | tr ',' ' ')"
+  echo "tap '$1' at $B"
+  adb shell input tap $(( (X1 + X2) / 2 )) $(( (Y1 + Y2) / 2 ))
+}
+# A fresh install opens the first-run guide: check it is there, then Skip and Start to reach the courts.
+if grep -q "Add everyone who is here" screen-text.txt; then
+  echo "==== THE GUIDE IS ON THE SCREEN ===="
+  # Walk through the pages like a person: tap Next until Start shows, then Start.
+  STARTED=""
+  for page in 1 2 3 4 5 6 7; do
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+    if adb shell cat /sdcard/ui.xml 2>/dev/null | grep -q 'text="Start'; then
+      tap_text "Start" && STARTED=yes
+      break
+    fi
+    tap_text "Next" || true
+    sleep 3
+    # If the tap did not move the page, swipe left like a thumb would.
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+    echo "---- page $page, words now ----"
+    adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,60\}"' | head -12
+    adb exec-out screencap -p > "guide-$page.png" || true
+    SIZE=$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)
+    W=${SIZE%x*}; H=${SIZE#*x}
+    adb shell input swipe $(( W * 8 / 10 )) $(( H / 2 )) $(( W * 2 / 10 )) $(( H / 2 )) 250
+    sleep 2
+  done
+  [ -z "$STARTED" ] && { echo "==== COULD NOT REACH START ===="; exit 1; }
+  sleep 5
+  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+  adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -40 > screen-text.txt || true
+  echo "==== words on the screen after the guide ===="
+  cat screen-text.txt
+  tap_text "Done" || true
+  sleep 2
+  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+fi
 if ! grep -q -i "open play" screen-text.txt; then
   echo "==== THE APP IS OPEN BUT THE COURTS SCREEN IS NOT ON THE SCREEN ===="
   exit 1
