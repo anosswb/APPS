@@ -130,9 +130,11 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
                   right={g.teamB.map(name)}
                   call={g.rallies.length ? scoreCall(score, session.settings.scoring) : undefined}
                   height={92}
+                  live
+                  introKey={g.id}
                 />
                 {leaving.length ? <Text style={s.leaving}>{leaving.map(name).join(', ')} {t.courts.leavingAfter}</Text> : null}
-                <View style={[s.row, g.rallies.length ? { marginTop: space.l } : null]}>
+                <View style={[s.row, { marginTop: space.l }]}>
                   <Button label={t.courts.score} kind="ink" onPress={() => openScorer(i)} style={s.flex} />
                   <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.flex} />
                 </View>

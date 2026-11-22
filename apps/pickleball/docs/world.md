@@ -30,7 +30,8 @@ Every new detail comes from a real court, nothing decorative:
 - **Shape:** 6 px corners on boxes; the place-in-line tag is round on the left (like the ball) and square on the right. 2 px ink outlines on buttons.
 - **Depth:** flat. No shadows, no glass, no gradients.
 - **Icons:** one set, drawn for this app in `src/ui/Icon.tsx` (square-cut 2.25 px strokes). No emoji.
-- **Motion:** quick, under 200 ms, no bounce.
+- **Motion:** quick, under 200 ms, no bounce, for taps. One show moment: the court opening (tilt down 560 ms, ball flight 760 ms, glass shine 900 ms), once per game, off with Reduce Motion. The live dot breathes every 1.4 s.
+- **Glass:** drawn frosted glass (see-through tint, bright rim, top shine) only on small tags over the court paint, never behind text blocks.
 - **Sound:** none in v1. Haptics on each point and at game end (switch in Settings).
 - **Targets:** 56 pt minimum, 64 for the main buttons. Scorer halves are the whole screen.
 
