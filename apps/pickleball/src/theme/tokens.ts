@@ -40,8 +40,8 @@ export const dark = {
   bg: '#000000',
   card: 'rgba(255,255,255,0.10)', // surface-glass
   cardHi: 'rgba(255,255,255,0.14)', // surface-glass-strong
-  edge: 'rgba(255,255,255,0.06)',
-  edgeHi: 'rgba(255,255,255,0.12)',
+  edge: 'rgba(255,255,255,0.14)', // card edge: each card stands apart from the black
+  edgeHi: 'rgba(255,255,255,0.20)',
   text: '#FFFFFF',
   textSoft: 'rgba(255,255,255,0.65)',
   mute: 'rgba(255,255,255,0.45)',
@@ -65,6 +65,11 @@ export const dark = {
   bar: 'rgba(26,26,26,0.96)', // tab bar and banners
   handle: '#242424', // surface-2: the taped paddle handle in the line
   handleWrap: '#3A3A3C',
+  /** Buttons that are not white: a lighter fill and an edge over 3:1 on black (WCAG 1.4.11). */
+  control: 'rgba(255,255,255,0.16)',
+  controlEdge: 'rgba(255,255,255,0.55)',
+  /** The line under every title. */
+  titleLine: 'rgba(255,255,255,0.28)',
 };
 
 export type Palette = typeof dark;
@@ -101,6 +106,9 @@ export const light: Palette = {
   bar: 'rgba(255,255,255,0.96)',
   handle: '#1C1C1E',
   handleWrap: '#3A3A3C',
+  control: '#FFFFFF',
+  controlEdge: 'rgba(0,0,0,0.45)',
+  titleLine: 'rgba(0,0,0,0.22)',
 };
 
 // Fonts (Anass, 22 Nov 2026: "use those fonts"). Presicav and Neumatic Compressed are paid fonts, here only

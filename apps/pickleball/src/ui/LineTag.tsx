@@ -33,7 +33,7 @@ const useS = themed((c) => ({
   faceStrong: { backgroundColor: c.accent, borderWidth: c.mode === 'light' ? 1.5 : 0, borderColor: c.accentLine },
   num: { width: 30, fontFamily: font.figure, fontSize: 20, color: c.highlight },
   inkText: { color: c.accentText },
-  name: { flex: 1, fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name - 1, color: c.text, letterSpacing: 0.3 },
+  name: { flex: 1, fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name - 1, color: c.text, letterSpacing: 3 },
   note: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginLeft: space.s },
   inkNote: { color: c.solidMute },
   throat: { width: 8, height: 14, backgroundColor: c.handle },

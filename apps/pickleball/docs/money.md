@@ -12,17 +12,17 @@ Rails (playbook/07, root CLAUDE.md): Android in Morocco = ads only. iPhone = pur
 
 ## Android: ads only
 - **Never on the Courts screen or the Scorer** (the protected moments: the phone is at the court and everyone looks at it).
-- One small banner on the Players and Settings tabs only. No interstitials, no rewarded ads in v1.
+- **Changed 22 Nov 2026 (Anass):** no banner. One full-screen ad (interstitial, often a skippable video) when a game ends, only if that game ran 3 minutes or more after Start game, and at most one every 10 minutes. Never during a game or while scoring. No rewarded ads.
 - Honest number: this app is opened ~1–3 times a week per organizer, so ad income per user is tiny (guess: under $0.50 per user per year). Android is mostly for reach and reviews.
 - `react-native-google-mobile-ads` needs minify OFF in release builds (apps/paper-puzzles/DECISIONS.md). Test ad IDs only until Anass says otherwise.
 
 ## Built (22 Nov 2026)
-- `src/money/rules.ts` (tested): banner only on Players and Settings, Android only; iPhone locks 3+ courts and the winners rules only when a real purchase is possible.
-- Android: one anchored adaptive banner with Google's TEST unit id (`ads.android.tsx`). Ads start the first time Players or Settings opens, so a consent form can never cover the courts. Minify stays off.
+- `src/money/rules.ts` (tested): `adAfterGame` (Android only, game of 3+ minutes, 10-minute gap); iPhone locks 3+ courts and the winners rules only when a real purchase is possible.
+- Android: one interstitial with Google's TEST unit id (`ads.android.tsx`). The first game that ends asks for consent and loads an ad; a later game end can show it. Minify stays off.
 - iPhone: `purchases.ts` is switched off (`available()` = false), so nothing is locked. The real `purchases.ios.ts` needs the Apple developer account and the product in App Store Connect.
 
 ## What Anass must do before real money (later, numbered steps when we get there)
-1. AdMob account (free) → Android app → one banner unit id. Then we put the real ids in and build with live ads.
+1. AdMob account (free) → Android app → one interstitial unit id. Then we put the real ids in and build with live ads.
 2. Apple developer account ($99/year) → App Store Connect → one non-consumable product "Dinkline Full" at $4.99.
 3. Google Play data-safety form and the Apple privacy label must then say: device identifiers and ad data collected by Google AdMob on Android.
 

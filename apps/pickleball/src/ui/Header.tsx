@@ -7,6 +7,7 @@ import { font, size, space } from '../theme/tokens';
 export function Header({ title, sub, right }: { title: string; sub?: string; right?: ReactNode }) {
   const s = useS();
   return (
+    <View style={s.wrap}>
     <View style={s.row}>
       <View style={{ flex: 1 }}>
         <Text style={s.title} accessibilityRole="header">{title.toUpperCase()}</Text>
@@ -14,11 +15,15 @@ export function Header({ title, sub, right }: { title: string; sub?: string; rig
       </View>
       {right}
     </View>
+      <View style={s.line} />
+    </View>
   );
 }
 
 const useS = themed((c) => ({
-  row: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: space.l + 4, paddingTop: space.m, paddingBottom: space.m },
+  wrap: { paddingHorizontal: space.l + 4, paddingBottom: space.m },
+  row: { flexDirection: 'row', alignItems: 'flex-end', paddingTop: space.m, paddingBottom: space.m },
+  line: { height: 1, backgroundColor: c.titleLine },
   title: { fontFamily: font.heading, fontSize: size.hero, lineHeight: size.hero + 4, color: c.text, letterSpacing: 0.2 },
-  sub: { fontFamily: font.body, fontSize: size.small + 1, color: c.mute, marginTop: 2 },
+  sub: { fontFamily: font.body, fontSize: size.small + 1, color: c.textSoft, marginTop: 2 },
 }));

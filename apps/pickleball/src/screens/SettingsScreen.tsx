@@ -3,9 +3,9 @@ import { Platform, Pressable, ScrollView, Switch, Text, View } from 'react-nativ
 import Constants from 'expo-constants';
 import { t } from '../i18n/en';
 import { MAX_COURTS, newSession, restartSession, Session, updateSettings } from '../logic/session';
-import { Prefs, ThemeChoice } from '../state/storage';
+import { Prefs } from '../state/storage';
 import { Button } from '../ui/Button';
-import { Label, Segments } from '../ui/Bits';
+import { Heading, Label, Segments } from '../ui/Bits';
 import { Glass } from '../ui/Glass';
 import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
@@ -38,11 +38,7 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
     <View style={{ flex: 1 }}>
       <Header title={t.settings.title} />
       <ScrollView contentContainerStyle={s.scroll}>
-        <Label style={s.label}>{t.settings.look}</Label>
-        <Segments<ThemeChoice> items={[['system', t.settings.system], ['dark', t.settings.dark], ['light', t.settings.light]]} value={prefs.theme} onChange={(v) => setPrefs({ ...prefs, theme: v })} />
-        <Text style={s.help}>{t.settings.lookHelp}</Text>
-
-        <Label style={s.label}>{t.settings.courts}</Label>
+        <Heading title={t.settings.courts} />
         <Glass>
           <View style={s.pad}>
             <View style={s.stepper}>
@@ -58,7 +54,7 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
           </View>
         </Glass>
 
-        <Label style={s.label}>{t.settings.rotation}</Label>
+        <Heading title={t.settings.rotation} />
         <Glass>
           <View style={s.padTight}>
             <Choice on={st.rule === 'all-off'} title={t.settings.allOff} help={t.settings.allOffHelp} onPress={() => act((s2, now) => updateSettings(s2, { rule: 'all-off' }, now))} />
@@ -69,12 +65,12 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
           </View>
         </Glass>
 
-        <Label style={s.label}>{t.settings.scoring}</Label>
+        <Heading title={t.settings.scoring} />
         <Segments<'sideout' | 'rally'> items={[['sideout', t.settings.sideout], ['rally', t.settings.rally]]} value={st.scoring.type} onChange={(v) => act((s2, now) => updateSettings(s2, { scoring: { ...st.scoring, type: v } }, now))} />
-        <Label style={s.label}>{t.settings.gameTo}</Label>
+        <Heading title={t.settings.gameTo} />
         <Segments<'11' | '15' | '21'> items={[['11', '11'], ['15', '15'], ['21', '21']]} value={String(st.scoring.target) as '11'} onChange={(v) => act((s2, now) => updateSettings(s2, { scoring: { ...st.scoring, target: Number(v) } }, now))} />
 
-        <Label style={s.label}>{t.settings.feel}</Label>
+        <Heading title={t.settings.feel} />
         <Glass>
           <View style={s.padTight}>
             <Toggle label={t.settings.voice} help={t.settings.voiceHelp} on={prefs.voice} set={(v) => setPrefs({ ...prefs, voice: v })} />
@@ -85,7 +81,7 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
           </View>
         </Glass>
 
-        <Label style={s.label}>{t.settings.session}</Label>
+        <Heading title={t.settings.session} />
         <Button label={t.settings.guide} onPress={openGuide} style={{ marginBottom: space.s }} />
         <View style={{ gap: space.s }}>
           <Button label={confirm === 'fresh' ? t.settings.sure : t.settings.fresh} kind={confirm === 'fresh' ? 'solid' : 'glass'} onPress={() => twice('fresh', () => closeSession((s2, now) => restartSession(s2, now)))} />
@@ -137,7 +133,7 @@ const useS = themed((c) => ({
   pad: { padding: space.l },
   padTight: { paddingHorizontal: space.l, paddingVertical: space.s },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  step: { width: touch.big, height: touch.big, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.hair, alignItems: 'center', justifyContent: 'center' },
+  step: { width: touch.big, height: touch.big, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.controlEdge, alignItems: 'center', justifyContent: 'center' },
   big: { fontFamily: font.figure, fontSize: 45, color: c.text, lineHeight: 58 },
   help: { fontFamily: font.body, fontSize: size.small + 1, lineHeight: 21, color: c.mute, marginTop: 2 },
   hair: { height: 1, backgroundColor: c.hair, marginVertical: space.s },

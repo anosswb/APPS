@@ -24,7 +24,8 @@ import { LicencesScreen } from './src/screens/LicencesScreen';
 import { PlayersScreen } from './src/screens/PlayersScreen';
 import { ScorerScreen } from './src/screens/ScorerScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
-import { AdBanner, initAds } from './src/money/ads';
+import { prepareAds, showGameAd } from './src/money/ads';
+import { adAfterGame } from './src/money/rules';
 import { Ambient } from './src/ui/Ambient';
 import { BADGES } from './src/ui/badges';
 import { Glass } from './src/ui/Glass';
@@ -53,7 +54,8 @@ export default function App() {
   });
   const app = useSession();
   const system = useColorScheme();
-  const palette = app.prefs.theme === 'light' || (app.prefs.theme === 'system' && system === 'light') ? light : dark;
+  // Dark or light follows the phone, always (Anass, 22 Nov 2026).
+  const palette = system === 'light' ? light : dark;
 
   useEffect(() => {
     if (fontsLoaded && app.ready) SplashScreen.hideAsync().catch((e) => console.warn(`[splash] ${String(e)}`));
@@ -77,20 +79,25 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
   const [scoring, setScoring] = useState<number | null>(null);
   const [board, setBoard] = useState(false);
   const [licences, setLicences] = useState(false);
-  const [adsReady, setAdsReady] = useState(false);
-  const [adsAsked, setAdsAsked] = useState(false);
   const [banner, setBanner] = useState<{ id: AwardId; who: string } | null>(null);
   const [guide, setGuide] = useState(false);
   const [startAdding, setStartAdding] = useState(false);
 
-  // Ads start the first time Players or Settings opens, never on the courts (docs/money.md).
+  // One full-screen ad when a game ends, if src/money/rules.ts allows it (docs/money.md). The first game
+  // that ends asks for ad consent and loads an ad; later games may show it. Never during a game.
+  const lastResults = useRef(session.results.length);
+  const lastAdAt = useRef<number | null>(null);
   useEffect(() => {
-    if (adsAsked || (tab !== 'players' && tab !== 'settings')) return;
-    setAdsAsked(true);
-    initAds()
-      .then(() => setAdsReady(true))
-      .catch((e) => console.warn(`[ads] did not start: ${String(e)}`));
-  }, [tab, adsAsked]);
+    const count = session.results.length;
+    const ended = count > lastResults.current ? session.results[count - 1] : null;
+    lastResults.current = count;
+    if (!ended) return;
+    prepareAds().catch((e) => console.warn(`[ads] did not start: ${String(e)}`));
+    const game = { started: ended.started ?? true, startedAt: ended.startedAt, endedAt: ended.endedAt };
+    if (adAfterGame(Platform.OS === 'android' ? 'android' : Platform.OS === 'ios' ? 'ios' : 'web', game, lastAdAt.current) && showGameAd()) {
+      lastAdAt.current = ended.endedAt;
+    }
+  }, [session.results]);
 
   useEffect(() => {
     const tag = 'court';
@@ -218,11 +225,6 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
         {tab === 'awards' ? <AwardsScreen awards={awards} sessions={sessions} goals={history.goals} setGoals={(goals) => setHistory((h) => ({ ...h, goals }))} /> : null}
         {tab === 'settings' ? <SettingsScreen session={session} act={act} closeSession={closeSession} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} openGuide={() => setGuide(true)} /> : null}
       </SafeAreaView>
-      {adsReady && (tab === 'players' || tab === 'settings') ? (
-        <View style={s.ad}>
-          <AdBanner place={tab} />
-        </View>
-      ) : null}
       <TabBar tab={tab} setTab={setTab} />
       {banner ? <Banner id={banner.id} who={banner.who} onDone={() => setBanner(null)} onOpen={() => { setBanner(null); setTab('awards'); }} /> : null}
     </View>
@@ -294,7 +296,6 @@ function Banner({ id, who, onDone, onOpen }: { id: AwardId; who: string; onDone:
 }
 
 const useS = themed((c) => ({
-  ad: { position: 'absolute', left: 0, right: 0, bottom: 96 },
   tabWrap: { position: 'absolute', left: space.m, right: space.m },
   tabs: { flexDirection: 'row', paddingHorizontal: 6, paddingVertical: 6 },
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 58 },

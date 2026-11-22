@@ -7,29 +7,26 @@ import { DEFAULT_SETTINGS, newSession, Session } from '../logic/session';
 
 const KEY = 'dinkline.session';
 const HISTORY_KEY = 'dinkline.history';
-export const SCHEMA = 2;
+export const SCHEMA = 3;
 export const HISTORY_SCHEMA = 1;
-
-export type ThemeChoice = 'system' | 'dark' | 'light';
 
 export interface Prefs {
   haptics: boolean;
   keepAwake: boolean;
   /** Say the next game out loud when a court opens. */
   voice: boolean;
-  theme: ThemeChoice;
-  /** Version of the look settings. 2 = dark became the default (22 Nov 2026). */
-  lookV: number;
   /** The first-run guide was finished or skipped. */
   guideDone: boolean;
 }
-export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, theme: 'dark', lookV: 2, guideDone: false };
+export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, guideDone: false };
 
-/** Old prefs had "Auto" as the default; Anass chose dark as the main look, so they move to dark once. */
-export function upgradePrefs(raw: Partial<Prefs> | undefined): Prefs {
-  const p = { ...DEFAULT_PREFS, ...raw };
-  if ((raw?.lookV ?? 0) < 2) return { ...p, theme: 'dark', lookV: 2 };
-  return p;
+/**
+ * Fills in missing prefs. Dark or light now follows the phone, always (Anass, 22 Nov 2026), so the old
+ * look choice (`theme`, `lookV`) is dropped.
+ */
+export function upgradePrefs(raw: (Partial<Prefs> & { theme?: unknown; lookV?: unknown }) | undefined): Prefs {
+  const { theme: _theme, lookV: _lookV, ...rest } = raw ?? {};
+  return { ...DEFAULT_PREFS, ...rest };
 }
 
 interface Saved {
@@ -70,8 +67,17 @@ export function withPhoto(h: History, sessionId: string, photo: string | undefin
   return { ...h, meta: { ...h.meta, [sessionId]: { ...h.meta[sessionId], photo } } };
 }
 
-/** Version 1 → 2: sessions get an id and a start time; results get start time, target and comeback depth. */
+/**
+ * Version 1 → 2: sessions get an id and a start time; results get start time, target and comeback depth.
+ * Version 2 → 3: games get `started` (games already on court were running, so they count as started).
+ */
 export function migrate(data: { v: number; session: Record<string, unknown> }): Session {
+  const s2 = migrateTo2(data);
+  if (data.v >= 3) return s2;
+  return { ...s2, courts: s2.courts.map((g) => (g ? { ...g, started: g.started ?? true } : null)) };
+}
+
+function migrateTo2(data: { v: number; session: Record<string, unknown> }): Session {
   const s = data.session as unknown as Session & { id?: string; startedAt?: number | null };
   if (data.v >= 2) return s;
   const results = (s.results ?? []).map((r) => ({ ...r, startedAt: r.startedAt ?? r.endedAt, target: r.target ?? s.settings?.scoring?.target ?? 11, maxDeficit: r.maxDeficit ?? 0 }));

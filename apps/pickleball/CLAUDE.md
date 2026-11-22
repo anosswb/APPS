@@ -35,10 +35,11 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: fi
 
 ## Hard rules for this app
 - Rules live in `src/logic/` as pure functions with tests. Screens never decide who plays next.
-- **Never an ad or pop-up on the Courts screen or the Scorer.** Those are the moments people look at the phone at the court.
+- **No ad while a game is played or scored.** The only ad is one full-screen ad after Game over, when `adAfterGame` in `src/money/rules.ts` allows it (game of 3+ minutes, 10 minutes since the last ad). Anass, 22 Nov 2026. No banner, no other pop-ups.
+- **A game waits for Start game.** Four put on a court are "ready"; the clock starts when the host taps Start game (or scores a point).
 - The fairness test in `session.test.ts` (games played stay even, partners spread out) must stay green.
 - Storage changes: bump `SCHEMA`, migrate, test. Never lose a running session.
-- Dark and light mode (light = sun mode). Colours only from the palettes in `src/theme/tokens.ts`, styles through `themed()` in `src/theme/theme.tsx`. Targets 56 pt minimum.
+- Dark and light mode follow the phone; there is no setting (Anass, 22 Nov 2026). Colours only from the palettes in `src/theme/tokens.ts`, styles through `themed()` in `src/theme/theme.tsx`. Targets 56 pt minimum.
 - Awards are worked out again from the session records every time (`src/logic/achievements.ts`); never store "earned" flags that can get out of step. Only `seen` (banner already shown) is stored.
 
 ## Anass approves the look first (22 Nov 2026)

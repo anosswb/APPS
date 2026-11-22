@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { t } from '../i18n/en';
 import { checkIn, checkOut, moveUp, Player, removePlayer, Session } from '../logic/session';
-import { Label } from '../ui/Bits';
+import { Heading, Label } from '../ui/Bits';
 import { Glass } from '../ui/Glass';
 import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
@@ -26,7 +26,7 @@ export function PlayersScreen({ session, act }: Props) {
       <Header title={t.players.title} sub={t.players.sub(all.length)} />
       <ScrollView contentContainerStyle={s.scroll}>
         {all.length === 0 ? <Text style={s.empty}>{t.players.empty}</Text> : null}
-        {waiting.length ? <Label style={s.label}>{t.players.waiting}</Label> : null}
+        {waiting.length ? <Heading title={t.players.waiting} /> : null}
         {waiting.length ? (
           <Glass style={s.group}>
             {waiting.map((p, i) => (
@@ -42,7 +42,7 @@ export function PlayersScreen({ session, act }: Props) {
           </Glass>
         ) : null}
 
-        {playing.length ? <Label style={s.label}>{t.players.playing}</Label> : null}
+        {playing.length ? <Heading title={t.players.playing} /> : null}
         {playing.length ? (
           <Glass style={s.group}>
             {playing.map((p, i) => (
@@ -53,7 +53,7 @@ export function PlayersScreen({ session, act }: Props) {
           </Glass>
         ) : null}
 
-        <Label style={s.label}>{t.players.resting}</Label>
+        <Heading title={t.players.resting} />
         {resting.length === 0 ? <Text style={s.help}>{t.players.emptyResting}</Text> : null}
         {resting.length ? (
           <Glass style={s.group}>
@@ -101,11 +101,11 @@ const useS = themed((c) => ({
   group: { paddingHorizontal: space.l },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: 66, paddingVertical: space.s },
   rowBorder: { borderTopWidth: 1, borderColor: c.hair },
-  name: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name, color: c.text },
+  name: { fontFamily: font.name, textTransform: 'uppercase', letterSpacing: 3, fontSize: size.name, color: c.text },
   faded: { color: c.mute },
   meta: { fontFamily: font.body, fontSize: 13, color: c.mute },
-  upBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: c.hair },
-  small: { minHeight: 44, paddingHorizontal: space.m + 2, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(11,13,18,0.3)', justifyContent: 'center' },
+  upBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: c.controlEdge },
+  small: { minHeight: 44, paddingHorizontal: space.m + 2, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.controlEdge, justifyContent: 'center' },
   smallStrong: { backgroundColor: c.accent, borderColor: c.accent },
   smallQuiet: { borderColor: 'transparent' },
   smallText: { fontFamily: font.bodyBold, fontSize: size.small, color: c.text },
