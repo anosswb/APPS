@@ -15,7 +15,7 @@ const court = {
   ballInk: '#000000',
 };
 
-/** The spectral accent (design system 2026-11-22). Only small: a line, a ring, award moments. Never behind text. */
+/** The spectral palette (design system 2026-11-22): big blurred glows (src/ui/Glow) and small lines and rings. */
 export const spectrum = {
   cyan: '#00D9FF',
   blue: '#315BFF',
@@ -65,6 +65,7 @@ export const dark = {
   bar: 'rgba(26,26,26,0.96)', // tab bar and banners
   handle: '#242424', // surface-2: the taped paddle handle in the line
   handleWrap: '#3A3A3C',
+  glow: 1, // strength of the big spectral glows
 };
 
 export type Palette = typeof dark;
@@ -101,6 +102,7 @@ export const light: Palette = {
   bar: 'rgba(255,255,255,0.96)',
   handle: '#1C1C1E',
   handleWrap: '#3A3A3C',
+  glow: 0.7,
 };
 
 // Fonts (Anass, 22 Nov 2026: "use those fonts"). Presicav and Neumatic Compressed are paid fonts, here only
@@ -147,7 +149,7 @@ export const touch = { min: 56, big: 64 } as const;
 
 export const line = { court: 3, hair: 1, button: 2 } as const;
 
-export const motion = { quick: 140, slide: 220, courtIn: 560, ballFlight: 760, sweep: 900, nameStagger: 90, livePulse: 1400, banner: 3600 } as const;
+export const motion = { quick: 140, slide: 220, courtIn: 560, ballFlight: 760, sweep: 900, nameStagger: 90, livePulse: 1400, banner: 3600, glow: 7000 } as const;
 
 /** Court tilt at rest: the court lies back a little, like seen from the stands. */
 export const courtTilt = 22;

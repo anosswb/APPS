@@ -6,7 +6,7 @@ import { isGamePoint, scoreCall, scoreFromRallies, switchEndsAt, Team } from '..
 import { Session } from '../logic/session';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/Icon';
-import { Spectrum } from '../ui/Spectrum';
+import { Aura } from '../ui/Glow';
 import { dark, font, line, radius, size, space, touch } from '../theme/tokens';
 
 /** The scorer looks the same in dark and light mode: a night court on a black canvas. */
@@ -96,7 +96,7 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
       </View>
       {sc.winner ? (
         <View style={s.winBox}>
-          <Spectrum height={3} radius={0} style={s.winLine} />
+          <Aura size={460} style={s.winLine} />
           <Text style={s.winText}>
             {t.scorer.wins(names(sc.winner).join(' & '), Math.max(sc.a, sc.b), Math.min(sc.a, sc.b))}
           </Text>
@@ -135,7 +135,7 @@ const s = StyleSheet.create({
   call: { fontFamily: font.num, fontSize: size.call, color: color.paint, letterSpacing: 1.5, lineHeight: size.call + 4 },
   hint: { fontFamily: font.body, fontSize: size.small, color: color.mute, minHeight: 18 },
   winBox: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: color.sheet, padding: space.l, paddingTop: space.l + 3, paddingBottom: space.xxl, gap: space.m, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, overflow: 'hidden' },
-  winLine: { position: 'absolute', left: 0, right: 0, top: 0 },
+  winLine: { right: -140, top: -170 },
   winText: { fontFamily: font.heading, fontSize: 17, lineHeight: 22, color: color.ink },
   row: { flexDirection: 'row', gap: space.s },
 });

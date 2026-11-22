@@ -13,6 +13,7 @@ import { font, radius, size, space } from '../theme/tokens';
 import { BADGES } from './badges';
 import { CourtSurface } from './CourtSurface';
 import { Glass } from './Glass';
+import { Aura } from './Glow';
 import { Icon } from './Icon';
 
 interface Props {
@@ -38,6 +39,7 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
         <Image source={{ uri: photo }} style={s.fill} resizeMode="cover" accessibilityIgnoresInvertColors />
       ) : (
         <View style={[s.fill, s.art]}>
+          <Aura size={520} still style={s.artAura} />
           <View style={s.artCourt}>
             <CourtSurface left={top ? [top.name] : ['']} right={[t.posts.wins(top?.wins ?? 0)]} height={92} />
           </View>
@@ -144,6 +146,7 @@ const useS = themed((c) => ({
   fill: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
   art: { backgroundColor: c.courtOut, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 92 },
   artCourt: { width: '100%', paddingHorizontal: space.l },
+  artAura: { alignSelf: 'center', top: -60 },
   topBar: { position: 'absolute', left: space.l, right: space.m, top: space.m, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   brand: { fontFamily: font.heading, fontSize: 11, letterSpacing: 1.0, color: W },
   when: { fontFamily: font.bodyBold, fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 1 },

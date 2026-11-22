@@ -29,7 +29,7 @@ import { Ambient } from './src/ui/Ambient';
 import { BADGES } from './src/ui/badges';
 import { Glass } from './src/ui/Glass';
 import { Icon, IconName } from './src/ui/Icon';
-import { Spectrum } from './src/ui/Spectrum';
+import { Aura } from './src/ui/Glow';
 import { useReduceMotion } from './src/ui/useReduceMotion';
 import { ThemeProvider, themed, useTheme } from './src/theme/theme';
 import { dark, font, light, motion, radius, space } from './src/theme/tokens';
@@ -278,7 +278,7 @@ function Banner({ id, who, onDone, onOpen }: { id: AwardId; who: string; onDone:
     <Animated.View style={[s.bannerWrap, { top: insets.top + 6, transform: [{ translateY: y }] }]}>
       <Pressable onPress={onOpen} accessibilityRole="button">
         <Glass radius={radius.xl} style={s.banner} tint={c.bar}>
-          <Spectrum height={2} style={s.bannerLine} />
+          <Aura size={260} style={s.bannerLine} />
           <View style={s.bannerCase}>
             <Image source={BADGES[id]} style={s.bannerBadge} resizeMode="contain" />
           </View>
@@ -304,7 +304,7 @@ const useS = themed((c) => ({
   tabTextOn: { fontFamily: font.bodyBold, color: c.text },
   bannerWrap: { position: 'absolute', left: space.m, right: space.m },
   banner: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.s },
-  bannerLine: { position: 'absolute', left: space.xl, right: space.xl, top: 0 },
+  bannerLine: { left: -90, top: -95 },
   bannerCase: { width: 64, height: 72, borderRadius: 18, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
   bannerBadge: { width: 52, height: 64 },
   bannerKicker: { fontFamily: font.micro, fontSize: 12.5, letterSpacing: 1, color: c.highlight },

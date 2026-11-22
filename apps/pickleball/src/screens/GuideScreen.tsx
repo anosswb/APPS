@@ -11,6 +11,7 @@ import { Label, Segments } from '../ui/Bits';
 import { BADGES } from '../ui/badges';
 import { CourtSurface } from '../ui/CourtSurface';
 import { Glass } from '../ui/Glass';
+import { Aura } from '../ui/Glow';
 import { Icon } from '../ui/Icon';
 import { useReduceMotion } from '../ui/useReduceMotion';
 import { themed, useTheme } from '../theme/theme';
@@ -79,7 +80,10 @@ function Page({ width, title, body, children }: { width: number; title: string; 
   const s = useS();
   return (
     <View style={{ width, paddingHorizontal: space.l }}>
-      <View style={s.stage}>{children}</View>
+      <View style={s.stage}>
+        <Aura size={380} style={s.stageAura} />
+        {children}
+      </View>
       <Text style={s.title}>{title}</Text>
       <Text style={s.body}>{body}</Text>
     </View>
@@ -264,6 +268,7 @@ const useS = themed((c) => ({
   brand: { fontFamily: font.heading, fontSize: 12, letterSpacing: 1.0, color: c.accent },
   skip: { minHeight: 44, minWidth: 64, alignItems: 'flex-end', justifyContent: 'center' },
   skipText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.mute },
+  stageAura: { alignSelf: 'center', top: -40 },
   stage: { height: 300, alignItems: 'center', justifyContent: 'center', marginTop: space.l, overflow: 'hidden' },
   title: { fontFamily: font.heading, fontSize: 22, lineHeight: 25, color: c.text, marginTop: space.l },
   body: { fontFamily: font.body, fontSize: size.body + 1, lineHeight: 25, color: c.textSoft, marginTop: space.s },

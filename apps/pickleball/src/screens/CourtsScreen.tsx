@@ -9,6 +9,7 @@ import { Button } from '../ui/Button';
 import { Chip, Label, Segments } from '../ui/Bits';
 import { CourtSurface } from '../ui/CourtSurface';
 import { Glass } from '../ui/Glass';
+import { Aura } from '../ui/Glow';
 import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
 import { LineTag } from '../ui/LineTag';
@@ -134,6 +135,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
             const leaving = [...g.teamA, ...g.teamB].filter((id) => session.players[id]?.leaving);
             return (
               <Glass key={g.id} style={s.card}>
+                <Aura size={420} style={s.cardAura} strength={0.85} />
                 <View style={s.pad}>
                   <View style={s.head}>
                     <Label>{t.courts.court(i + 1)}</Label>
@@ -319,6 +321,7 @@ const useS = themed((c) => ({
   root: { flex: 1 },
   scroll: { paddingHorizontal: space.l, paddingBottom: space.l },
   card: { marginBottom: space.m },
+  cardAura: { right: -150, top: -120 },
   pad: { padding: space.m + 2 },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: space.s },
   timer: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 12, paddingVertical: 5 },

@@ -1,6 +1,5 @@
 // The signature: a game is drawn as a top-down night court (black surround, dark court, lighter kitchens,
-// white lines, a black net with posts) with the players' names painted on it. A live game gets a thin
-// spectral line under the court.
+// white lines, a black net with posts) with the players' names painted on it.
 // When a game starts, the court swoops down into place, a ball flies over the net, a glass shine sweeps
 // across and the names float in. Once per game, and never when the phone asks for reduced motion.
 import { useEffect, useRef, useState } from 'react';
@@ -8,7 +7,6 @@ import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { courtTilt, dark as color, font, glass, line, motion, size } from '../theme/tokens';
 import { Glass } from './Glass';
-import { Spectrum } from './Spectrum';
 import { useReduceMotion } from './useReduceMotion';
 
 interface Props {
@@ -122,7 +120,6 @@ export function CourtSurface({ left, right, call, live = false, height = 122, di
           <Animated.View pointerEvents="none" style={[s.ball, { top: mid }, ballStyle]} />
         </>
       ) : null}
-      {live ? <Spectrum height={2} style={s.liveLine} /> : null}
       {call || live ? (
         <Glass style={s.tag} radius={14} tint={glass.tint}>
           <View style={s.tagRow}>
@@ -180,7 +177,6 @@ function LiveDot() {
 
 const s = StyleSheet.create({
   out: { backgroundColor: color.courtOut, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 14 },
-  liveLine: { position: 'absolute', left: 14, right: 14, bottom: 3 },
   dim: { opacity: 0.4 },
   court: { flexDirection: 'row', alignItems: 'stretch', backgroundColor: color.court, borderWidth: line.court, borderColor: color.paint, overflow: 'visible' },
   half: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
