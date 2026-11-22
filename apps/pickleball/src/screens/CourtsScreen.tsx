@@ -3,10 +3,10 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, Tex
 import { t } from '../i18n/en';
 import { clock } from '../logic/history';
 import { scoreCall, scoreFromRallies, Team } from '../logic/scoring';
-import { addPlayer, canOpenCourt, canRemoveCourt, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, MAX_COURTS, RotationRule, Session, updateSettings } from '../logic/session';
+import { addPlayer, beginGame, canOpenCourt, canRemoveCourt, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, MAX_COURTS, RotationRule, Session, updateSettings } from '../logic/session';
 import { minutesSince, useNow } from '../state/useNow';
 import { Button } from '../ui/Button';
-import { Chip, Label, Segments } from '../ui/Bits';
+import { Chip, Heading, Label, Segments } from '../ui/Bits';
 import { CourtSurface } from '../ui/CourtSurface';
 import { Glass } from '../ui/Glass';
 import { Header } from '../ui/Header';
@@ -37,6 +37,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
   const [draft, setDraft] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [ending, setEnding] = useState<number | null>(null);
+  const [courtSheet, setCourtSheet] = useState<number | null>(null);
   const name = (id: string) => session.players[id]?.name ?? '?';
   const n = counts(session);
   const nobody = Object.keys(session.players).length === 0;
@@ -74,6 +75,11 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
     buzz('tap');
   };
 
+  const startGame = (court: number) => {
+    act((s2, at) => beginGame(s2, court, at));
+    buzz('tap');
+  };
+
   const endGame = (court: number, winner: Team) => {
     act((s2, at) => finishGame(s2, court, winner, at));
     setEnding(null);
@@ -83,6 +89,8 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
   const up = session.queue.slice(0, 4);
   const rest = session.queue.slice(4);
   const endingGame = ending !== null ? session.courts[ending] : null;
+  /** The game on the court whose sheet is open (null: an open court; undefined: no sheet). */
+  const sheetGame = courtSheet !== null ? session.courts[courtSheet] ?? null : undefined;
   const rules = session.settings.scoring;
 
   return (
@@ -133,28 +141,34 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
             const servers = (sc.serving === 'A' ? g.teamA : g.teamB).map(name).join(' & ');
             const leaving = [...g.teamA, ...g.teamB].filter((id) => session.players[id]?.leaving);
             return (
-              <Glass key={g.id} style={s.card}>
+              <Pressable key={g.id} onPress={() => setCourtSheet(i)} accessibilityRole="button" accessibilityLabel={t.courts.edit(i + 1)}>
+              <Glass style={s.card}>
                 <View style={s.pad}>
                   <View style={s.head}>
                     <Label>{t.courts.court(i + 1)}</Label>
                     <Glass radius={radius.pill} style={s.timer} tint={c.cardHi}>
-                      <View style={s.live} />
-                      <Text style={s.timerText}>{clock(now - g.startedAt)}</Text>
+                      {g.started ? <View style={s.live} /> : null}
+                      <Text style={s.timerText}>{g.started ? clock(now - g.startedAt) : t.courts.ready}</Text>
                     </Glass>
                   </View>
-                  <CourtSurface left={g.teamA.map(name)} right={g.teamB.map(name)} call={g.rallies.length ? scoreCall(sc, rules) : undefined} live height={96} introKey={g.id} />
-                  <View style={s.scoreRow}>
-                    <Text style={s.score} accessibilityLabel={`${sc.a} to ${sc.b}`}>{`${sc.a}–${sc.b}`}</Text>
-                    <View style={s.buttons}>
-                      <Button label={t.courts.score} onPress={() => openScorer(i)} style={s.btn} />
-                      <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.btn} />
+                  <CourtSurface left={g.teamA.map(name)} right={g.teamB.map(name)} call={g.rallies.length ? scoreCall(sc, rules) : undefined} live={g.started} height={96} introKey={g.id} />
+                  {g.started ? (
+                    <View style={s.scoreRow}>
+                      <Text style={s.score} accessibilityLabel={`${sc.a} to ${sc.b}`}>{`${sc.a}–${sc.b}`}</Text>
+                      <View style={s.buttons}>
+                        <Button label={t.courts.score} onPress={() => openScorer(i)} style={s.btn} />
+                        <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.btn} />
+                      </View>
                     </View>
-                  </View>
+                  ) : (
+                    <Button label={t.courts.startGame} kind="go" onPress={() => startGame(i)} style={s.startBtn} />
+                  )}
                   <Text style={s.serve} numberOfLines={1}>
-                    {leaving.length ? `${leaving.map(name).join(', ')} ${t.courts.leavingAfter}` : t.courts.serving(servers, rules.type === 'sideout' && rules.doubles ? sc.server : 0)}
+                    {leaving.length ? `${leaving.map(name).join(', ')} ${t.courts.leavingAfter}` : g.started ? t.courts.serving(servers, rules.type === 'sideout' && rules.doubles ? sc.server : 0) : t.courts.readyHint}
                   </Text>
                 </View>
               </Glass>
+              </Pressable>
             );
           })
         )}
@@ -172,13 +186,16 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         ) : null}
         {up.length ? (
           <>
-            <View style={s.lineHead}>
-              <Label style={{ color: c.highlight }}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Label>
-              <Chip onPress={openBoard} a11y={t.board.open}>
+            <Heading
+              title={session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}
+              style={s.lineHead}
+              right={
+                <Chip onPress={openBoard} a11y={t.board.open}>
                 <Icon name="board" size={18} />
                 <Text style={s.chipText}>{t.board.open}</Text>
               </Chip>
-            </View>
+              }
+            />
             <View style={s.stack}>
               {up.map((id, k) => (
                 <LineTag key={id} pos={k + 1} name={name(id)} note={t.courts.waited(minutesSince(session.players[id].waitingSince, now))} strong />
@@ -188,9 +205,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         ) : null}
         {rest.length ? (
           <>
-            <View style={s.lineHead}>
-              <Label>{t.courts.theLine}</Label>
-            </View>
+            <Heading title={t.courts.theLine} style={s.lineHead} />
             <View style={s.stack}>
               {rest.map((id, k) => (
                 <LineTag key={id} pos={k + 5} name={name(id)} note={t.courts.gamesAway(gamesToWait(session, id))} />
@@ -242,7 +257,7 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         ) : (
           <View style={s.fabRow}>
             <Pressable onPress={() => { setAdding(true); setToast(null); }} accessibilityRole="button" accessibilityLabel={t.a11y.add} style={{ flex: 1 }}>
-              <Glass radius={radius.pill} style={s.addBtn}>
+              <Glass radius={radius.pill} style={s.addBtn} tint={c.control}>
                 <Icon name="people" size={20} />
                 <Text style={s.addText}>{t.menu.addPlayers}</Text>
               </Glass>
@@ -270,22 +285,38 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
                 <Button label={t.menu.removeCourt(session.courts.length)} onPress={() => act((s2, at) => updateSettings(s2, { courts: s2.courts.length - 1 }, at))} style={{ flex: 1 }} />
               ) : null}
             </View>
-            <Label style={s.menuLabel}>{t.settings.rotation}</Label>
-            {(['all-off', 'winners-stay', 'winners-split'] as RotationRule[]).map((r) => {
-              const on = session.settings.rule === r;
-              return (
-                <Pressable key={r} onPress={() => act((s2, at) => updateSettings(s2, { rule: r }, at))} style={[s.rule, on && s.ruleOn]} accessibilityRole="radio" accessibilityState={{ selected: on }}>
-                  <Text style={[s.ruleTitle, on && s.ruleTitleOn]}>{t.menu.ruleShort[r]}</Text>
-                  <Text style={[s.ruleHelp, on && s.ruleHelpOn]}>{t.menu.ruleHelp[r]}</Text>
-                </Pressable>
-              );
-            })}
-            <Label style={s.menuLabel}>{t.settings.scoring}</Label>
-            <Segments<'sideout' | 'rally'> items={[['sideout', t.settings.sideout], ['rally', t.settings.rally]]} value={session.settings.scoring.type} onChange={(v) => act((s2, at) => updateSettings(s2, { scoring: { ...s2.settings.scoring, type: v } }, at))} />
+            <RulesPicker session={session} act={act} />
             <View style={s.menuRow}>
               <Button label={t.board.open} onPress={() => { setMenu(false); openBoard(); }} style={{ flex: 1 }} />
               <Button label={t.menu.howItWorks} onPress={() => { setMenu(false); openGuide(); }} style={{ flex: 1 }} />
             </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <Modal visible={sheetGame !== undefined} transparent animationType="slide" onRequestClose={() => setCourtSheet(null)}>
+        <Pressable style={s.scrim} onPress={() => setCourtSheet(null)}>
+          <Pressable style={s.sheet} onPress={() => {}}>
+            <Text style={s.sheetTitle}>{t.courts.sheetTitle((courtSheet ?? 0) + 1)}</Text>
+            {sheetGame ? (
+              <>
+                <Text style={s.sheetTeams}>{`${sheetGame.teamA.map(name).join(' & ')}  v  ${sheetGame.teamB.map(name).join(' & ')}`.toUpperCase()}</Text>
+                {sheetGame.started ? (
+                  <View style={s.menuRow}>
+                    <Button label={t.courts.score} onPress={() => { const k = courtSheet!; setCourtSheet(null); openScorer(k); }} style={{ flex: 1 }} />
+                    <Button label={t.courts.gameOver} kind="go" onPress={() => { const k = courtSheet!; setCourtSheet(null); setEnding(k); }} style={{ flex: 1 }} />
+                  </View>
+                ) : (
+                  <Button label={t.courts.startGame} kind="go" onPress={() => { startGame(courtSheet!); setCourtSheet(null); }} />
+                )}
+              </>
+            ) : null}
+            <RulesPicker session={session} act={act} />
+            {sheetGame ? (
+              <Pressable onPress={() => { act((s2) => cancelGame(s2, courtSheet!)); setCourtSheet(null); }} style={s.cancelLink} accessibilityRole="button">
+                <Text style={s.cancelText}>{t.courts.cancelGame}</Text>
+              </Pressable>
+            ) : null}
           </Pressable>
         </Pressable>
       </Modal>
@@ -315,6 +346,27 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
   );
 }
 
+/** Who comes off and how points are counted: in the + menu and on every court's sheet. */
+function RulesPicker({ session, act }: { session: Session; act: Props['act'] }) {
+  const s = useS();
+  return (
+    <>
+      <Label style={s.menuLabel}>{t.settings.rotation}</Label>
+      {(['all-off', 'winners-stay', 'winners-split'] as RotationRule[]).map((r) => {
+        const on = session.settings.rule === r;
+        return (
+          <Pressable key={r} onPress={() => act((s2, at) => updateSettings(s2, { rule: r }, at))} style={[s.rule, on && s.ruleOn]} accessibilityRole="radio" accessibilityState={{ selected: on }}>
+            <Text style={[s.ruleTitle, on && s.ruleTitleOn]}>{t.menu.ruleShort[r]}</Text>
+            <Text style={[s.ruleHelp, on && s.ruleHelpOn]}>{t.menu.ruleHelp[r]}</Text>
+          </Pressable>
+        );
+      })}
+      <Label style={s.menuLabel}>{t.settings.scoring}</Label>
+      <Segments<'sideout' | 'rally'> items={[['sideout', t.settings.sideout], ['rally', t.settings.rally]]} value={session.settings.scoring.type} onChange={(v) => act((s2, at) => updateSettings(s2, { scoring: { ...s2.settings.scoring, type: v } }, at))} />
+    </>
+  );
+}
+
 const useS = themed((c) => ({
   root: { flex: 1 },
   scroll: { paddingHorizontal: space.l, paddingBottom: space.l },
@@ -328,15 +380,17 @@ const useS = themed((c) => ({
   score: { fontFamily: font.figure, fontSize: 34, lineHeight: 37, color: c.text, letterSpacing: 0.2 },
   buttons: { flexDirection: 'row', gap: space.s },
   btn: { minWidth: 104 },
+  startBtn: { marginTop: space.l },
+  sheetTeams: { fontFamily: font.name, textTransform: 'uppercase', fontSize: 24, letterSpacing: 3, color: c.textSoft, marginBottom: space.xs },
   serve: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginTop: 2 },
   needs: { fontFamily: font.bodyBold, fontSize: size.body, color: c.textSoft, marginTop: space.s },
   emptyTitle: { fontFamily: font.heading, fontSize: size.title, color: c.text, marginTop: space.l },
   emptyBody: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: c.textSoft, marginTop: space.xs },
-  lineHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: space.s, marginBottom: space.s, paddingHorizontal: 4 },
+  lineHead: { marginTop: space.l, marginBottom: space.m, marginHorizontal: 4 },
   chipText: { fontFamily: font.bodyBold, fontSize: size.small, color: c.text },
   stack: { gap: 7 },
   bottom: { paddingHorizontal: space.l, paddingBottom: TAB_SPACE, paddingTop: space.s },
-  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, paddingHorizontal: space.l },
+  addBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, paddingHorizontal: space.l, borderWidth: 1.5, borderColor: c.controlEdge },
   fabRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   fab: { width: touch.big + 4, height: touch.big + 4, borderRadius: (touch.big + 4) / 2, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', borderWidth: c.mode === 'light' ? 1.5 : 0, borderColor: c.accentLine },
   emptyActions: { flexDirection: 'row', gap: space.s, marginTop: space.l },
@@ -346,7 +400,7 @@ const useS = themed((c) => ({
   ghostSub: { fontFamily: font.body, fontSize: size.small, color: c.mute },
   menuRow: { flexDirection: 'row', gap: space.s },
   menuLabel: { marginTop: space.s },
-  rule: { borderRadius: 16, borderWidth: 1, borderColor: c.hair, paddingHorizontal: space.l, paddingVertical: space.s + 2 },
+  rule: { borderRadius: 16, borderWidth: 1, borderColor: c.controlEdge, paddingHorizontal: space.l, paddingVertical: space.s + 2 },
   ruleOn: { backgroundColor: c.solid, borderColor: c.solid },
   ruleTitle: { fontFamily: font.bodyBold, fontSize: size.body, color: c.text },
   ruleTitleOn: { color: c.solidText },
@@ -360,14 +414,14 @@ const useS = themed((c) => ({
   chips: { borderTopWidth: 0 },
   chipsPad: { alignItems: 'center', gap: space.s, paddingHorizontal: space.l, paddingVertical: space.s },
   backChip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.l, backgroundColor: c.accent, borderRadius: 22 },
-  backChipText: { fontFamily: font.name, textTransform: 'uppercase', fontSize: 21, color: c.accentText },
+  backChipText: { fontFamily: font.name, textTransform: 'uppercase', letterSpacing: 3, fontSize: 21, color: c.accentText },
   toast: { position: 'absolute', left: space.l, right: space.l, bottom: TAB_SPACE + touch.big + space.l, backgroundColor: c.solid, borderRadius: radius.chip, paddingVertical: space.m, paddingHorizontal: space.l },
   toastText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.solidText },
   scrim: { flex: 1, backgroundColor: c.scrim, justifyContent: 'flex-end' },
   sheet: { backgroundColor: c.sheet, padding: space.l, paddingBottom: space.xxl + space.l, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, gap: space.s },
   sheetTitle: { fontFamily: font.heading, fontSize: size.title, color: c.text, marginBottom: space.xs },
   winBtn: { minHeight: 76, backgroundColor: c.cardHi, borderRadius: radius.glass, borderWidth: 1, borderColor: c.edgeHi, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.m },
-  winText: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name + 2, color: c.text },
+  winText: { fontFamily: font.name, textTransform: 'uppercase', letterSpacing: 3, fontSize: size.name + 2, color: c.text },
   cancelLink: { minHeight: touch.min, alignItems: 'center', justifyContent: 'center' },
   cancelText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.mute, textDecorationLine: 'underline' },
 }));

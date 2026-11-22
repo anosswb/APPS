@@ -1,14 +1,33 @@
-// Android ads through Google AdMob: one small banner on Players and Settings only (rules.ts).
+// Android ads through Google AdMob: one full-screen VIDEO ad after a game (skip after a few seconds, then an end page with close), when rules.ts says so. No banner.
+// In the AdMob console the real unit must allow only the "Video" ad type, so a plain picture ad never shows in its place.
 // TEST ads only: the real unit id comes later, after Anass makes the AdMob account. Never tap a real ad of our own app.
-import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import mobileAds, { AdsConsent, BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-import { bannerAllowed } from './rules';
-import { useTheme } from '../theme/theme';
+import mobileAds, { AdEventType, AdsConsent, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 let allowed = false;
+let started = false;
+let ad: InterstitialAd | null = null;
+let loaded = false;
 
-export async function initAds(): Promise<void> {
+function loadNext() {
+  if (!allowed) return;
+  loaded = false;
+  ad = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL_VIDEO ?? TestIds.INTERSTITIAL);
+  ad.addAdEventListener(AdEventType.LOADED, () => {
+    loaded = true;
+  });
+  ad.addAdEventListener(AdEventType.ERROR, (e) => {
+    console.warn(`[ads] after-game ad did not load: ${String(e?.message ?? e)}`);
+    loaded = false;
+  });
+  // Get the next one ready as soon as this one is closed.
+  ad.addAdEventListener(AdEventType.CLOSED, loadNext);
+  ad.load();
+}
+
+/** Asks for consent (once) and loads the first ad. Called when the first game of the session ends. */
+export async function prepareAds(): Promise<void> {
+  if (started) return;
+  started = true;
   try {
     const info = await AdsConsent.gatherConsent();
     allowed = info.canRequestAds;
@@ -24,24 +43,13 @@ export async function initAds(): Promise<void> {
   if (!allowed) return;
   await mobileAds().initialize();
   console.log('[ads] started (test ads)');
+  loadNext();
 }
 
-export function AdBanner({ place }: { place: 'players' | 'settings' }) {
-  const [failed, setFailed] = useState(false);
-  const c = useTheme();
-  if (!allowed || failed || !bannerAllowed('android', place)) return null;
-  return (
-    <View style={[s.slot, { backgroundColor: c.bg }]}>
-      <BannerAd
-        unitId={TestIds.ADAPTIVE_BANNER}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        onAdFailedToLoad={(e) => {
-          console.warn(`[ads] banner did not load: ${String(e?.message ?? e)}`);
-          setFailed(true);
-        }}
-      />
-    </View>
-  );
+/** Shows the after-game ad if one is loaded. Returns true when it was shown. */
+export function showGameAd(): boolean {
+  if (!allowed || !ad || !loaded) return false;
+  loaded = false;
+  ad.show().catch((e) => console.warn(`[ads] after-game ad did not show: ${String(e)}`));
+  return true;
 }
-
-const s = StyleSheet.create({ slot: { alignItems: 'center' } });

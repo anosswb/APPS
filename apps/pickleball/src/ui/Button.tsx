@@ -18,7 +18,7 @@ export function Button({ label, onPress, kind = 'glass', style, a11y, disabled }
 const useS = themed((c) => ({
   base: { minHeight: touch.min, borderRadius: radius.pill },
   fill: { flex: 1, minHeight: touch.min, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18 },
-  glass: { backgroundColor: c.cardHi, borderWidth: 1, borderColor: c.edgeHi },
+  glass: { backgroundColor: c.control, borderWidth: 1.5, borderColor: c.controlEdge },
   go: { backgroundColor: c.accent, borderWidth: c.mode === 'light' ? 1.5 : 0, borderColor: c.accentLine },
   solid: { backgroundColor: c.solid },
   stop: { backgroundColor: c.stop },

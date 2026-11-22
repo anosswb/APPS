@@ -1,6 +1,6 @@
 import {
   canOpenCourt, canRemoveCourt, addPlayer, bestTeams, cancelGame, checkIn, checkOut, counts, DEFAULT_SETTINGS, fillCourts, finishGame,
-  gamesToWait, moveUp, newSession, removePlayer, renamePlayer, restartSession, scoreRally, Session, setCourtCount, undoRally,
+  beginGame, gamesToWait, moveUp, newSession, removePlayer, renamePlayer, restartSession, scoreRally, Session, setCourtCount, undoRally,
 } from './session';
 
 function withPlayers(n: number, settings = DEFAULT_SETTINGS): Session {
@@ -231,5 +231,24 @@ describe('opening and closing courts from the courts screen', () => {
     const open = fillCourts(withPlayers(4), 0);
     expect(canRemoveCourt(open)).toBe(true);
     expect(canRemoveCourt(newSession({ ...DEFAULT_SETTINGS, courts: 1 }))).toBe(false);
+  });
+});
+
+describe('start game', () => {
+  it('four on a court wait for Start: the clock starts when the host taps it', () => {
+    let s = fillCourts(withPlayers(4), 100);
+    expect(s.courts[0]).toMatchObject({ started: false, startedAt: 100 });
+    s = beginGame(s, 0, 400);
+    expect(s.courts[0]).toMatchObject({ started: true, startedAt: 400 });
+    expect(beginGame(s, 0, 900)).toBe(s);
+  });
+  it('a point scored starts the game too', () => {
+    const s = scoreRally(fillCourts(withPlayers(4), 0), 0, 'A');
+    expect(s.courts[0]?.started).toBe(true);
+  });
+  it('the next game on a court waits for Start again', () => {
+    let s = beginGame(fillCourts(withPlayers(8), 0), 0, 0);
+    s = finishGame(s, 0, 'A', 600_000);
+    expect(s.courts[0]?.started).toBe(false);
   });
 });

@@ -6,14 +6,24 @@ import { themed, useTheme } from '../theme/theme';
 import { font, radius, size, space, spectral } from '../theme/tokens';
 import { Glass } from './Glass';
 
-export function Section({ title, right }: { title: string; right?: ReactNode }) {
+/** A section title with a line under it, so the eye finds where each part starts. */
+export function Heading({ title, right, style }: { title: string; right?: ReactNode; style?: ViewStyle }) {
   const s = useS();
   return (
-    <View style={s.section}>
-      <Text style={s.sectionText} accessibilityRole="header">{title}</Text>
-      {right}
+    <View style={[s.heading, style]}>
+      <View style={s.headingRow}>
+        <Text style={s.headingText} accessibilityRole="header">{title.toUpperCase()}</Text>
+        {right}
+      </View>
+      <View style={s.headingLine} />
     </View>
   );
+}
+
+/** A Heading with the screen's side margins. */
+export function Section({ title, right }: { title: string; right?: ReactNode }) {
+  const s = useS();
+  return <Heading title={title} right={right} style={s.section} />;
 }
 
 export function Label({ children, style }: { children: string; style?: object }) {
@@ -72,7 +82,8 @@ export function Segments<T extends string>({ items, value, onChange }: { items: 
 
 export function Chip({ children, style, onPress, a11y }: { children: ReactNode; style?: ViewStyle; onPress?: () => void; a11y?: string }) {
   const s = useS();
-  const inner = <Glass radius={radius.pill} style={[s.chip, style]}>{children}</Glass>;
+  const c = useTheme();
+  const inner = <Glass radius={radius.pill} style={[s.chip, style]} tint={c.control}>{children}</Glass>;
   return onPress ? (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={a11y} style={({ pressed }) => [pressed && { opacity: 0.8 }, { minHeight: 44, justifyContent: 'center' }]}>
       {inner}
@@ -83,8 +94,11 @@ export function Chip({ children, style, onPress, a11y }: { children: ReactNode; 
 }
 
 const useS = themed((c) => ({
-  section: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.l + 4, marginTop: space.xl, marginBottom: space.s + 2 },
-  sectionText: { fontFamily: font.heading, fontSize: 14, color: c.text, letterSpacing: 0.6 },
+  section: { marginHorizontal: space.l + 4 },
+  heading: { marginTop: space.xl, marginBottom: space.m },
+  headingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 30, gap: space.s },
+  headingText: { fontFamily: font.heading, fontSize: 15, letterSpacing: 1, color: c.text },
+  headingLine: { height: 1, backgroundColor: c.titleLine, marginTop: space.xs },
   label: { fontFamily: font.micro, fontSize: size.label, letterSpacing: 1, color: c.mute },
   statPad: { paddingHorizontal: space.l, paddingTop: space.m + 2, paddingBottom: space.m },
   statValue: { fontFamily: font.figure, fontSize: size.stat, lineHeight: size.stat + 4, color: c.text },
@@ -92,10 +106,10 @@ const useS = themed((c) => ({
   solid: { backgroundColor: c.solid, borderRadius: radius.glass - 2 },
   solidText: { color: c.solidText },
   solidMute: { color: c.solidMute },
-  seg: { flexDirection: 'row', padding: 4 },
+  seg: { flexDirection: 'row', padding: 4, borderWidth: 1.5, borderColor: c.controlEdge },
   segItem: { flex: 1, minHeight: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   segOn: { backgroundColor: c.solid },
   segText: { fontFamily: font.bodyBold, fontSize: size.small + 1, color: c.textSoft },
   segTextOn: { color: c.solidText },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1.5, borderColor: c.controlEdge },
 }));

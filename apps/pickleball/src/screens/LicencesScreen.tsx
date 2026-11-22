@@ -69,7 +69,7 @@ const useS = themed((color) => ({
   intro: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.textSoft },
   label: { fontFamily: font.micro, fontSize: size.label, letterSpacing: 1, color: color.textSoft, marginTop: space.xl, marginBottom: space.s },
   row: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m, marginBottom: 6 },
-  name: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.nameSmall, color: color.text },
+  name: { fontFamily: font.name, textTransform: 'uppercase', letterSpacing: 3, fontSize: size.nameSmall, color: color.text },
   pkg: { fontFamily: font.bodyBold, fontSize: size.body, color: color.text },
   meta: { fontFamily: font.body, fontSize: size.small, color: color.textSoft, marginTop: 2 },
   toggle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44 },

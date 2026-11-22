@@ -23,7 +23,10 @@ export interface Game {
   teamB: [string, string];
   rallies: Team[];
   firstServe: Team;
+  /** When the four were put on the court; once started, when Start game was tapped (game lengths use it). */
   startedAt: number;
+  /** False until the host taps Start game: the four may still be walking on (Anass, 22 Nov 2026). */
+  started: boolean;
   /** Games in a row that team A has won on this court (winners-stay rule). */
   streakA: number;
 }
@@ -47,6 +50,8 @@ export interface Result {
   target: number;
   /** The biggest lead the losers ever had over the winners (a comeback when 5 or more). */
   maxDeficit: number;
+  /** Start game was tapped (or a point scored). Missing in saves from before 22 Nov 2026: counts as started. */
+  started?: boolean;
 }
 
 export interface Session {
@@ -178,7 +183,7 @@ export function bestTeams(four: string[], partners: Record<string, number>): { t
 function startGame(s: Session, court: number, teamA: [string, string], teamB: [string, string], now: number, streakA: number): Session {
   let next = s;
   for (const id of [...teamA, ...teamB]) next = patch(next, id, { status: 'playing' });
-  const game: Game = { id: `g${next.nextId}`, teamA, teamB, rallies: [], firstServe: 'A', startedAt: now, streakA };
+  const game: Game = { id: `g${next.nextId}`, teamA, teamB, rallies: [], firstServe: 'A', startedAt: now, started: false, streakA };
   const courts = [...next.courts];
   courts[court] = game;
   const used = new Set([...teamA, ...teamB]);
@@ -243,6 +248,7 @@ export function finishGame(s: Session, court: number, winner: Team, now: number)
     endedAt: now,
     target: s.settings.scoring.target,
     maxDeficit: maxDeficit(g.rallies, s.settings.scoring, g.firstServe, winner),
+    started: g.started,
   };
 
   let next: Session = { ...s, results: [...s.results, result] };
@@ -299,13 +305,23 @@ export function cancelGame(s: Session, court: number): Session {
   return { ...next, courts, queue: [...four, ...next.queue] };
 }
 
+/** The four are on court and play begins: the clock starts now. Does nothing to a game already started. */
+export function beginGame(s: Session, court: number, now: number): Session {
+  const g = s.courts[court];
+  if (!g || g.started) return s;
+  const courts = [...s.courts];
+  courts[court] = { ...g, started: true, startedAt: now };
+  return { ...s, courts };
+}
+
 export function scoreRally(s: Session, court: number, team: Team): Session {
   const g = s.courts[court];
   if (!g) return s;
   const now = scoreFromRallies(g.rallies, s.settings.scoring, g.firstServe);
   if (now.winner) return s;
   const courts = [...s.courts];
-  courts[court] = { ...g, rallies: [...g.rallies, team] };
+  // A point scored means the game is on, even if Start game was not tapped.
+  courts[court] = { ...g, started: true, rallies: [...g.rallies, team] };
   return { ...s, courts };
 }
 

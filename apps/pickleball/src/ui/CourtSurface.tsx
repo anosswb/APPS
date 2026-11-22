@@ -186,7 +186,7 @@ const s = StyleSheet.create({
   half: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   names: { alignItems: 'center' },
   center: { position: 'absolute', left: 0, right: 0, top: '50%', height: 2, backgroundColor: color.kitchen },
-  name: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name, lineHeight: size.name + 4, color: color.paint, letterSpacing: 0.4 },
+  name: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name, lineHeight: size.name + 4, color: color.paint, letterSpacing: 3 },
   kitchen: { width: 24, backgroundColor: color.kitchenFill },
   kitchenL: { borderLeftWidth: 2, borderColor: color.paint },
   kitchenR: { borderRightWidth: 2, borderColor: color.paint },

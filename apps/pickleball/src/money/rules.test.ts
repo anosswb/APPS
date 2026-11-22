@@ -1,14 +1,24 @@
-import { bannerAllowed, courtsLocked, FREE_COURTS, ruleLocked, Screen } from './rules';
+import { AD_GAP_MS, AD_MIN_GAME_MS, adAfterGame, courtsLocked, FREE_COURTS, ruleLocked } from './rules';
 
-describe('ads', () => {
-  it('never on the court screens, the scorer or the board', () => {
-    for (const s of ['courts', 'scorer', 'board', 'licences'] as Screen[]) expect(bannerAllowed('android', s)).toBe(false);
+const MIN = 60_000;
+const game = (minutes: number, started = true) => ({ started, startedAt: 0, endedAt: minutes * MIN });
+
+describe('the ad after a game', () => {
+  it('shows after a game of 3 minutes or more, Android only', () => {
+    expect(AD_MIN_GAME_MS).toBe(3 * MIN);
+    expect(adAfterGame('android', game(3), null)).toBe(true);
+    expect(adAfterGame('ios', game(12), null)).toBe(false);
+    expect(adAfterGame('web', game(12), null)).toBe(false);
   });
-  it('a banner on Players and Settings, Android only', () => {
-    expect(bannerAllowed('android', 'players')).toBe(true);
-    expect(bannerAllowed('android', 'settings')).toBe(true);
-    expect(bannerAllowed('ios', 'players')).toBe(false);
-    expect(bannerAllowed('web', 'settings')).toBe(false);
+  it('never after a game shorter than 3 minutes or one that never started', () => {
+    expect(adAfterGame('android', game(2.9), null)).toBe(false);
+    expect(adAfterGame('android', game(15, false), null)).toBe(false);
+  });
+  it('at most one every 10 minutes', () => {
+    expect(AD_GAP_MS).toBe(10 * MIN);
+    const g = { started: true, startedAt: 20 * MIN, endedAt: 32 * MIN };
+    expect(adAfterGame('android', g, 25 * MIN)).toBe(false);
+    expect(adAfterGame('android', g, 22 * MIN)).toBe(true);
   });
 });
 

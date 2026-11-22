@@ -2,15 +2,24 @@
 // Plan approved by Anass on 22 Nov 2026 (docs/money.md).
 import type { RotationRule } from '../logic/session';
 
-export type Screen = 'courts' | 'scorer' | 'board' | 'players' | 'settings' | 'licences';
 export type Platform = 'android' | 'ios' | 'web';
 
-/** The protected moments: the phone is at the court and everyone looks at it. Never an ad there. */
-const NO_AD_SCREENS: Screen[] = ['courts', 'scorer', 'board'];
+/**
+ * No banner anywhere (Anass, 22 Nov 2026: "the ad bar is so big"). One full-screen ad (often a video,
+ * skippable) when a game ends, Android only, and only when:
+ *  - the game really ran at least 3 minutes on its clock (Anass: someone ending a game after 1 minute
+ *    just wants to clear the court), and
+ *  - no ad was shown in the last 10 minutes (with 4 courts a game ends every few minutes; without a gap
+ *    the host would see an ad after almost every game).
+ * Never while a game is being played or scored.
+ */
+export const AD_MIN_GAME_MS = 3 * 60_000;
+export const AD_GAP_MS = 10 * 60_000;
 
-/** Android only, small banner, only on Players and Settings. */
-export function bannerAllowed(platform: Platform, screen: Screen): boolean {
-  return platform === 'android' && !NO_AD_SCREENS.includes(screen) && (screen === 'players' || screen === 'settings');
+export function adAfterGame(platform: Platform, game: { started: boolean; startedAt: number; endedAt: number }, lastAdAt: number | null): boolean {
+  if (platform !== 'android' || !game.started) return false;
+  if (game.endedAt - game.startedAt < AD_MIN_GAME_MS) return false;
+  return lastAdAt === null || game.endedAt - lastAdAt >= AD_GAP_MS;
 }
 
 /** Free forever: 1–2 courts. The unlock opens 3–8. */

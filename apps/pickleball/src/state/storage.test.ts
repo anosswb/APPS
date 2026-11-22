@@ -1,6 +1,6 @@
 jest.mock('@react-native-async-storage/async-storage', () => ({ getItem: jest.fn(), setItem: jest.fn() }));
 import { DEFAULT_PREFS, emptyHistory, parseHistory, parseSaved, SCHEMA, withPhoto, withPlace } from './storage';
-import { addPlayer, newSession } from '../logic/session';
+import { addPlayer, fillCourts, newSession } from '../logic/session';
 
 describe('saved data', () => {
   it('nothing saved gives a fresh session', () => {
@@ -11,7 +11,6 @@ describe('saved data', () => {
     const out = parseSaved(JSON.stringify({ v: SCHEMA, session: s, prefs: { haptics: false, keepAwake: true } }));
     expect(out.session.players.p1.name).toBe('Dana');
     expect(out.prefs).toEqual({ ...DEFAULT_PREFS, haptics: false });
-    expect(out.prefs.theme).toBe('dark');
     expect(out.problem).toBeUndefined();
   });
   it('a version 1 save is upgraded, not lost', () => {
@@ -26,11 +25,19 @@ describe('saved data', () => {
     expect(out.session.startedAt).toBe(500);
     expect(typeof out.session.id).toBe('string');
   });
-  it('the old Auto look moves to dark once; a later choice is kept', () => {
-    const old = parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { theme: 'system' } }));
-    expect(old.prefs).toMatchObject({ theme: 'dark', lookV: 2 });
-    const chosen = parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { theme: 'light', lookV: 2 } }));
-    expect(chosen.prefs.theme).toBe('light');
+  it('the old look choice is dropped: dark or light follows the phone', () => {
+    const old = parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { theme: 'light', lookV: 2, voice: false } }));
+    expect(old.prefs).toEqual({ ...DEFAULT_PREFS, voice: false });
+  });
+  it('a version 2 save keeps its running games, counted as started', () => {
+    let s = newSession();
+    for (const n of ['A', 'B', 'C', 'D']) s = addPlayer(s, n, 0);
+    s = fillCourts(s, 100);
+    const old = JSON.parse(JSON.stringify(s));
+    delete old.courts[0].started;
+    const out = parseSaved(JSON.stringify({ v: 2, session: old, prefs: {} }));
+    expect(out.problem).toBeUndefined();
+    expect(out.session.courts[0]).toMatchObject({ started: true, startedAt: 100 });
   });
   it('broken text gives a fresh session and a reason', () => {
     const out = parseSaved('{oops');
