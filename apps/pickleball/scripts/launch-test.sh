@@ -27,6 +27,30 @@ if [ -z "$PID" ]; then
   echo "==== THE APP DIED ===="
   exit 1
 fi
+# Tap the first thing on screen whose text matches $1 (reads a fresh screen dump).
+tap_text() {
+  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+  local B
+  B=$(adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o "text=\"$1[^\"]*\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]' | head -1)
+  [ -z "$B" ] && return 1
+  read X1 Y1 X2 Y2 <<<"$(echo "$B" | tr -d '[]' | tr ',' ' ')"
+  adb shell input tap $(( (X1 + X2) / 2 )) $(( (Y1 + Y2) / 2 ))
+}
+# A fresh install opens the first-run guide: check it is there, then Skip and Start to reach the courts.
+if grep -q "Add everyone who is here" screen-text.txt; then
+  echo "==== THE GUIDE IS ON THE SCREEN ===="
+  tap_text "Skip" || { echo "==== COULD NOT FIND SKIP ===="; exit 1; }
+  sleep 3
+  tap_text "Start" || { echo "==== COULD NOT FIND START ===="; exit 1; }
+  sleep 5
+  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+  adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -40 > screen-text.txt || true
+  echo "==== words on the screen after the guide ===="
+  cat screen-text.txt
+  tap_text "Done" || true
+  sleep 2
+  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+fi
 if ! grep -q -i "open play" screen-text.txt; then
   echo "==== THE APP IS OPEN BUT THE COURTS SCREEN IS NOT ON THE SCREEN ===="
   exit 1
