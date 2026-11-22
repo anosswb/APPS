@@ -15,6 +15,7 @@ import { CourtsScreen } from './src/screens/CourtsScreen';
 import { PlayersScreen } from './src/screens/PlayersScreen';
 import { ScorerScreen } from './src/screens/ScorerScreen';
 import { BoardScreen } from './src/screens/BoardScreen';
+import { LicencesScreen } from './src/screens/LicencesScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { Icon, IconName } from './src/ui/Icon';
 import { color, font, space } from './src/theme/tokens';
@@ -29,6 +30,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('courts');
   const [scoring, setScoring] = useState<number | null>(null);
   const [board, setBoard] = useState(false);
+  const [licences, setLicences] = useState(false);
 
   useEffect(() => {
     if (fontsLoaded && ready) SplashScreen.hideAsync().catch((e) => console.warn(`[splash] ${String(e)}`));
@@ -50,6 +52,15 @@ export default function App() {
   );
 
   if (!fontsLoaded || !ready) return null;
+
+  if (licences) {
+    return (
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <LicencesScreen onClose={() => setLicences(false)} />
+      </SafeAreaProvider>
+    );
+  }
 
   if (board) {
     return (
@@ -92,7 +103,7 @@ export default function App() {
         <View style={{ flex: 1 }}>
           {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} openScorer={setScoring} openBoard={() => setBoard(true)} buzz={buzz} /> : null}
           {tab === 'players' ? <PlayersScreen session={session} act={act} /> : null}
-          {tab === 'settings' ? <SettingsScreen session={session} act={act} prefs={prefs} setPrefs={setPrefs} /> : null}
+          {tab === 'settings' ? <SettingsScreen session={session} act={act} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} /> : null}
         </View>
         <SafeAreaView edges={['bottom']} style={s.tabs}>
           {(
