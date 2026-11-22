@@ -48,9 +48,18 @@ tap_text() {
 # A fresh install opens the first-run guide: check it is there, then Skip and Start to reach the courts.
 if grep -q "Add everyone who is here" screen-text.txt; then
   echo "==== THE GUIDE IS ON THE SCREEN ===="
-  tap_text "Skip" || { echo "==== COULD NOT FIND SKIP ===="; exit 1; }
-  sleep 3
-  tap_text "Start" || { echo "==== COULD NOT FIND START ===="; exit 1; }
+  # Walk through the pages like a person: tap Next until Start shows, then Start.
+  STARTED=""
+  for page in 1 2 3 4 5 6 7; do
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+    if adb shell cat /sdcard/ui.xml 2>/dev/null | grep -q 'text="Start'; then
+      tap_text "Start" && STARTED=yes
+      break
+    fi
+    tap_text "Next" || true
+    sleep 2
+  done
+  [ -z "$STARTED" ] && { echo "==== COULD NOT REACH START ===="; exit 1; }
   sleep 5
   adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
   adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -40 > screen-text.txt || true
