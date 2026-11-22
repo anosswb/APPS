@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 import { t } from '../i18n/en';
 import { MAX_COURTS, newSession, restartSession, Session, updateSettings } from '../logic/session';
@@ -82,7 +82,7 @@ export function SettingsScreen({ session, act, prefs, setPrefs, openLicences }: 
         <Text style={s.help}>{t.settings.clearHelp}</Text>
       </View>
 
-      <Text style={s.foot}>{t.settings.privacy}</Text>
+      <Text style={s.foot}>{Platform.OS === 'android' ? t.settings.privacyAndroid : t.settings.privacy}</Text>
       <Pressable onPress={openLicences} style={s.licBtn} accessibilityRole="button">
         <Text style={s.licText}>{t.licences.open}</Text>
       </Pressable>

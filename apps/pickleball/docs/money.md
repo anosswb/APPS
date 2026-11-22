@@ -1,4 +1,4 @@
-# Money plan — Dinkline (draft, needs Anass's yes before any ad or purchase code)
+# Money plan — Dinkline (approved by Anass on 22 Nov 2026)
 
 Rails (playbook/07, root CLAUDE.md): Android in Morocco = ads only. iPhone = purchases allowed. Checked research/2026-11-21-pickleball-reviews.md and research/2026-11-21-ideas-store-proof.md today; no newer money research exists.
 
@@ -16,8 +16,15 @@ Rails (playbook/07, root CLAUDE.md): Android in Morocco = ads only. iPhone = pur
 - Honest number: this app is opened ~1–3 times a week per organizer, so ad income per user is tiny (guess: under $0.50 per user per year). Android is mostly for reach and reviews.
 - `react-native-google-mobile-ads` needs minify OFF in release builds (apps/paper-puzzles/DECISIONS.md). Test ad IDs only until Anass says otherwise.
 
-## Not in the test APK of 21 Nov 2026
-No ad SDK and no purchase code yet: the first test is "is it useful at a real court?". Ads come after his yes on this plan.
+## Built (22 Nov 2026)
+- `src/money/rules.ts` (tested): banner only on Players and Settings, Android only; iPhone locks 3+ courts and the winners rules only when a real purchase is possible.
+- Android: one anchored adaptive banner with Google's TEST unit id (`ads.android.tsx`). Ads start the first time Players or Settings opens, so a consent form can never cover the courts. Minify stays off.
+- iPhone: `purchases.ts` is switched off (`available()` = false), so nothing is locked. The real `purchases.ios.ts` needs the Apple developer account and the product in App Store Connect.
+
+## What Anass must do before real money (later, numbered steps when we get there)
+1. AdMob account (free) → Android app → one banner unit id. Then we put the real ids in and build with live ads.
+2. Apple developer account ($99/year) → App Store Connect → one non-consumable product "Dinkline Full" at $4.99.
+3. Google Play data-safety form and the Apple privacy label must then say: device identifiers and ad data collected by Google AdMob on Android.
 
 ## tools/roi.py lines
 Not run: no real numbers exist yet. Run it at day 30 with real installs.

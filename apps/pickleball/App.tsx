@@ -18,6 +18,7 @@ import { BoardScreen } from './src/screens/BoardScreen';
 import { LicencesScreen } from './src/screens/LicencesScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { Icon, IconName } from './src/ui/Icon';
+import { AdBanner, initAds } from './src/money/ads';
 import { color, font, space } from './src/theme/tokens';
 
 SplashScreen.preventAutoHideAsync().catch((e) => console.warn(`[splash] ${String(e)}`));
@@ -31,6 +32,17 @@ export default function App() {
   const [scoring, setScoring] = useState<number | null>(null);
   const [board, setBoard] = useState(false);
   const [licences, setLicences] = useState(false);
+  const [adsReady, setAdsReady] = useState(false);
+  const [adsAsked, setAdsAsked] = useState(false);
+
+  // Ads start the first time Players or Settings opens, never on the courts (docs/money.md).
+  useEffect(() => {
+    if (adsAsked || (tab !== 'players' && tab !== 'settings')) return;
+    setAdsAsked(true);
+    initAds()
+      .then(() => setAdsReady(true))
+      .catch((e) => console.warn(`[ads] did not start: ${String(e)}`));
+  }, [tab, adsAsked]);
 
   useEffect(() => {
     if (fontsLoaded && ready) SplashScreen.hideAsync().catch((e) => console.warn(`[splash] ${String(e)}`));
@@ -105,6 +117,7 @@ export default function App() {
           {tab === 'players' ? <PlayersScreen session={session} act={act} /> : null}
           {tab === 'settings' ? <SettingsScreen session={session} act={act} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} /> : null}
         </View>
+        {adsReady && (tab === 'players' || tab === 'settings') ? <AdBanner place={tab} /> : null}
         <SafeAreaView edges={['bottom']} style={s.tabs}>
           {(
             [
