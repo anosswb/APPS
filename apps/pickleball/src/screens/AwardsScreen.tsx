@@ -11,7 +11,7 @@ import { Button } from '../ui/Button';
 import { Chip, Label, Ring, Section, Segments } from '../ui/Bits';
 import { BADGES } from '../ui/badges';
 import { Glass } from '../ui/Glass';
-import { Aura } from '../ui/Glow';
+import { Spectrum } from '../ui/Spectrum';
 import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
 import { themed, useTheme } from '../theme/theme';
@@ -47,7 +47,7 @@ export function AwardsScreen({ awards, sessions, goals, setGoals }: Props) {
           <Segments<Filter> items={[['all', t.awards.all], ['player', t.awards.players], ['host', t.awards.host]]} value={filter} onChange={setFilter} />
         </View>
         <View style={s.case}>
-          <Aura size={520} style={s.caseShine} strength={0.9} />
+          <Spectrum height={2} style={s.caseShine} />
           <View style={s.grid}>
             {list.map((a) => {
               const st = awards[a.id];
@@ -189,7 +189,7 @@ const useS = themed((c) => ({
   help: { fontFamily: font.body, fontSize: size.body, color: c.mute, lineHeight: 22 },
   chipText: { fontFamily: font.bodyBold, fontSize: size.small, color: c.text },
   case: { marginHorizontal: space.l, marginTop: space.m, borderRadius: radius.xl, backgroundColor: c.showcase, borderWidth: 1, borderColor: c.edgeHi, paddingVertical: space.m, overflow: 'hidden' },
-  caseShine: { alignSelf: 'center', top: -200 },
+  caseShine: { position: 'absolute', left: space.xl, right: space.xl, top: 0 },
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   cell: { width: '25%', alignItems: 'center', paddingVertical: space.s },
   badge: { width: 70, height: 88 },
