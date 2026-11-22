@@ -147,5 +147,5 @@ const useS = themed((c) => ({
   toggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: touch.min, paddingVertical: space.xs },
   foot: { fontFamily: font.body, fontSize: size.small, color: c.mute, textAlign: 'center', marginTop: space.l, lineHeight: 20 },
   licBtn: { minHeight: touch.min, alignItems: 'center', justifyContent: 'center', marginTop: space.s },
-  licText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.mode === 'dark' ? c.accent : c.court, textDecorationLine: 'underline' },
+  licText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.highlight, textDecorationLine: 'underline' },
 }));

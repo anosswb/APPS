@@ -41,8 +41,8 @@ export function Ring({ value, sizePx = 64, stroke = 7 }: { value: number; sizePx
   const len = 2 * Math.PI * r;
   return (
     <Svg width={sizePx} height={sizePx}>
-      <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.hair} strokeWidth={stroke} fill="none" />
-      <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.mode === 'light' ? c.court : c.accent} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={`${len * Math.max(0.001, Math.min(1, value))} ${len}`} rotation={-90} origin={`${sizePx / 2}, ${sizePx / 2}`} />
+      <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.hairHex} strokeOpacity={c.hairOpacity} strokeWidth={stroke} fill="none" />
+      <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.highlight} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={`${len * Math.max(0.001, Math.min(1, value))} ${len}`} rotation={-90} origin={`${sizePx / 2}, ${sizePx / 2}`} />
     </Svg>
   );
 }

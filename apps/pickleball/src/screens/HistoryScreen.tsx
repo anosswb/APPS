@@ -125,7 +125,7 @@ export function HistoryScreen({ sessions, awards, meta, places, setPlace, setPho
               <View style={s.pad}>
                 <View style={s.rowBetween}>
                   <Label>{t.history.chart}</Label>
-                  <Label style={{ color: c.mode === 'dark' ? c.accent : c.court }}>{t.history.longestMin(longest)}</Label>
+                  <Label style={{ color: c.highlight }}>{t.history.longestMin(longest)}</Label>
                 </View>
                 <Bars minutes={st.minutes.slice(-24)} />
               </View>
@@ -136,7 +136,7 @@ export function HistoryScreen({ sessions, awards, meta, places, setPlace, setPho
               <View style={s.listPad}>
                 {st.table.slice(0, 5).map((p, i) => (
                   <View key={p.name} style={[s.line, i > 0 && s.lineBorder]}>
-                    <Text style={[s.rank, i === 0 && { color: c.mode === 'dark' ? c.accent : c.court }]}>{i + 1}</Text>
+                    <Text style={[s.rank, i === 0 && { color: c.highlight }]}>{i + 1}</Text>
                     <Text style={s.lineName} numberOfLines={1}>{p.name.toUpperCase()}</Text>
                     <Text style={s.record}>{t.history.record(p.wins, p.games - p.wins)}</Text>
                   </View>
@@ -251,7 +251,7 @@ function Bars({ minutes }: { minutes: number[] }) {
       {minutes.map((m, i) => {
         const bh = Math.max(6, (m / max) * (h - 8));
         const w = 100 / n;
-        return <Rect key={i} x={`${i * w + w * 0.28}%`} y={h - bh} width={`${w * 0.44}%`} height={bh} rx={6} fill={i === top ? c.accent : c.mode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(11,13,18,0.55)'} />;
+        return <Rect key={i} x={`${i * w + w * 0.28}%`} y={h - bh} width={`${w * 0.44}%`} height={bh} rx={6} fill={i === top ? c.accent : c.hairHex} fillOpacity={i === top ? 1 : c.mode === 'dark' ? 0.55 : 0.45} />;
       })}
     </Svg>
   );

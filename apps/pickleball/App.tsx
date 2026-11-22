@@ -216,7 +216,7 @@ function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
           return (
             <Pressable key={key} style={s.tab} onPress={() => setTab(key)} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={label}>
               <View style={[s.tabIcon, on && s.tabIconOn]}>
-                <Icon name={icon} size={21} tint={on ? (c.mode === 'dark' ? c.accent : c.court) : c.mute} />
+                <Icon name={icon} size={21} tint={on ? (c.highlight) : c.mute} />
               </View>
               <Text style={[s.tabText, on && s.tabTextOn]} numberOfLines={1}>{label}</Text>
             </Pressable>
@@ -273,7 +273,7 @@ const useS = themed((c) => ({
   banner: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.s },
   bannerCase: { width: 64, height: 72, borderRadius: 18, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
   bannerBadge: { width: 52, height: 64 },
-  bannerKicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 2, color: c.mode === 'dark' ? c.accent : c.court },
+  bannerKicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 2, color: c.highlight },
   bannerName: { fontFamily: font.displayItalic, fontSize: 26, color: c.text },
   bannerWho: { fontFamily: font.body, fontSize: 13, color: c.mute },
 }));

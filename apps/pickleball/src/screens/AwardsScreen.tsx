@@ -85,7 +85,7 @@ export function AwardsScreen({ awards, sessions, goals, setGoals }: Props) {
                   <Ring value={fraction(g, sessions, now)} />
                   {done ? (
                     <View style={s.goalCheck}>
-                      <Icon name="check" size={22} tint={c.mode === 'dark' ? c.accent : c.court} />
+                      <Icon name="check" size={22} tint={c.highlight} />
                     </View>
                   ) : null}
                 </View>
@@ -202,14 +202,14 @@ const useS = themed((c) => ({
   trash: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   topRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 4, gap: space.s },
   topName: { flex: 1, fontFamily: font.display, fontSize: 28, color: c.text },
-  topMeta: { fontFamily: font.displayItalic, fontSize: 21, color: c.mode === 'dark' ? c.accent : c.court },
+  topMeta: { fontFamily: font.displayItalic, fontSize: 21, color: c.highlight },
   scrim: { flex: 1, backgroundColor: c.scrim, alignItems: 'center', justifyContent: 'center', padding: space.xl },
   detail: { alignSelf: 'stretch', backgroundColor: c.sheet, borderRadius: 30, padding: space.xl, alignItems: 'center' },
   detailCase: { width: 180, height: 200, borderRadius: 28, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
   detailBadge: { width: 140, height: 175 },
   detailName: { fontFamily: font.displayItalic, fontSize: 32, color: c.text, marginTop: space.l },
   detailHow: { fontFamily: font.body, fontSize: size.body, color: c.textSoft, textAlign: 'center', marginTop: space.xs },
-  detailWho: { fontFamily: font.bodyBold, fontSize: size.body, color: c.mode === 'dark' ? c.accent : c.court, textAlign: 'center', marginTop: space.m },
+  detailWho: { fontFamily: font.bodyBold, fontSize: size.body, color: c.highlight, textAlign: 'center', marginTop: space.m },
   scrimBottom: { flex: 1, backgroundColor: c.scrim, justifyContent: 'flex-end' },
   sheet: { backgroundColor: c.sheet, padding: space.l, paddingBottom: space.xxl + space.l, borderTopLeftRadius: 28, borderTopRightRadius: 28, gap: space.s },
   sheetTitle: { fontFamily: font.displayItalic, fontSize: size.title, color: c.text, marginBottom: space.xs },
