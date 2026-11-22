@@ -1,6 +1,6 @@
 // The open-play session: players, the waiting line (the "stack"), the courts and the rotation rules.
 // Pure functions only: each takes a session and returns a new one. `now` is passed in so tests are exact.
-import { DEFAULT_RULES, ScoreRules, scoreFromRallies, Team } from './scoring';
+import { DEFAULT_RULES, maxDeficit, ScoreRules, scoreFromRallies, Team } from './scoring';
 
 export type RotationRule = 'all-off' | 'winners-stay' | 'winners-split';
 export type PlayerStatus = 'waiting' | 'playing' | 'resting';
@@ -41,10 +41,18 @@ export interface Result {
   winners: [string, string];
   losers: [string, string];
   score: [number, number]; // winners first
+  startedAt: number;
   endedAt: number;
+  /** The game was to this many points. */
+  target: number;
+  /** The biggest lead the losers ever had over the winners (a comeback when 5 or more). */
+  maxDeficit: number;
 }
 
 export interface Session {
+  id: string;
+  /** When the first game started; null before that. */
+  startedAt: number | null;
   players: Record<string, Player>;
   /** Ids of waiting players, first = next on court. */
   queue: string[];
@@ -62,8 +70,10 @@ export const MAX_NAME = 18;
 
 export const DEFAULT_SETTINGS: Settings = { courts: 2, rule: 'all-off', maxWins: 2, scoring: DEFAULT_RULES };
 
-export function newSession(settings: Settings = DEFAULT_SETTINGS): Session {
+export function newSession(settings: Settings = DEFAULT_SETTINGS, now = 0): Session {
   return {
+    id: `s${now.toString(36)}`,
+    startedAt: null,
     players: {},
     queue: [],
     courts: Array(settings.courts).fill(null),
@@ -172,7 +182,7 @@ function startGame(s: Session, court: number, teamA: [string, string], teamB: [s
   const courts = [...next.courts];
   courts[court] = game;
   const used = new Set([...teamA, ...teamB]);
-  return { ...next, courts, queue: next.queue.filter((q) => !used.has(q)), nextId: next.nextId + 1 };
+  return { ...next, startedAt: next.startedAt ?? now, courts, queue: next.queue.filter((q) => !used.has(q)), nextId: next.nextId + 1 };
 }
 
 /** Put the next four in line on every open court, lowest court number first. */
@@ -229,7 +239,10 @@ export function finishGame(s: Session, court: number, winner: Team, now: number)
     winners,
     losers,
     score: winner === 'A' ? [score.a, score.b] : [score.b, score.a],
+    startedAt: g.startedAt,
     endedAt: now,
+    target: s.settings.scoring.target,
+    maxDeficit: maxDeficit(g.rallies, s.settings.scoring, g.firstServe, winner),
   };
 
   let next: Session = { ...s, results: [...s.results, result] };
@@ -330,7 +343,7 @@ export function updateSettings(s: Session, change: Partial<Settings>, now: numbe
 
 /** Same players and settings, everyone back in line, no results. For "new session" with the same group. */
 export function restartSession(s: Session, now: number): Session {
-  let next = newSession(s.settings);
+  let next = newSession(s.settings, now);
   const names = [...s.queue, ...s.courts.flatMap((g) => (g ? [...g.teamA, ...g.teamB] : []))]
     .map((id) => s.players[id]?.name)
     .filter((n): n is string => !!n);

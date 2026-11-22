@@ -1,17 +1,20 @@
 // The work of others inside the app: the two fonts and every code package, with the licence texts.
 // The data is made by scripts/make-licences.js (run it after adding or updating a package).
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import data from '../config/licences.json';
 import { t } from '../i18n/en';
 import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
-import { color, font, radius, size, space, touch } from '../theme/tokens';
+import { font, radius, size, space, touch } from '../theme/tokens';
+import { themed, useTheme } from '../theme/theme';
 
 type Pkg = { name: string; version: string; licence: string; copyright: string };
 
 export function LicencesScreen({ onClose }: { onClose: () => void }) {
+  const s = useS();
+  const color = useTheme();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState<string | null>(null);
   const texts = data.texts as Record<string, string>;
@@ -59,19 +62,19 @@ export function LicencesScreen({ onClose }: { onClose: () => void }) {
   );
 }
 
-const s = StyleSheet.create({
+const useS = themed((color) => ({
   root: { flex: 1, backgroundColor: color.court },
-  body0: { flex: 1, backgroundColor: color.ground },
+  body0: { flex: 1, backgroundColor: color.bg },
   pad: { padding: space.l },
-  intro: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.inkSoft },
-  label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.inkSoft, marginTop: space.xl, marginBottom: space.s },
-  row: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m, marginBottom: 6 },
-  name: { fontFamily: font.display, fontSize: size.nameSmall, color: color.ink },
-  pkg: { fontFamily: font.bodyBold, fontSize: size.body, color: color.ink },
-  meta: { fontFamily: font.body, fontSize: size.small, color: color.inkSoft, marginTop: 2 },
+  intro: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.textSoft },
+  label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.textSoft, marginTop: space.xl, marginBottom: space.s },
+  row: { backgroundColor: color.glassTop, borderRadius: radius.box, padding: space.m, marginBottom: 6 },
+  name: { fontFamily: font.display, fontSize: size.nameSmall, color: color.text },
+  pkg: { fontFamily: font.bodyBold, fontSize: size.body, color: color.text },
+  meta: { fontFamily: font.body, fontSize: size.small, color: color.textSoft, marginTop: 2 },
   toggle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44 },
   link: { fontFamily: font.bodyBold, fontSize: size.body, color: color.court, textDecorationLine: 'underline' },
-  body: { fontFamily: font.body, fontSize: size.small, lineHeight: 20, color: color.ink, marginTop: space.s },
-  close: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, margin: space.l, borderWidth: 2, borderColor: color.ink, borderRadius: radius.box },
-  closeText: { fontFamily: font.bodyBold, fontSize: size.body + 1, color: color.ink },
-});
+  body: { fontFamily: font.body, fontSize: size.small, lineHeight: 20, color: color.text, marginTop: space.s },
+  close: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, margin: space.l, borderWidth: 2, borderColor: color.text, borderRadius: radius.box },
+  closeText: { fontFamily: font.bodyBold, fontSize: size.body + 1, color: color.text },
+}));

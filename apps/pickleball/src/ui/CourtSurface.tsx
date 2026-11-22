@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { color, font, glass, line, motion, size } from '../theme/tokens';
+import { courtTilt, dark as color, font, glass, line, motion, size } from '../theme/tokens';
 import { Glass } from './Glass';
 import { useReduceMotion } from './useReduceMotion';
 
@@ -55,8 +55,8 @@ export function CourtSurface({ left, right, call, live = false, height = 122, di
   const courtStyle = {
     opacity: land.interpolate({ inputRange: [0, 0.25, 1], outputRange: [0, 1, 1] }),
     transform: [
-      { perspective: 700 },
-      { rotateX: land.interpolate({ inputRange: [0, 1], outputRange: ['58deg', '0deg'] }) },
+      { perspective: 650 },
+      { rotateX: land.interpolate({ inputRange: [0, 1], outputRange: ['62deg', `${courtTilt}deg`] }) },
       { scale: land.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] }) },
     ],
   };
@@ -121,7 +121,7 @@ export function CourtSurface({ left, right, call, live = false, height = 122, di
         </>
       ) : null}
       {call || live ? (
-        <Glass style={s.tag}>
+        <Glass style={s.tag} radius={14} tint={glass.tint}>
           <View style={s.tagRow}>
             {live ? <LiveDot /> : null}
             <Text style={s.call}>{call ?? 'LIVE'}</Text>
@@ -176,7 +176,7 @@ function LiveDot() {
 }
 
 const s = StyleSheet.create({
-  out: { backgroundColor: color.courtOut, paddingVertical: 10, paddingHorizontal: 14 },
+  out: { backgroundColor: color.courtOut, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 14 },
   dim: { opacity: 0.4 },
   court: { flexDirection: 'row', alignItems: 'stretch', backgroundColor: color.court, borderWidth: line.court, borderColor: color.paint, overflow: 'visible' },
   half: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
@@ -191,9 +191,9 @@ const s = StyleSheet.create({
   post: { width: 9, height: 9, borderRadius: 5, backgroundColor: color.net },
   clip: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' },
   shine: { position: 'absolute', top: -30, left: 0, width: 90 },
-  ball: { position: 'absolute', left: 0, width: 16, height: 16, marginLeft: -8, borderRadius: 8, backgroundColor: color.ball, borderWidth: 1.5, borderColor: color.ink },
+  ball: { position: 'absolute', left: 0, width: 16, height: 16, marginLeft: -8, borderRadius: 8, backgroundColor: color.ball, borderWidth: 1.5, borderColor: color.ballInk },
   ballShadow: { position: 'absolute', left: 0, width: 16, height: 6, marginLeft: -8, borderRadius: 4, backgroundColor: color.net },
-  tag: { position: 'absolute', right: 10, bottom: -14, paddingHorizontal: 12, paddingVertical: 3, backgroundColor: glass.tint },
+  tag: { position: 'absolute', right: 10, bottom: -14, paddingHorizontal: 12, paddingVertical: 3 },
   tagRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   call: { fontFamily: font.displayItalic, fontSize: 20, color: color.paint, letterSpacing: 1.5 },
   dotBox: { width: 10, height: 10, alignItems: 'center', justifyContent: 'center' },

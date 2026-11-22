@@ -6,7 +6,10 @@ import { isGamePoint, scoreCall, scoreFromRallies, switchEndsAt, Team } from '..
 import { Session } from '../logic/session';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/Icon';
-import { color, font, line, size, space, touch } from '../theme/tokens';
+import { dark, font, line, size, space, touch } from '../theme/tokens';
+
+/** The scorer looks the same in dark and light mode: a scoreboard on the court. */
+const color = { ...dark, ground: '#F4F6FA', ink: '#0B0D12' };
 
 interface Props {
   session: Session;

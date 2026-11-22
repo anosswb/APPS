@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { t } from '../i18n/en';
+import { clock } from '../logic/history';
 import { scoreCall, scoreFromRallies, Team } from '../logic/scoring';
 import { addPlayer, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, Session } from '../logic/session';
 import { minutesSince, useNow } from '../state/useNow';
 import { Button } from '../ui/Button';
+import { Chip, Label } from '../ui/Bits';
 import { CourtSurface } from '../ui/CourtSurface';
+import { Glass } from '../ui/Glass';
+import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
 import { LineTag } from '../ui/LineTag';
-import { Header } from '../ui/Header';
-import { color, font, radius, size, space, touch } from '../theme/tokens';
+import { themed, useTheme } from '../theme/theme';
+import { font, radius, size, space, TAB_SPACE, touch } from '../theme/tokens';
 
 interface Props {
   session: Session;
@@ -22,42 +26,41 @@ interface Props {
 }
 
 export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoard, buzz }: Props) {
-  const now = useNow();
+  const s = useS();
+  const c = useTheme();
+  const now = useNow(1000);
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [ending, setEnding] = useState<number | null>(null);
+  const name = (id: string) => session.players[id]?.name ?? '?';
+  const n = counts(session);
+  const nobody = Object.keys(session.players).length === 0;
+
   useEffect(() => {
     if (!toast) return;
     const id = setTimeout(() => setToast(null), 3200);
     return () => clearTimeout(id);
   }, [toast]);
-  const name = (id: string) => session.players[id]?.name ?? '?';
-  const c = counts(session);
-  const here = c.waiting + c.playing;
-  const nobody = Object.keys(session.players).length === 0;
 
   const submit = () => {
     const text = draft;
     setDraft('');
     const known = findByName(session, text);
     const next = fillCourts(addPlayer(session, text, now), now);
-    if (next.queue.length === session.queue.length && next === session) {
+    if (next === session) {
       if (known) setToast(t.courts.already(known.name));
       return;
     }
-    act((s, at) => fillCourts(addPlayer(s, text, at), at));
+    act((s2, at) => fillCourts(addPlayer(s2, text, at), at));
     const p = findByName(next, text);
     if (!p) return;
     const pos = next.queue.indexOf(p.id) + 1;
-    if (pos === 0) setToast(t.courts.nextUpNow(p.name));
-    else setToast(known ? t.courts.back(p.name, pos) : t.courts.added(p.name, pos));
+    setToast(pos === 0 ? t.courts.nextUpNow(p.name) : known ? t.courts.back(p.name, pos) : t.courts.added(p.name, pos));
     buzz('tap');
   };
 
-  const resting = Object.values(session.players)
-    .filter((p) => p.status === 'resting')
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const resting = Object.values(session.players).filter((p) => p.status === 'resting').sort((a, b) => a.name.localeCompare(b.name));
 
   const bringBack = (id: string, who: string) => {
     const next = fillCourts(checkIn(session, id, now), now);
@@ -68,88 +71,94 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
   };
 
   const endGame = (court: number, winner: Team) => {
-    const next = finishGame(session, court, winner, now);
-    act((s, at) => finishGame(s, court, winner, at));
+    act((s2, at) => finishGame(s2, court, winner, at));
     setEnding(null);
-    const g = next.courts[court];
-    if (g) setToast(t.courts.nextUpNow([...g.teamA, ...g.teamB].map((id) => next.players[id].name).join(', ')));
     buzz('done');
   };
 
   const up = session.queue.slice(0, 4);
   const rest = session.queue.slice(4);
   const endingGame = ending !== null ? session.courts[ending] : null;
+  const rules = session.settings.scoring;
 
   return (
     <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Header
         title={t.courts.title}
-        chip={t.courts.here(here, session.courts.length)}
+        sub={t.courts.here(n.waiting + n.playing, session.courts.length)}
         right={
           canUndo ? (
-            <Pressable onPress={undo} style={s.undo} accessibilityRole="button" accessibilityLabel={t.a11y.undo}>
-              <Icon name="undo" size={22} tint={color.paint} />
-              <Text style={s.undoText}>{t.courts.undo}</Text>
-            </Pressable>
+            <Chip onPress={undo} a11y={t.a11y.undo}>
+              <Icon name="undo" size={18} />
+              <Text style={s.chipText}>{t.courts.undo}</Text>
+            </Chip>
           ) : undefined
         }
       />
-
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         {nobody ? (
-          <View style={s.empty}>
-            <CourtSurface left={['1', '2']} right={['3', '4']} height={150} />
-            <Text style={s.emptyTitle}>{t.courts.emptyTitle}</Text>
-            <Text style={s.emptyBody}>{t.courts.emptyBody}</Text>
-          </View>
+          <Glass style={s.card}>
+            <View style={s.pad}>
+              <CourtSurface left={['1', '2']} right={['3', '4']} height={120} />
+              <Text style={s.emptyTitle}>{t.courts.emptyTitle}</Text>
+              <Text style={s.emptyBody}>{t.courts.emptyBody}</Text>
+            </View>
+          </Glass>
         ) : (
           session.courts.map((g, i) => {
             if (!g) {
               const missing = Math.max(0, 4 - session.queue.length);
               return (
-                <View key={`open-${i}`} style={s.card}>
-                  <View style={s.chead}>
-                    <Text style={s.courtTab}>{t.courts.court(i + 1)}</Text>
-                    <Text style={s.label}>{t.courts.open.toUpperCase()}</Text>
+                <Glass key={`open-${i}`} style={s.card}>
+                  <View style={s.pad}>
+                    <View style={s.head}>
+                      <Label>{t.courts.court(i + 1)}</Label>
+                      <Label>{t.courts.open}</Label>
+                    </View>
+                    <CourtSurface left={[]} right={[]} height={60} dim />
+                    <Text style={s.needs}>{t.courts.needs(missing)}</Text>
                   </View>
-                  <CourtSurface left={[]} right={[]} height={70} dim />
-                  <Text style={s.needs}>{t.courts.needs(missing)}</Text>
-                </View>
+                </Glass>
               );
             }
-            const score = scoreFromRallies(g.rallies, session.settings.scoring, g.firstServe);
+            const sc = scoreFromRallies(g.rallies, rules, g.firstServe);
+            const servers = (sc.serving === 'A' ? g.teamA : g.teamB).map(name).join(' & ');
             const leaving = [...g.teamA, ...g.teamB].filter((id) => session.players[id]?.leaving);
             return (
-              <View key={g.id} style={s.card}>
-                <View style={s.chead}>
-                  <Text style={s.courtTab}>{t.courts.court(i + 1)}</Text>
-                  <Text style={s.label}>{t.courts.minutes(minutesSince(g.startedAt, now)).toUpperCase()}</Text>
+              <Glass key={g.id} style={s.card}>
+                <View style={s.pad}>
+                  <View style={s.head}>
+                    <Label>{t.courts.court(i + 1)}</Label>
+                    <Glass radius={radius.pill} style={s.timer} tint={c.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(11,13,18,0.06)'}>
+                      <View style={s.live} />
+                      <Text style={s.timerText}>{clock(now - g.startedAt)}</Text>
+                    </Glass>
+                  </View>
+                  <CourtSurface left={g.teamA.map(name)} right={g.teamB.map(name)} call={g.rallies.length ? scoreCall(sc, rules) : undefined} live height={96} introKey={g.id} />
+                  <View style={s.scoreRow}>
+                    <Text style={s.score} accessibilityLabel={`${sc.a} to ${sc.b}`}>{`${sc.a}–${sc.b}`}</Text>
+                    <View style={s.buttons}>
+                      <Button label={t.courts.score} onPress={() => openScorer(i)} style={s.btn} />
+                      <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.btn} />
+                    </View>
+                  </View>
+                  <Text style={s.serve} numberOfLines={1}>
+                    {leaving.length ? `${leaving.map(name).join(', ')} ${t.courts.leavingAfter}` : t.courts.serving(servers, rules.type === 'sideout' && rules.doubles ? sc.server : 0)}
+                  </Text>
                 </View>
-                <CourtSurface
-                  left={g.teamA.map(name)}
-                  right={g.teamB.map(name)}
-                  call={g.rallies.length ? scoreCall(score, session.settings.scoring) : undefined}
-                  height={92}
-                  live
-                  introKey={g.id}
-                />
-                {leaving.length ? <Text style={s.leaving}>{leaving.map(name).join(', ')} {t.courts.leavingAfter}</Text> : null}
-                <View style={[s.row, { marginTop: space.l }]}>
-                  <Button label={t.courts.score} kind="ink" onPress={() => openScorer(i)} style={s.flex} />
-                  <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.flex} />
-                </View>
-              </View>
+              </Glass>
             );
           })
         )}
 
         {up.length ? (
           <>
-            <View style={[s.sectionHead, s.headRow]}>
-              <Text style={s.label}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Text>
-              <Pressable onPress={openBoard} style={s.boardBtn} accessibilityRole="button">
-                <Text style={s.boardText}>{t.board.open}</Text>
-              </Pressable>
+            <View style={s.lineHead}>
+              <Label style={{ color: c.mode === 'dark' ? c.accent : c.court }}>{session.courts.some((g) => !g) && up.length === 4 ? t.courts.nextOn : t.courts.onDeck}</Label>
+              <Chip onPress={openBoard} a11y={t.board.open}>
+                <Icon name="board" size={18} />
+                <Text style={s.chipText}>{t.board.open}</Text>
+              </Chip>
             </View>
             <View style={s.stack}>
               {up.map((id, k) => (
@@ -160,8 +169,8 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         ) : null}
         {rest.length ? (
           <>
-            <View style={s.sectionHead}>
-              <Text style={s.label}>{t.courts.theLine}</Text>
+            <View style={s.lineHead}>
+              <Label>{t.courts.theLine}</Label>
             </View>
             <View style={s.stack}>
               {rest.map((id, k) => (
@@ -174,55 +183,59 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
       </ScrollView>
 
       {toast ? (
-        <Pressable onPress={() => setToast(null)} style={[s.toast, adding && { bottom: resting.length ? 150 : 92 }]} accessibilityRole="text">
-          <Text style={s.toastText} numberOfLines={2}>
-            {toast}
-          </Text>
+        <Pressable onPress={() => setToast(null)} style={[s.toast, adding && { bottom: (resting.length ? 150 : 92) + TAB_SPACE }]}>
+          <Text style={s.toastText} numberOfLines={2}>{toast}</Text>
         </Pressable>
       ) : null}
 
       {adding && resting.length ? (
-        <ScrollView horizontal keyboardShouldPersistTaps="always" style={s.chips} contentContainerStyle={s.chipsPad}>
-          <Text style={s.chipsLabel}>{t.courts.backIn}</Text>
-          {resting.map((p) => (
-            <Pressable key={p.id} style={s.chip} onPress={() => bringBack(p.id, p.name)} accessibilityRole="button" accessibilityLabel={`${t.courts.backIn} ${p.name}`}>
-              <Text style={s.chipText}>{p.name.toUpperCase()}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+        <Glass radius={0} style={s.chips}>
+          <ScrollView horizontal keyboardShouldPersistTaps="always" contentContainerStyle={s.chipsPad}>
+            <Label>{t.courts.backIn}</Label>
+            {resting.map((p) => (
+              <Pressable key={p.id} style={s.backChip} onPress={() => bringBack(p.id, p.name)} accessibilityRole="button" accessibilityLabel={`${t.courts.backIn} ${p.name}`}>
+                <Text style={s.backChipText}>{p.name.toUpperCase()}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </Glass>
       ) : null}
-      {adding ? (
-        <View style={s.addBar}>
-          <TextInput
-            value={draft}
-            onChangeText={setDraft}
-            onSubmitEditing={submit}
-            submitBehavior="submit"
-            autoFocus
-            autoCapitalize="words"
-            autoCorrect={false}
-            returnKeyType="next"
-            placeholder={t.courts.addHint}
-            placeholderTextColor={color.mute}
-            style={s.input}
-            maxLength={18}
-            accessibilityLabel={t.a11y.add}
-          />
-          <Button label={t.courts.done} kind="ink" onPress={() => { if (draft.trim()) submit(); setAdding(false); }} style={s.doneBtn} />
-        </View>
-      ) : (
-        <Pressable style={s.addBtn} onPress={() => { setAdding(true); setToast(null); }} accessibilityRole="button" accessibilityLabel={t.a11y.add}>
-          <Icon name="plus" tint={color.ground} />
-          <Text style={s.addText}>{t.courts.addPlayer}</Text>
-        </Pressable>
-      )}
+      <View style={s.bottom}>
+        {adding ? (
+          <Glass radius={radius.pill} style={s.addBar}>
+            <TextInput
+              value={draft}
+              onChangeText={setDraft}
+              onSubmitEditing={submit}
+              submitBehavior="submit"
+              autoFocus
+              autoCapitalize="words"
+              autoCorrect={false}
+              returnKeyType="next"
+              placeholder={t.courts.addHint}
+              placeholderTextColor={c.mute}
+              style={s.input}
+              maxLength={18}
+              accessibilityLabel={t.a11y.add}
+            />
+            <Button label={t.courts.done} kind="solid" onPress={() => { if (draft.trim()) submit(); setAdding(false); }} style={s.done} />
+          </Glass>
+        ) : (
+          <Pressable onPress={() => { setAdding(true); setToast(null); }} accessibilityRole="button" accessibilityLabel={t.a11y.add}>
+            <Glass radius={radius.pill} style={s.addBtn}>
+              <View style={s.plus}>
+                <Icon name="plus" size={20} tint={c.accentText} />
+              </View>
+              <Text style={s.addText}>{t.courts.addPlayer}</Text>
+            </Glass>
+          </Pressable>
+        )}
+      </View>
 
       <Modal visible={endingGame != null} transparent animationType="fade" onRequestClose={() => setEnding(null)}>
         <View style={s.scrim}>
           <View style={s.sheet}>
-            <Text style={s.sheetTitle}>
-              {t.courts.whoWon} {ending !== null ? ending + 1 : ''}?
-            </Text>
+            <Text style={s.sheetTitle}>{t.courts.whoWon(ending !== null ? ending + 1 : 0)}</Text>
             {endingGame
               ? (['A', 'B'] as Team[]).map((team) => {
                   const ids = team === 'A' ? endingGame.teamA : endingGame.teamB;
@@ -244,47 +257,44 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.ground },
-  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.l + 2, paddingTop: space.m, paddingBottom: space.s },
-  title: { fontFamily: font.display, fontSize: size.hero, color: color.ink, letterSpacing: 0.5, lineHeight: size.hero + 2 },
-  meta: { fontFamily: font.body, fontSize: size.body, color: color.inkSoft },
-  undo: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: touch.min, paddingHorizontal: space.m },
-  undoText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.paint },
-  scroll: { paddingHorizontal: space.l, paddingTop: space.l },
-  card: { marginBottom: space.l + 2 },
-  chead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  courtTab: { fontFamily: font.displayItalic, fontSize: 18, letterSpacing: 1.5, color: color.paint, backgroundColor: color.ink, paddingHorizontal: space.m, paddingTop: 3, paddingBottom: 1 },
-  label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.5, color: color.inkSoft },
-  row: { flexDirection: 'row', gap: space.s, marginTop: space.s },
-  flex: { flex: 1 },
-  needs: { fontFamily: font.bodyBold, fontSize: size.body, color: color.ink, marginTop: space.s },
-  leaving: { fontFamily: font.body, fontSize: size.body, color: color.ink, marginTop: space.s },
-  sectionHead: { marginTop: space.m, marginBottom: space.s, paddingHorizontal: 2 },
-  stack: { gap: 6 },
-  headRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  boardBtn: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.s },
-  boardText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.court, textDecorationLine: 'underline' },
-  empty: { backgroundColor: color.card, borderRadius: radius.box, padding: space.m },
-  emptyTitle: { fontFamily: font.displayItalic, fontSize: size.title, color: color.ink, marginTop: space.l },
-  emptyBody: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: color.inkSoft, marginTop: space.xs },
-  addBtn: { marginHorizontal: space.l, marginVertical: space.m, height: touch.big, borderRadius: radius.box, backgroundColor: color.ink, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l + 2, gap: space.s },
-  addText: { fontFamily: font.bodyBold, fontSize: size.body + 2, color: color.ground },
-  addBar: { flexDirection: 'row', gap: space.s, padding: space.m, backgroundColor: color.card, borderTopWidth: 2, borderColor: color.ink },
-  chips: { flexGrow: 0, backgroundColor: color.card, borderTopWidth: 2, borderColor: color.ink },
-  chipsPad: { alignItems: 'center', gap: space.s, paddingHorizontal: space.m, paddingVertical: space.s },
-  chipsLabel: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.2, color: color.inkSoft },
-  chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.m, backgroundColor: color.ball, borderWidth: 2, borderColor: color.ink, borderRadius: 22 },
-  chipText: { fontFamily: font.display, fontSize: 20, color: color.ballInk },
-  input: { flex: 1, minWidth: 0, minHeight: touch.min, borderWidth: 2, borderColor: color.ink, borderRadius: radius.box, paddingHorizontal: space.m, fontFamily: font.display, fontSize: size.name, color: color.ink },
-  doneBtn: { width: 88 },
-  toast: { position: 'absolute', left: space.l, right: space.l, bottom: touch.big + space.m * 2 + space.s, backgroundColor: color.ball, borderRadius: radius.box, paddingVertical: space.m, paddingHorizontal: space.l, borderWidth: 2, borderColor: color.ink },
-  toastText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.ballInk },
-  scrim: { flex: 1, backgroundColor: color.scrim, justifyContent: 'flex-end' },
-  sheet: { backgroundColor: color.ground, padding: space.l, paddingBottom: space.xxl, borderTopLeftRadius: radius.box * 2, borderTopRightRadius: radius.box * 2, gap: space.s },
-  sheetTitle: { fontFamily: font.display, fontSize: size.title, color: color.ink, marginBottom: space.xs },
-  winBtn: { minHeight: 76, backgroundColor: color.court, borderWidth: 3, borderColor: color.paint, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.m },
-  winText: { fontFamily: font.display, fontSize: size.name + 2, color: color.paint },
+const useS = themed((c) => ({
+  root: { flex: 1 },
+  scroll: { paddingHorizontal: space.l, paddingBottom: space.l },
+  card: { marginBottom: space.m },
+  pad: { padding: space.m + 2 },
+  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: space.s },
+  timer: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 12, paddingVertical: 5 },
+  live: { width: 8, height: 8, borderRadius: 4, backgroundColor: c.mode === 'dark' ? c.accent : '#1E9E4A' },
+  timerText: { fontFamily: font.display, fontSize: 17, letterSpacing: 1, color: c.text, fontVariant: ['tabular-nums'] },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.l + 2 },
+  score: { fontFamily: font.displayItalic, fontSize: 48, lineHeight: 52, color: c.text, letterSpacing: 0.5 },
+  buttons: { flexDirection: 'row', gap: space.s },
+  btn: { minWidth: 104 },
+  serve: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginTop: 2 },
+  needs: { fontFamily: font.bodyBold, fontSize: size.body, color: c.textSoft, marginTop: space.s },
+  emptyTitle: { fontFamily: font.displayItalic, fontSize: size.title, color: c.text, marginTop: space.l },
+  emptyBody: { fontFamily: font.body, fontSize: size.body, lineHeight: 23, color: c.textSoft, marginTop: space.xs },
+  lineHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: space.s, marginBottom: space.s, paddingHorizontal: 4 },
+  chipText: { fontFamily: font.bodyBold, fontSize: size.small, color: c.text },
+  stack: { gap: 7 },
+  bottom: { paddingHorizontal: space.l, paddingBottom: TAB_SPACE, paddingTop: space.s },
+  addBtn: { flexDirection: 'row', alignItems: 'center', gap: space.m, minHeight: touch.big, paddingHorizontal: space.s + 2 },
+  plus: { width: 44, height: 44, borderRadius: 22, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' },
+  addText: { fontFamily: font.bodyBold, fontSize: size.body + 2, color: c.text },
+  addBar: { flexDirection: 'row', alignItems: 'center', gap: space.s, padding: 6 },
+  input: { flex: 1, minWidth: 0, minHeight: touch.min - 4, paddingHorizontal: space.l, fontFamily: font.display, fontSize: size.name, color: c.text },
+  done: { width: 96 },
+  chips: { borderTopWidth: 0 },
+  chipsPad: { alignItems: 'center', gap: space.s, paddingHorizontal: space.l, paddingVertical: space.s },
+  backChip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space.l, backgroundColor: c.accent, borderRadius: 22 },
+  backChipText: { fontFamily: font.display, fontSize: 20, color: c.accentText },
+  toast: { position: 'absolute', left: space.l, right: space.l, bottom: TAB_SPACE + touch.big + space.l, backgroundColor: c.solid, borderRadius: radius.chip, paddingVertical: space.m, paddingHorizontal: space.l },
+  toastText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.solidText },
+  scrim: { flex: 1, backgroundColor: c.scrim, justifyContent: 'flex-end' },
+  sheet: { backgroundColor: c.sheet, padding: space.l, paddingBottom: space.xxl + space.l, borderTopLeftRadius: 28, borderTopRightRadius: 28, gap: space.s },
+  sheetTitle: { fontFamily: font.displayItalic, fontSize: size.title, color: c.text, marginBottom: space.xs },
+  winBtn: { minHeight: 76, backgroundColor: c.court, borderRadius: 18, borderWidth: 2, borderColor: c.paint, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.m },
+  winText: { fontFamily: font.display, fontSize: size.name + 2, color: c.paint },
   cancelLink: { minHeight: touch.min, alignItems: 'center', justifyContent: 'center' },
-  cancelText: { fontFamily: font.bodyBold, fontSize: size.body, color: color.inkSoft, textDecorationLine: 'underline' },
-});
+  cancelText: { fontFamily: font.bodyBold, fontSize: size.body, color: c.mute, textDecorationLine: 'underline' },
+}));

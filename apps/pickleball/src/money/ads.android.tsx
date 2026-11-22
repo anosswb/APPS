@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import mobileAds, { AdsConsent, BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { bannerAllowed } from './rules';
-import { color } from '../theme/tokens';
+import { useTheme } from '../theme/theme';
 
 let allowed = false;
 
@@ -28,9 +28,10 @@ export async function initAds(): Promise<void> {
 
 export function AdBanner({ place }: { place: 'players' | 'settings' }) {
   const [failed, setFailed] = useState(false);
+  const c = useTheme();
   if (!allowed || failed || !bannerAllowed('android', place)) return null;
   return (
-    <View style={s.slot}>
+    <View style={[s.slot, { backgroundColor: c.bg }]}>
       <BannerAd
         unitId={TestIds.ADAPTIVE_BANNER}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
@@ -43,4 +44,4 @@ export function AdBanner({ place }: { place: 'players' | 'settings' }) {
   );
 }
 
-const s = StyleSheet.create({ slot: { alignItems: 'center', backgroundColor: color.ground, borderTopWidth: 1, borderColor: color.hair } });
+const s = StyleSheet.create({ slot: { alignItems: 'center' } });
