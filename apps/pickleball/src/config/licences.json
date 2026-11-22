@@ -9,11 +9,6 @@
    "name": "Spline Sans Mono",
    "copyright": "Copyright 2022 The Spline Sans Mono Project Authors (https://github.com/SorkinType/SplineSansMono)",
    "licence": "OFL-1.1"
-  },
-  {
-   "name": "Michroma",
-   "copyright": "Copyright 2011 The Michroma Project Authors (https://github.com/googlefonts/Michroma-font)",
-   "licence": "OFL-1.1"
   }
  ],
  "packages": [
@@ -25,12 +20,6 @@
   },
   {
    "name": "@expo-google-fonts/inter",
-   "version": "0.4.2",
-   "licence": "MIT AND OFL-1.1",
-   "copyright": "Copyright (c) 2020 Expo"
-  },
-  {
-   "name": "@expo-google-fonts/michroma",
    "version": "0.4.2",
    "licence": "MIT AND OFL-1.1",
    "copyright": "Copyright (c) 2020 Expo"

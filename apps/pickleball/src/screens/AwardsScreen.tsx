@@ -11,6 +11,7 @@ import { Button } from '../ui/Button';
 import { Chip, Label, Ring, Section, Segments } from '../ui/Bits';
 import { BADGES } from '../ui/badges';
 import { Glass } from '../ui/Glass';
+import { Spectrum } from '../ui/Spectrum';
 import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
 import { themed, useTheme } from '../theme/theme';
@@ -46,7 +47,7 @@ export function AwardsScreen({ awards, sessions, goals, setGoals }: Props) {
           <Segments<Filter> items={[['all', t.awards.all], ['player', t.awards.players], ['host', t.awards.host]]} value={filter} onChange={setFilter} />
         </View>
         <View style={s.case}>
-          <View style={s.caseShine} />
+          <Spectrum height={2} style={s.caseShine} />
           <View style={s.grid}>
             {list.map((a) => {
               const st = awards[a.id];
@@ -187,8 +188,8 @@ const useS = themed((c) => ({
   pad: { padding: space.l },
   help: { fontFamily: font.body, fontSize: size.body, color: c.mute, lineHeight: 22 },
   chipText: { fontFamily: font.bodyBold, fontSize: size.small, color: c.text },
-  case: { marginHorizontal: space.l, marginTop: space.m, borderRadius: 28, backgroundColor: c.showcase, borderWidth: 1, borderColor: c.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(11,13,18,0.6)', paddingVertical: space.m, overflow: 'hidden' },
-  caseShine: { position: 'absolute', left: 0, right: 0, top: 0, height: 80, backgroundColor: 'rgba(255,255,255,0.05)' },
+  case: { marginHorizontal: space.l, marginTop: space.m, borderRadius: radius.xl, backgroundColor: c.showcase, borderWidth: 1, borderColor: c.edgeHi, paddingVertical: space.m, overflow: 'hidden' },
+  caseShine: { position: 'absolute', left: space.xl, right: space.xl, top: 0 },
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   cell: { width: '25%', alignItems: 'center', paddingVertical: space.s },
   badge: { width: 70, height: 88 },
@@ -197,21 +198,21 @@ const useS = themed((c) => ({
   badgeName: { fontFamily: font.bodyBold, fontSize: 11.5, color: '#E6E9EF', marginTop: 4, maxWidth: 88 },
   goal: { flexDirection: 'row', alignItems: 'center', gap: space.l, padding: space.l },
   goalCheck: { position: 'absolute', left: 0, top: 0, width: 64, height: 64, alignItems: 'center', justifyContent: 'center' },
-  goalBig: { fontFamily: font.num, fontSize: 24, lineHeight: 27, color: c.text },
+  goalBig: { fontFamily: font.figure, fontSize: 20, lineHeight: 22, color: c.text },
   goalSub: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginTop: 2 },
   trash: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   topRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 4, gap: space.s },
-  topName: { flex: 1, fontFamily: font.name, fontSize: 22, color: c.text },
+  topName: { flex: 1, fontFamily: font.name, textTransform: 'uppercase', fontSize: 29, color: c.text },
   topMeta: { fontFamily: font.num, fontSize: 18, color: c.highlight },
   scrim: { flex: 1, backgroundColor: c.scrim, alignItems: 'center', justifyContent: 'center', padding: space.xl },
   detail: { alignSelf: 'stretch', backgroundColor: c.sheet, borderRadius: 30, padding: space.xl, alignItems: 'center' },
-  detailCase: { width: 180, height: 200, borderRadius: 28, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
+  detailCase: { width: 180, height: 200, borderRadius: radius.xl, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
   detailBadge: { width: 140, height: 175 },
   detailName: { fontFamily: font.heading, fontSize: 20, color: c.text, marginTop: space.l },
   detailHow: { fontFamily: font.body, fontSize: size.body, color: c.textSoft, textAlign: 'center', marginTop: space.xs },
   detailWho: { fontFamily: font.bodyBold, fontSize: size.body, color: c.highlight, textAlign: 'center', marginTop: space.m },
   scrimBottom: { flex: 1, backgroundColor: c.scrim, justifyContent: 'flex-end' },
-  sheet: { backgroundColor: c.sheet, padding: space.l, paddingBottom: space.xxl + space.l, borderTopLeftRadius: 28, borderTopRightRadius: 28, gap: space.s },
+  sheet: { backgroundColor: c.sheet, padding: space.l, paddingBottom: space.xxl + space.l, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, gap: space.s },
   sheetTitle: { fontFamily: font.heading, fontSize: size.title, color: c.text, marginBottom: space.xs },
   kindRow: { minHeight: 52, borderRadius: 16, paddingHorizontal: space.l, justifyContent: 'center', borderWidth: 1, borderColor: c.hair },
   kindOn: { backgroundColor: c.solid, borderColor: c.solid },
@@ -219,5 +220,5 @@ const useS = themed((c) => ({
   kindTextOn: { color: c.solidText },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.m },
   step: { width: touch.big, height: touch.big, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.hair, alignItems: 'center', justifyContent: 'center' },
-  stepValue: { fontFamily: font.num, fontSize: 48, color: c.text },
+  stepValue: { fontFamily: font.figure, fontSize: 39, color: c.text },
 }));

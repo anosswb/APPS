@@ -126,7 +126,7 @@ function Toggle({ label, help, on, set }: { label: string; help?: string; on: bo
         <Text style={s.choiceTitle}>{label}</Text>
         {help ? <Text style={s.help}>{help}</Text> : null}
       </View>
-      <Switch value={on} onValueChange={set} trackColor={{ true: c.mode === 'dark' ? '#7FA526' : c.court, false: c.hair }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={label} />
+      <Switch value={on} onValueChange={set} trackColor={{ true: c.on, false: c.hair }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={label} />
     </View>
   );
 }
@@ -138,7 +138,7 @@ const useS = themed((c) => ({
   padTight: { paddingHorizontal: space.l, paddingVertical: space.s },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   step: { width: touch.big, height: touch.big, borderRadius: radius.pill, borderWidth: 1.5, borderColor: c.hair, alignItems: 'center', justifyContent: 'center' },
-  big: { fontFamily: font.num, fontSize: 55, color: c.text, lineHeight: 58 },
+  big: { fontFamily: font.figure, fontSize: 45, color: c.text, lineHeight: 58 },
   help: { fontFamily: font.body, fontSize: size.small + 1, lineHeight: 21, color: c.mute, marginTop: 2 },
   hair: { height: 1, backgroundColor: c.hair, marginVertical: space.s },
   choice: { flexDirection: 'row', gap: space.m, alignItems: 'flex-start', minHeight: touch.min, paddingVertical: space.xs },

@@ -41,3 +41,7 @@ yarn-error.*
 /android
 logcat2.txt
 screen-players.png
+
+# Paid fonts (Presicav, Neumatic Compressed): never in a public repo (RIGHTS.md)
+assets/fonts/Presicav-*.otf
+assets/fonts/NeumaticCompressed-*.otf

@@ -8,7 +8,6 @@ import * as Speech from 'expo-speech';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { SplineSansMono_500Medium, SplineSansMono_600SemiBold } from '@expo-google-fonts/spline-sans-mono';
-import { Michroma_400Regular } from '@expo-google-fonts/michroma';
 import { t } from './src/i18n/en';
 import { AwardId, evaluate, newlyEarned } from './src/logic/achievements';
 import { allSessions } from './src/logic/history';
@@ -30,6 +29,7 @@ import { Ambient } from './src/ui/Ambient';
 import { BADGES } from './src/ui/badges';
 import { Glass } from './src/ui/Glass';
 import { Icon, IconName } from './src/ui/Icon';
+import { Spectrum } from './src/ui/Spectrum';
 import { useReduceMotion } from './src/ui/useReduceMotion';
 import { ThemeProvider, themed, useTheme } from './src/theme/theme';
 import { dark, font, light, motion, radius, space } from './src/theme/tokens';
@@ -39,7 +39,18 @@ SplashScreen.preventAutoHideAsync().catch((e) => console.warn(`[splash] ${String
 type Tab = 'courts' | 'players' | 'history' | 'awards' | 'settings';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({ Inter_500Medium, Inter_600SemiBold, Inter_700Bold, SplineSansMono_500Medium, SplineSansMono_600SemiBold, Michroma_400Regular });
+  const [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    SplineSansMono_500Medium,
+    SplineSansMono_600SemiBold,
+    // Paid fonts, test builds only until licensed (RIGHTS.md).
+    'Presicav-Bold': require('./assets/fonts/Presicav-Bold.otf'),
+    'Presicav-Heavy': require('./assets/fonts/Presicav-Heavy.otf'),
+    'NeumaticCompressed-SemiBold': require('./assets/fonts/NeumaticCompressed-SemiBold.otf'),
+    'NeumaticCompressed-Bold': require('./assets/fonts/NeumaticCompressed-Bold.otf'),
+  });
   const app = useSession();
   const system = useColorScheme();
   const palette = app.prefs.theme === 'light' || (app.prefs.theme === 'system' && system === 'light') ? light : dark;
@@ -266,7 +277,8 @@ function Banner({ id, who, onDone, onOpen }: { id: AwardId; who: string; onDone:
   return (
     <Animated.View style={[s.bannerWrap, { top: insets.top + 6, transform: [{ translateY: y }] }]}>
       <Pressable onPress={onOpen} accessibilityRole="button">
-        <Glass radius={26} style={s.banner} tint={c.bar}>
+        <Glass radius={radius.xl} style={s.banner} tint={c.bar}>
+          <Spectrum height={2} style={s.bannerLine} />
           <View style={s.bannerCase}>
             <Image source={BADGES[id]} style={s.bannerBadge} resizeMode="contain" />
           </View>
@@ -287,14 +299,15 @@ const useS = themed((c) => ({
   tabs: { flexDirection: 'row', paddingHorizontal: 6, paddingVertical: 6 },
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 58 },
   tabIcon: { width: 48, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
-  tabIconOn: { backgroundColor: c.mode === 'dark' ? 'rgba(216,242,58,0.16)' : 'rgba(33,71,201,0.12)' },
+  tabIconOn: { backgroundColor: c.accentSoft },
   tabText: { fontFamily: font.body, fontSize: 11.5, color: c.mute, marginTop: 2 },
   tabTextOn: { fontFamily: font.bodyBold, color: c.text },
   bannerWrap: { position: 'absolute', left: space.m, right: space.m },
   banner: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.s },
+  bannerLine: { position: 'absolute', left: space.xl, right: space.xl, top: 0 },
   bannerCase: { width: 64, height: 72, borderRadius: 18, backgroundColor: c.showcase, alignItems: 'center', justifyContent: 'center' },
   bannerBadge: { width: 52, height: 64 },
-  bannerKicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 1, color: c.highlight },
+  bannerKicker: { fontFamily: font.micro, fontSize: 12.5, letterSpacing: 1, color: c.highlight },
   bannerName: { fontFamily: font.heading, fontSize: 16, color: c.text },
   bannerWho: { fontFamily: font.body, fontSize: 13, color: c.mute },
 }));

@@ -1,5 +1,5 @@
 // A place in the line, drawn as a paddle lying in the rack: the face with the number and name, then the
-// taped handle. The next four are yellow paddles.
+// taped handle. The next four are white paddles.
 import { Text, View } from 'react-native';
 import { themed } from '../theme/theme';
 import { font, size, space } from '../theme/tokens';
@@ -31,12 +31,12 @@ const useS = themed((c) => ({
   row: { flexDirection: 'row', alignItems: 'center' },
   face: { flex: 1, flexDirection: 'row', alignItems: 'center', minHeight: 56, borderTopLeftRadius: 28, borderBottomLeftRadius: 28, borderTopRightRadius: 16, borderBottomRightRadius: 16, paddingHorizontal: space.l },
   faceStrong: { backgroundColor: c.accent, borderWidth: c.mode === 'light' ? 1.5 : 0, borderColor: c.accentLine },
-  num: { width: 30, fontFamily: font.num, fontSize: 24, color: c.highlight },
+  num: { width: 30, fontFamily: font.figure, fontSize: 20, color: c.highlight },
   inkText: { color: c.accentText },
-  name: { flex: 1, fontFamily: font.name, fontSize: size.name - 1, color: c.text, letterSpacing: 0.3 },
+  name: { flex: 1, fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name - 1, color: c.text, letterSpacing: 0.3 },
   note: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginLeft: space.s },
-  inkNote: { color: '#2B3038' },
-  throat: { width: 8, height: 14, backgroundColor: c.mode === 'dark' ? '#2A2F3A' : '#0B0D12' },
-  handle: { width: 34, height: 22, backgroundColor: c.mode === 'dark' ? '#2A2F3A' : '#0B0D12', borderTopRightRadius: 7, borderBottomRightRadius: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingHorizontal: 3 },
-  wrap: { width: 2, height: 16, backgroundColor: c.mode === 'dark' ? '#4A5160' : '#3B3E44', transform: [{ rotate: '20deg' }] },
+  inkNote: { color: c.solidMute },
+  throat: { width: 8, height: 14, backgroundColor: c.handle },
+  handle: { width: 34, height: 22, backgroundColor: c.handle, borderTopRightRadius: 7, borderBottomRightRadius: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingHorizontal: 3 },
+  wrap: { width: 2, height: 16, backgroundColor: c.handleWrap, transform: [{ rotate: '20deg' }] },
 }));

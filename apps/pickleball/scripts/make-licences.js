@@ -106,7 +106,7 @@ for (const p of packages) {
   }
 }
 /** The fonts are files we ship as they are, so their own copyright lines are shown on the page. */
-const FONT_NAMES = { inter: 'Inter', 'spline-sans-mono': 'Spline Sans Mono', michroma: 'Michroma' };
+const FONT_NAMES = { inter: 'Inter', 'spline-sans-mono': 'Spline Sans Mono' };
 const fonts = Object.keys(FONT_NAMES).map((f) => ({
   name: FONT_NAMES[f],
   copyright: fs.readFileSync(path.join(root, 'node_modules', '@expo-google-fonts', f, 'LICENSE_FONT'), 'utf8').split('\n')[0].trim(),

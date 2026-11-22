@@ -1,9 +1,9 @@
 // Small shared pieces: section titles, stat tiles, progress rings, segmented switch, glass chips.
 import { ReactNode } from 'react';
 import { Pressable, Text, View, ViewStyle } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { themed, useTheme } from '../theme/theme';
-import { font, radius, size, space } from '../theme/tokens';
+import { font, radius, size, space, spectral } from '../theme/tokens';
 import { Glass } from './Glass';
 
 export function Section({ title, right }: { title: string; right?: ReactNode }) {
@@ -42,7 +42,14 @@ export function Ring({ value, sizePx = 64, stroke = 7 }: { value: number; sizePx
   return (
     <Svg width={sizePx} height={sizePx}>
       <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.hairHex} strokeOpacity={c.hairOpacity} strokeWidth={stroke} fill="none" />
-      <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.highlight} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={`${len * Math.max(0.001, Math.min(1, value))} ${len}`} rotation={-90} origin={`${sizePx / 2}, ${sizePx / 2}`} />
+      <Defs>
+        <LinearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+          {spectral.cool.map((col, i) => (
+            <Stop key={col} offset={i / (spectral.cool.length - 1)} stopColor={col} />
+          ))}
+        </LinearGradient>
+      </Defs>
+      <Circle cx={sizePx / 2} cy={sizePx / 2} r={r} stroke={c.mode === 'dark' ? 'url(#ring)' : c.highlight} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={`${len * Math.max(0.001, Math.min(1, value))} ${len}`} rotation={-90} origin={`${sizePx / 2}, ${sizePx / 2}`} />
     </Svg>
   );
 }
@@ -77,14 +84,14 @@ export function Chip({ children, style, onPress, a11y }: { children: ReactNode; 
 
 const useS = themed((c) => ({
   section: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.l + 4, marginTop: space.xl, marginBottom: space.s + 2 },
-  sectionText: { fontFamily: font.heading, fontSize: 15, color: c.text, letterSpacing: 0.3 },
-  label: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1, color: c.mute },
+  sectionText: { fontFamily: font.heading, fontSize: 14, color: c.text, letterSpacing: 0.6 },
+  label: { fontFamily: font.micro, fontSize: size.label, letterSpacing: 1, color: c.mute },
   statPad: { paddingHorizontal: space.l, paddingTop: space.m + 2, paddingBottom: space.m },
-  statValue: { fontFamily: font.num, fontSize: size.stat, lineHeight: size.stat + 4, color: c.text },
-  statUnit: { fontFamily: font.label, fontSize: 16, letterSpacing: 1, color: c.mute },
+  statValue: { fontFamily: font.figure, fontSize: size.stat, lineHeight: size.stat + 4, color: c.text },
+  statUnit: { fontFamily: font.label, fontSize: 21, letterSpacing: 1, color: c.mute },
   solid: { backgroundColor: c.solid, borderRadius: radius.glass - 2 },
   solidText: { color: c.solidText },
-  solidMute: { color: c.mode === 'dark' ? '#3B3E44' : '#B9BFCA' },
+  solidMute: { color: c.solidMute },
   seg: { flexDirection: 'row', padding: 4 },
   segItem: { flex: 1, minHeight: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   segOn: { backgroundColor: c.solid },

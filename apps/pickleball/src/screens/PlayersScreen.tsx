@@ -101,7 +101,7 @@ const useS = themed((c) => ({
   group: { paddingHorizontal: space.l },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: 66, paddingVertical: space.s },
   rowBorder: { borderTopWidth: 1, borderColor: c.hair },
-  name: { fontFamily: font.name, fontSize: size.nameSmall + 1, color: c.text },
+  name: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name, color: c.text },
   faded: { color: c.mute },
   meta: { fontFamily: font.body, fontSize: 13, color: c.mute },
   upBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: c.hair },

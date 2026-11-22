@@ -6,10 +6,11 @@ import { isGamePoint, scoreCall, scoreFromRallies, switchEndsAt, Team } from '..
 import { Session } from '../logic/session';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/Icon';
-import { dark, font, line, size, space, touch } from '../theme/tokens';
+import { Spectrum } from '../ui/Spectrum';
+import { dark, font, line, radius, size, space, touch } from '../theme/tokens';
 
-/** The scorer looks the same in dark and light mode: a scoreboard on the court. */
-const color = { ...dark, ground: '#F4F6FA', ink: '#0B0D12' };
+/** The scorer looks the same in dark and light mode: a night court on a black canvas. */
+const color = { ...dark, ground: '#FFFFFF', ink: '#FFFFFF' };
 
 interface Props {
   session: Session;
@@ -95,6 +96,7 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
       </View>
       {sc.winner ? (
         <View style={s.winBox}>
+          <Spectrum height={3} radius={0} style={s.winLine} />
           <Text style={s.winText}>
             {t.scorer.wins(names(sc.winner).join(' & '), Math.max(sc.a, sc.b), Math.min(sc.a, sc.b))}
           </Text>
@@ -111,28 +113,29 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
 const KITCHEN = 64;
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.courtOut },
+  root: { flex: 1, backgroundColor: color.bg },
   bar: { alignItems: 'center', justifyContent: 'center', minHeight: 44 },
   bottom: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.s },
   bottomBtn: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: touch.big, paddingHorizontal: space.l },
   bottomText: { fontFamily: font.bodyBold, fontSize: size.body + 1, color: color.ground },
-  barText: { fontFamily: font.label, fontSize: 19, letterSpacing: 1, color: color.ground },
+  barText: { fontFamily: font.label, fontSize: 21, letterSpacing: 0.8, color: color.textSoft, textTransform: 'uppercase' },
   kitchen: { position: 'absolute', left: 0, right: 0, height: KITCHEN, backgroundColor: color.kitchenFill, borderColor: color.paint, borderTopWidth: 2, borderBottomWidth: 2 },
   centerLine: { position: 'absolute', left: '50%', width: 2, marginLeft: -1, backgroundColor: color.kitchen },
   half: { flex: 1, overflow: 'hidden', backgroundColor: color.court, borderWidth: line.court, borderColor: color.paint, marginHorizontal: space.s, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.m },
   pressed: { backgroundColor: color.courtDeep },
   lost: { opacity: 0.45 },
-  names: { fontFamily: font.name, fontSize: size.name + 4, color: color.paint, letterSpacing: 0.5, backgroundColor: color.court, paddingHorizontal: space.s },
-  points: { fontFamily: font.num, fontSize: size.scoreGiant, lineHeight: size.scoreGiant * 1.02, color: color.paint, includeFontPadding: false },
+  names: { fontFamily: font.name, textTransform: 'uppercase', fontSize: size.name + 4, color: color.paint, letterSpacing: 0.5, backgroundColor: color.court, paddingHorizontal: space.s },
+  points: { fontFamily: font.display, fontSize: size.scoreGiant, lineHeight: size.scoreGiant * 1.02, color: color.paint, includeFontPadding: false },
   status: { flexDirection: 'row', alignItems: 'center', gap: space.s, minHeight: 40, backgroundColor: color.court, paddingHorizontal: space.s },
-  statusText: { fontFamily: font.name, fontSize: 19, letterSpacing: 1, color: color.paint },
-  serveFirst: { borderWidth: 2, borderColor: color.paint, paddingHorizontal: space.m, minHeight: 40, justifyContent: 'center', borderRadius: 4 },
-  serveFirstText: { fontFamily: font.bodyBold, fontSize: size.small, color: color.paint },
-  gp: { fontFamily: font.num, fontSize: size.body + 2, letterSpacing: 0.5, color: color.ballInk, backgroundColor: color.ball, paddingHorizontal: space.s, paddingVertical: 2, overflow: 'hidden' },
+  statusText: { fontFamily: font.label, fontSize: 24, letterSpacing: 0.8, textTransform: 'uppercase', color: color.paint },
+  serveFirst: { backgroundColor: color.solid, paddingHorizontal: space.l, minHeight: 40, justifyContent: 'center', borderRadius: radius.pill },
+  serveFirstText: { fontFamily: font.bodyBold, fontSize: size.small, color: color.solidText },
+  gp: { fontFamily: font.label, fontSize: size.body + 6, letterSpacing: 0.8, borderRadius: radius.box, color: color.ballInk, backgroundColor: color.ball, paddingHorizontal: space.s, paddingVertical: 2, overflow: 'hidden' },
   callBand: { alignItems: 'center', paddingVertical: space.xs, backgroundColor: color.net, marginHorizontal: 0 },
-  call: { fontFamily: font.num, fontSize: size.call, color: color.ball, letterSpacing: 1.5, lineHeight: size.call + 4 },
-  hint: { fontFamily: font.body, fontSize: size.small, color: color.hair, minHeight: 18 },
-  winBox: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: color.ground, padding: space.l, paddingBottom: space.xxl, gap: space.m, borderTopWidth: 3, borderColor: color.ball },
-  winText: { fontFamily: font.name, fontSize: size.title, color: color.ink },
+  call: { fontFamily: font.num, fontSize: size.call, color: color.paint, letterSpacing: 1.5, lineHeight: size.call + 4 },
+  hint: { fontFamily: font.body, fontSize: size.small, color: color.mute, minHeight: 18 },
+  winBox: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: color.sheet, padding: space.l, paddingTop: space.l + 3, paddingBottom: space.xxl, gap: space.m, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, overflow: 'hidden' },
+  winLine: { position: 'absolute', left: 0, right: 0, top: 0 },
+  winText: { fontFamily: font.heading, fontSize: 17, lineHeight: 22, color: color.ink },
   row: { flexDirection: 'row', gap: space.s },
 });
