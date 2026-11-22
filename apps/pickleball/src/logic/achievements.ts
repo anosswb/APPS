@@ -1,6 +1,8 @@
-// The 20 awards. Player awards are earned by players (by name); host awards by the person running the app.
+// The 20 awards. All of them belong to the person who runs the app (a host or a coach), never to the
+// players: a coach can have hundreds of names, so awards count what YOU ran (Anass, 22 Nov 2026).
 // Pure: everything is worked out again from the session records, so nothing can get out of step.
-import { duration, GameRecord, SessionRecord, stats } from './history';
+// The ids stay as they were so the badge pictures and the "already shown" list still match.
+import { duration, SessionRecord } from './history';
 
 export type AwardId =
   | 'first-dink' | 'pickled' | 'comeback' | 'marathon' | 'quick-kill' | 'hot-streak' | 'on-fire' | 'iron-paddle'
@@ -9,132 +11,116 @@ export type AwardId =
 
 export interface AwardDef {
   id: AwardId;
-  /** player = earned by players at the court; host = earned by whoever runs the sessions */
-  kind: 'player' | 'host';
-  /** For host awards with a count: the number to reach (shown as progress). */
+  /** For counting awards: the number to reach (shown as progress). */
   goal?: number;
 }
 
 export const AWARDS: AwardDef[] = [
-  { id: 'first-dink', kind: 'player' },
-  { id: 'pickled', kind: 'player' },
-  { id: 'comeback', kind: 'player' },
-  { id: 'marathon', kind: 'player' },
-  { id: 'quick-kill', kind: 'player' },
-  { id: 'hot-streak', kind: 'player' },
-  { id: 'on-fire', kind: 'player' },
-  { id: 'iron-paddle', kind: 'player' },
-  { id: 'social-butterfly', kind: 'player' },
-  { id: 'win-by-two', kind: 'player' },
-  { id: 'host', kind: 'host', goal: 1 },
-  { id: 'regular', kind: 'host', goal: 5 },
-  { id: 'club-captain', kind: 'host', goal: 25 },
-  { id: 'full-house', kind: 'host' },
-  { id: 'four-courts', kind: 'host' },
-  { id: 'century', kind: 'host', goal: 100 },
-  { id: 'early-bird', kind: 'host' },
-  { id: 'night-owl', kind: 'host' },
-  { id: 'weekend-warrior', kind: 'host' },
-  { id: 'golden-paddle', kind: 'player' },
+  { id: 'first-dink' },
+  { id: 'host', goal: 1 },
+  { id: 'pickled' },
+  { id: 'comeback' },
+  { id: 'win-by-two' },
+  { id: 'iron-paddle', goal: 10 },
+  { id: 'quick-kill', goal: 6 },
+  { id: 'marathon' },
+  { id: 'regular', goal: 5 },
+  { id: 'hot-streak', goal: 3 },
+  { id: 'full-house', goal: 16 },
+  { id: 'four-courts' },
+  { id: 'early-bird' },
+  { id: 'night-owl' },
+  { id: 'weekend-warrior' },
+  { id: 'social-butterfly', goal: 50 },
+  { id: 'club-captain', goal: 25 },
+  { id: 'century', goal: 100 },
+  { id: 'on-fire', goal: 500 },
+  { id: 'golden-paddle', goal: 50 },
 ];
 
 export const MIN = 60 * 1000;
+const HOUR = 60 * MIN;
 
 export interface AwardState {
   earned: boolean;
-  /** Players who earned it (player awards), most recent first. */
-  by: string[];
   /** When it was first earned. */
   at: number | null;
   /** Progress toward `goal` for counting awards. */
   progress?: number;
 }
 
-const scored = (g: GameRecord) => g.score[0] + g.score[1] > 0;
-
-/** Player awards that one game can give, to its winners (or all four for first-dink and marathon). */
-function gameAwards(g: GameRecord): [AwardId, string[]][] {
-  const out: [AwardId, string[]][] = [['first-dink', [...g.winners, ...g.losers]]];
-  const len = duration(g);
-  if (scored(g) && g.score[1] === 0 && g.score[0] >= g.target) out.push(['pickled', g.winners]);
-  if (g.maxDeficit >= 5) out.push(['comeback', g.winners]);
-  if (len >= 20 * MIN) out.push(['marathon', [...g.winners, ...g.losers]]);
-  if (len >= 2 * MIN && len < 8 * MIN) out.push(['quick-kill', g.winners]);
-  if (scored(g) && g.score[1] >= g.target - 1) out.push(['win-by-two', g.winners]);
-  return out;
-}
+const dayKey = (t: number) => new Date(t).toDateString();
 
 export function evaluate(sessions: SessionRecord[]): Record<AwardId, AwardState> {
   const st = {} as Record<AwardId, AwardState>;
-  for (const a of AWARDS) st[a.id] = { earned: false, by: [], at: null };
-  const give = (id: AwardId, names: string[], at: number) => {
-    const s = st[id];
-    if (!s.earned) {
-      s.earned = true;
-      s.at = at;
-    }
-    for (const n of names) if (!s.by.includes(n)) s.by.unshift(n);
+  for (const a of AWARDS) st[a.id] = { earned: false, at: null, progress: a.goal ? 0 : undefined };
+  const give = (id: AwardId, at: number) => {
+    if (!st[id].earned) st[id] = { ...st[id], earned: true, at };
+  };
+  /** A counting award: keeps the best value reached, earned when it reaches the goal. */
+  const count = (id: AwardId, value: number, at: number) => {
+    const goal = AWARDS.find((a) => a.id === id)!.goal!;
+    st[id].progress = Math.max(st[id].progress ?? 0, Math.min(value, goal));
+    if (value >= goal) give(id, at);
   };
 
   const real = sessions.filter((s) => s.games.length > 0);
-  const partners = new Map<string, Set<string>>();
-  let totalGames = 0;
+  const names = new Set<string>();
+  let games = 0;
+  let points = 0;
 
-  for (const s of real) {
-    const games = [...s.games].sort((a, b) => a.endedAt - b.endedAt);
-    const streak = new Map<string, number>();
-    const played = new Map<string, number>();
-    for (const g of games) {
-      totalGames += 1;
-      for (const [id, names] of gameAwards(g)) give(id, names, g.endedAt);
-      if (new Date(g.startedAt).getHours() >= 19) give('night-owl', [], g.endedAt);
-      if (totalGames === 100) give('century', [], g.endedAt);
-      for (const team of [g.winners, g.losers]) {
-        for (const n of team) {
-          const other = team[0] === n ? team[1] : team[0];
-          const set = partners.get(n) ?? new Set<string>();
-          set.add(other);
-          partners.set(n, set);
-          if (set.size === 8) give('social-butterfly', [n], g.endedAt);
-        }
-      }
-      for (const n of [...g.winners, ...g.losers]) {
-        const won = g.winners.includes(n);
-        const run = won ? (streak.get(n) ?? 0) + 1 : 0;
-        streak.set(n, run);
-        if (run === 3) give('hot-streak', [n], g.endedAt);
-        if (run === 5) give('on-fire', [n], g.endedAt);
-        const count = (played.get(n) ?? 0) + 1;
-        played.set(n, count);
-        if (count === 10) give('iron-paddle', [n], g.endedAt);
-      }
-    }
+  real.forEach((s, i) => {
+    const list = [...s.games].sort((a, b) => a.endedAt - b.endedAt);
     const end = s.endedAt;
-    if (s.players.length >= 16) give('full-house', [], end);
-    if (games.some((g) => g.court >= 3)) give('four-courts', [], end);
-    if (new Date(s.startedAt).getHours() < 8) give('early-bird', [], end);
-    const top = stats(games).table;
-    if (top.length && top[0].wins >= 3) give('golden-paddle', top.filter((p) => p.wins === top[0].wins).map((p) => p.name), end);
-  }
+    count('host', i + 1, end);
+    count('regular', i + 1, end);
+    count('club-captain', i + 1, end);
+    count('golden-paddle', i + 1, end);
+    list.forEach((g, k) => {
+      games += 1;
+      points += g.score[0] + g.score[1];
+      give('first-dink', g.endedAt);
+      const scored = g.score[0] + g.score[1] > 0;
+      if (scored && g.score[1] === 0 && g.score[0] >= g.target) give('pickled', g.endedAt);
+      if (g.maxDeficit >= 5) give('comeback', g.endedAt);
+      if (scored && g.score[1] >= g.target - 1) give('win-by-two', g.endedAt);
+      if (new Date(g.startedAt).getHours() >= 19) give('night-owl', g.endedAt);
+      if (g.court >= 3) give('four-courts', g.endedAt);
+      count('century', games, g.endedAt);
+      count('on-fire', points, g.endedAt);
+      count('iron-paddle', k + 1, g.endedAt);
+      // Fast lane: games finished inside any one hour.
+      const inHour = list.slice(0, k + 1).filter((x) => g.endedAt - x.endedAt < HOUR).length;
+      count('quick-kill', inHour, g.endedAt);
+    });
+    for (const n of s.players) names.add(n.trim().toLowerCase());
+    count('social-butterfly', names.size, end);
+    count('full-house', s.players.length, end);
+    if (end - s.startedAt >= 2 * HOUR) give('marathon', end);
+    if (new Date(s.startedAt).getHours() < 8) give('early-bird', end);
+  });
 
-  const count = real.length;
-  st.host.progress = Math.min(count, 1);
-  st.regular.progress = Math.min(count, 5);
-  st['club-captain'].progress = Math.min(count, 25);
-  st.century.progress = Math.min(totalGames, 100);
-  if (count >= 1) give('host', [], real[0].endedAt);
-  if (count >= 5) give('regular', [], real[4].endedAt);
-  if (count >= 25) give('club-captain', [], real[24].endedAt);
-
-  // A Saturday session followed by a Sunday session the next day.
-  const days = real.map((s) => new Date(s.startedAt));
+  // Days in a row with a session, and a Saturday followed by a Sunday.
+  const days = [...new Set(real.map((s) => dayKey(s.startedAt)))].map((d) => new Date(d));
+  const has = (d: Date) => real.find((s) => dayKey(s.startedAt) === d.toDateString());
   for (const d of days) {
-    if (d.getDay() !== 6) continue;
-    const sunday = new Date(d);
-    sunday.setDate(d.getDate() + 1);
-    const hit = real.find((s) => new Date(s.startedAt).toDateString() === sunday.toDateString());
-    if (hit) give('weekend-warrior', [], hit.endedAt);
+    let run = 1;
+    const next = new Date(d);
+    for (;;) {
+      next.setDate(next.getDate() + 1);
+      const hit = has(next);
+      if (!hit) break;
+      run += 1;
+      count('hot-streak', run, hit.endedAt);
+    }
+    if (d.getDay() === 6) {
+      const sunday = new Date(d);
+      sunday.setDate(d.getDate() + 1);
+      const hit = has(sunday);
+      if (hit) give('weekend-warrior', hit.endedAt);
+    }
   }
+  if (real.length) st['hot-streak'].progress = Math.max(st['hot-streak'].progress ?? 0, 1);
   return st;
 }
 

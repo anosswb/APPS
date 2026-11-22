@@ -25,9 +25,13 @@ describe('saved data', () => {
     expect(out.session.startedAt).toBe(500);
     expect(typeof out.session.id).toBe('string');
   });
-  it('the old look choice is dropped: dark or light follows the phone', () => {
+  it('the old look keys are dropped and the look starts on Auto', () => {
     const old = parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { theme: 'light', lookV: 2, voice: false } }));
-    expect(old.prefs).toEqual({ ...DEFAULT_PREFS, voice: false });
+    expect(old.prefs).toEqual({ ...DEFAULT_PREFS, voice: false, look: 'system' });
+  });
+  it('the look choice is kept, and a bad value falls back to Auto', () => {
+    expect(parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { look: 'light' } })).prefs.look).toBe('light');
+    expect(parseSaved(JSON.stringify({ v: SCHEMA, session: newSession(), prefs: { look: 'pink' } })).prefs.look).toBe('system');
   });
   it('a version 2 save keeps its running games, counted as started', () => {
     let s = newSession();

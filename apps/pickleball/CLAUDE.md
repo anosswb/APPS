@@ -22,7 +22,7 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: fi
 | `src/logic/scoring.ts` | Side-out and rally scoring, the "4-2-1" call, game point. Pure, tested |
 | `src/logic/session.ts` | Players, the line, courts, rotation (all four off / winners stay / winners split), fair partners. Pure, tested |
 | `src/logic/history.ts` | Session records, game lengths, stats for today/week/all time. Pure, tested |
-| `src/logic/achievements.ts` | The 20 awards (player + host). Pure, tested |
+| `src/logic/achievements.ts` | The 20 awards, all for the person running the app (host or coach), never per player. Pure, tested |
 | `src/logic/goals.ts` | Goals and their progress. Pure, tested |
 | `src/state/` | Saving (versioned), the session hook with 30-step Undo, the clock |
 | `src/theme/tokens.ts` | Every colour, size, font. Nowhere else |
@@ -39,7 +39,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: fi
 - **A game waits for Start game.** Four put on a court are "ready"; the clock starts when the host taps Start game (or scores a point).
 - The fairness test in `session.test.ts` (games played stay even, partners spread out) must stay green.
 - Storage changes: bump `SCHEMA`, migrate, test. Never lose a running session.
-- Dark and light mode follow the phone; there is no setting (Anass, 22 Nov 2026). Colours only from the palettes in `src/theme/tokens.ts`, styles through `themed()` in `src/theme/theme.tsx`. Targets 56 pt minimum.
+- Dark and light: Settings → Look (Auto follows the phone, the default; or Dark / Light). Anass, 22 Nov 2026. Colours only from the palettes in `src/theme/tokens.ts`, styles through `themed()` in `src/theme/theme.tsx`. Targets 56 pt minimum.
+- Awards belong to the person using the app, not to players (a coach can have hundreds of names). Anass, 22 Nov 2026.
 - Awards are worked out again from the session records every time (`src/logic/achievements.ts`); never store "earned" flags that can get out of step. Only `seen` (banner already shown) is stored.
 
 ## Anass approves the look first (22 Nov 2026)

@@ -3,7 +3,7 @@ import { Platform, Pressable, ScrollView, Switch, Text, View } from 'react-nativ
 import Constants from 'expo-constants';
 import { t } from '../i18n/en';
 import { MAX_COURTS, newSession, restartSession, Session, updateSettings } from '../logic/session';
-import { Prefs } from '../state/storage';
+import { LookChoice, Prefs } from '../state/storage';
 import { Button } from '../ui/Button';
 import { Heading, Label, Segments } from '../ui/Bits';
 import { Glass } from '../ui/Glass';
@@ -69,6 +69,10 @@ export function SettingsScreen({ session, act, closeSession, prefs, setPrefs, op
         <Segments<'sideout' | 'rally'> items={[['sideout', t.settings.sideout], ['rally', t.settings.rally]]} value={st.scoring.type} onChange={(v) => act((s2, now) => updateSettings(s2, { scoring: { ...st.scoring, type: v } }, now))} />
         <Heading title={t.settings.gameTo} />
         <Segments<'11' | '15' | '21'> items={[['11', '11'], ['15', '15'], ['21', '21']]} value={String(st.scoring.target) as '11'} onChange={(v) => act((s2, now) => updateSettings(s2, { scoring: { ...st.scoring, target: Number(v) } }, now))} />
+
+        <Heading title={t.settings.look} />
+        <Segments<LookChoice> items={[['system', t.settings.auto], ['dark', t.settings.dark], ['light', t.settings.light]]} value={prefs.look} onChange={(v) => setPrefs({ ...prefs, look: v })} />
+        <Text style={[s.help, { marginTop: space.xs }]}>{t.settings.lookHelp}</Text>
 
         <Heading title={t.settings.feel} />
         <Glass>

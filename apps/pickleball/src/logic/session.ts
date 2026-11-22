@@ -305,6 +305,22 @@ export function cancelGame(s: Session, court: number): Session {
   return { ...next, courts, queue: [...four, ...next.queue] };
 }
 
+/** Clear courts: every game comes off without a result; the players go back to the front of the line,
+ *  court 1's four first. The courts stay open until the host fills them (fillCourts). */
+export function clearCourts(s: Session): Session {
+  let next = s;
+  for (let c = next.courts.length - 1; c >= 0; c--) next = cancelGame(next, c);
+  return next;
+}
+
+/** Clear the line: everyone waiting is removed (games on court keep going). Finished games stay in History. */
+export function clearLine(s: Session): Session {
+  let next = s;
+  for (const id of s.queue) next = removePlayer(next, id);
+  for (const p of Object.values(next.players)) if (p.status === 'resting') next = removePlayer(next, p.id);
+  return next;
+}
+
 /** The four are on court and play begins: the clock starts now. Does nothing to a game already started. */
 export function beginGame(s: Session, court: number, now: number): Session {
   const g = s.courts[court];

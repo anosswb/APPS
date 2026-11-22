@@ -1,7 +1,7 @@
 // A session as a photo post, like a run on a running app: the group photo fills the card and the numbers
 // of the session sit on it in big white type (time played, games, players, longest game), with the day,
 // the top player and the badges won. Without a photo, the painted court is the background.
-// The same picture is what gets shared.
+// The shared picture is a 9:16 story (1080 x 1920) with bigger type; the card in the app stays 4:5.
 import { Image, Pressable, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { APP_NAME, t } from '../i18n/en';
@@ -14,6 +14,7 @@ import { BADGES } from './badges';
 import { CourtSurface } from './CourtSurface';
 import { Glass } from './Glass';
 import { Icon } from './Icon';
+import { Spectrum } from './Spectrum';
 
 interface Props {
   record: SessionRecord;
@@ -37,9 +38,9 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
       {photo ? (
         <Image source={{ uri: photo }} style={s.fill} resizeMode="cover" accessibilityIgnoresInvertColors />
       ) : (
-        <View style={[s.fill, s.art]}>
+        <View style={[s.fill, s.art, forShare && s.artStory]}>
           <View style={s.artCourt}>
-            <CourtSurface left={top ? [top.name] : ['']} right={[t.posts.wins(top?.wins ?? 0)]} height={92} />
+            <CourtSurface left={top ? [top.name] : ['']} right={[t.posts.wins(top?.wins ?? 0)]} height={forShare ? 120 : 92} />
           </View>
         </View>
       )}
@@ -57,8 +58,8 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
 
       <View style={s.topBar} pointerEvents="box-none">
         <View>
-          <Text style={s.brand}>{APP_NAME.toUpperCase()}</Text>
-          <Text style={s.when}>{t.posts.when(record.startedAt)}</Text>
+          <Text style={[s.brand, forShare && s.brandStory]}>{APP_NAME.toUpperCase()}</Text>
+          <Text style={[s.when, forShare && s.whenStory]}>{t.posts.when(record.startedAt)}</Text>
         </View>
         {!forShare && !photo ? (
           <Pressable onPress={onPhoto} style={s.cameraBtn} accessibilityRole="button" accessibilityLabel={t.posts.groupPhoto}>
@@ -68,8 +69,9 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
         ) : null}
       </View>
 
-      <View style={s.bottom} pointerEvents="none">
-        <Text style={s.title} numberOfLines={1}>{t.posts.title(record.startedAt)}</Text>
+      <View style={[s.bottom, forShare && s.bottomStory]} pointerEvents="none">
+        {forShare ? <Spectrum height={3} style={s.storyLine} /> : null}
+        <Text style={[s.title, forShare && s.titleStory]} numberOfLines={1}>{t.posts.title(record.startedAt)}</Text>
         {meta?.place ? (
           <View style={s.placeRow}>
             <Icon name="pin" size={14} tint="#FFFFFF" />
@@ -77,10 +79,10 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
           </View>
         ) : null}
         <View style={s.statsRow}>
-          <Big v={hoursMinutes(sessionLength(record))} l={t.posts.played} grow={1.45} />
-          <Big v={String(st.games)} l={t.history.games} grow={0.8} />
-          <Big v={String(record.players.length)} l={t.history.players} grow={0.9} />
-          <Big v={clock(st.longestMs)} l={t.history.longest} grow={1.1} />
+          <Big v={hoursMinutes(sessionLength(record))} l={t.posts.played} grow={1.45} story={forShare} />
+          <Big v={String(st.games)} l={t.history.games} grow={0.8} story={forShare} />
+          <Big v={String(record.players.length)} l={t.history.players} grow={0.9} story={forShare} />
+          <Big v={clock(st.longestMs)} l={t.history.longest} grow={1.1} story={forShare} />
         </View>
         {top ? (
           <View style={s.topRow}>
@@ -92,7 +94,7 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
         {awards.length ? (
           <View style={s.badges}>
             {awards.slice(0, 6).map((id) => (
-              <Image key={id} source={BADGES[id]} style={s.badge} resizeMode="contain" accessibilityLabel={t.awards.name[id]} />
+              <Image key={id} source={BADGES[id]} style={[s.badge, forShare && s.badgeStory]} resizeMode="contain" accessibilityLabel={t.awards.name[id]} />
             ))}
             {awards.length > 6 ? <Text style={s.more}>+{awards.length - 6}</Text> : null}
           </View>
@@ -114,11 +116,11 @@ export function PostCard({ record, meta, awards, forShare, onPhoto, onPlace, onS
   );
 }
 
-function Big({ v, l, grow }: { v: string; l: string; grow: number }) {
+function Big({ v, l, grow, story }: { v: string; l: string; grow: number; story?: boolean }) {
   const s = useS();
   return (
     <View style={[s.big, { flex: grow }]}>
-      <Text style={s.bigV} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{v}</Text>
+      <Text style={[s.bigV, story && s.bigVStory]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{v}</Text>
       <Text style={s.bigL}>{l.toUpperCase()}</Text>
     </View>
   );
@@ -136,11 +138,21 @@ function Action({ icon, label, onPress, strong }: { icon: 'camera' | 'image' | '
 }
 
 const W = '#FFFFFF';
+/** The story picture is drawn 360 wide and saved at 1080 x 1920 (ShareCard.tsx). */
+export const STORY_W = 360;
 
 const useS = themed((c) => ({
   card: { marginBottom: space.l },
   media: { aspectRatio: 4 / 5, margin: 6, borderRadius: radius.glass - 6, overflow: 'hidden', backgroundColor: c.courtOut },
-  mediaShare: { width: 360, margin: 0, borderRadius: 0 },
+  mediaShare: { width: STORY_W, aspectRatio: 9 / 16, margin: 0, borderRadius: 0 },
+  artStory: { paddingTop: 230 },
+  brandStory: { fontSize: 14, letterSpacing: 1.6 },
+  whenStory: { fontSize: 14 },
+  bottomStory: { bottom: space.xxl + space.s },
+  storyLine: { marginBottom: space.m },
+  titleStory: { fontSize: 26, lineHeight: 30 },
+  bigVStory: { fontSize: 22, lineHeight: 27 },
+  badgeStory: { width: 46, height: 58 },
   fill: { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
   art: { backgroundColor: c.courtOut, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 92 },
   artCourt: { width: '100%', paddingHorizontal: space.l },
