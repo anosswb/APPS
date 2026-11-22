@@ -10,10 +10,11 @@ import { useFonts, BarlowCondensed_600SemiBold, BarlowCondensed_800ExtraBold, Ba
 import { Archivo_500Medium, Archivo_700Bold } from '@expo-google-fonts/archivo';
 import { t } from './src/i18n/en';
 import { AwardId, evaluate, newlyEarned } from './src/logic/achievements';
-import { allSessions, startOfDay } from './src/logic/history';
+import { allSessions } from './src/logic/history';
 import { finishGame, scoreRally, setFirstServe, undoRally } from './src/logic/session';
 import { Team } from './src/logic/scoring';
 import { useSession } from './src/state/useSession';
+import { withPhoto, withPlace } from './src/state/storage';
 import { AwardsScreen } from './src/screens/AwardsScreen';
 import { BoardScreen } from './src/screens/BoardScreen';
 import { CourtsScreen } from './src/screens/CourtsScreen';
@@ -121,10 +122,6 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
     setBanner({ id, who: awards[id].by[0] ?? '' });
     buzz('done');
   }, [awards, history.seen, setHistory, buzz]);
-  const earnedToday = useMemo(() => {
-    const from = startOfDay(Date.now());
-    return (Object.keys(awards) as AwardId[]).filter((id) => awards[id].earned && (awards[id].at ?? 0) >= from);
-  }, [awards]);
 
   if (licences) {
     return (
@@ -176,7 +173,16 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
         {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} openScorer={setScoring} openBoard={() => setBoard(true)} buzz={buzz} /> : null}
         {tab === 'players' ? <PlayersScreen session={session} act={act} /> : null}
-        {tab === 'history' ? <HistoryScreen sessions={sessions} earnedToday={earnedToday} /> : null}
+        {tab === 'history' ? (
+          <HistoryScreen
+            sessions={sessions}
+            awards={awards}
+            meta={history.meta}
+            places={history.places}
+            setPlace={(id, p) => setHistory((h) => withPlace(h, id, p))}
+            setPhoto={(id, uri) => setHistory((h) => withPhoto(h, id, uri))}
+          />
+        ) : null}
         {tab === 'awards' ? <AwardsScreen awards={awards} sessions={sessions} goals={history.goals} setGoals={(goals) => setHistory((h) => ({ ...h, goals }))} /> : null}
         {tab === 'settings' ? <SettingsScreen session={session} act={act} closeSession={closeSession} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} /> : null}
       </SafeAreaView>

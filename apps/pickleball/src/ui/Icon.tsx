@@ -4,7 +4,7 @@ import { useTheme } from '../theme/theme';
 
 export type IconName =
   | 'plus' | 'undo' | 'gear' | 'people' | 'courts' | 'close' | 'up' | 'ball' | 'minus' | 'chart' | 'award'
-  | 'share' | 'speaker' | 'lock' | 'check' | 'chevron' | 'trash' | 'timer' | 'board';
+  | 'share' | 'speaker' | 'lock' | 'check' | 'chevron' | 'trash' | 'timer' | 'board' | 'camera' | 'image' | 'pin';
 
 export function Icon({ name, size = 24, tint }: { name: IconName; size?: number; tint?: string }) {
   const c = useTheme();
@@ -67,6 +67,25 @@ export function Icon({ name, size = 24, tint }: { name: IconName; size?: number;
         <>
           <Rect x={3} y={4} width={18} height={13} rx={2} {...p} />
           <Path d="M8 21h8M12 17v4M7 9h6M7 12h10" {...p} />
+        </>
+      )}
+      {name === 'camera' && (
+        <>
+          <Path d="M3.5 8.5a2 2 0 012-2h2.2l1.6-2.2h5.4l1.6 2.2h2.2a2 2 0 012 2v9.5a2 2 0 01-2 2h-13a2 2 0 01-2-2z" {...p} />
+          <Circle cx={12} cy={13} r={3.6} {...p} />
+        </>
+      )}
+      {name === 'image' && (
+        <>
+          <Rect x={3} y={4.5} width={18} height={15} rx={2.5} {...p} />
+          <Circle cx={8.5} cy={9.5} r={1.6} {...p} />
+          <Path d="M4 17.5l5-5 4 4 3-3 4 4" {...p} />
+        </>
+      )}
+      {name === 'pin' && (
+        <>
+          <Path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0113 0C18.5 14.8 12 21 12 21z" {...p} />
+          <Circle cx={12} cy={9.8} r={2.4} {...p} />
         </>
       )}
       {name === 'ball' && (
