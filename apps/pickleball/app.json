@@ -48,7 +48,15 @@
           "androidAppId": "ca-app-pub-3940256099942544~3347511713"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Dinkline uses your photos only when you pick one for a session post.",
+          "cameraPermission": "Dinkline uses the camera only when you take a photo for a session post.",
+          "microphonePermission": false
+        }
+      ]
     ]
   }
 }

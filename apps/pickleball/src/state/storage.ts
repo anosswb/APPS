@@ -27,13 +27,37 @@ interface Saved {
   prefs: Prefs;
 }
 
+/** What the host adds to a session to make it a post: where it was, and a photo (a file on this phone). */
+export interface PostMeta {
+  place?: string;
+  photo?: string;
+}
+
 export interface History {
   sessions: SessionRecord[];
   goals: Goal[];
   /** Award ids already celebrated, so the banner shows once. */
   seen: string[];
+  /** Place and photo per session id (the running session too). */
+  meta: Record<string, PostMeta>;
+  /** Places typed before, newest first, offered again. */
+  places: string[];
 }
-export const emptyHistory = (now: number): History => ({ sessions: [], goals: DEFAULT_GOALS(now), seen: [] });
+export const emptyHistory = (now: number): History => ({ sessions: [], goals: DEFAULT_GOALS(now), seen: [], meta: {}, places: [] });
+
+export const MAX_PLACE = 40;
+
+/** Set the place of a session and remember it (newest first, no duplicates, at most 8). */
+export function withPlace(h: History, sessionId: string, raw: string): History {
+  const place = raw.replace(/\s+/g, ' ').trim().slice(0, MAX_PLACE);
+  const meta = { ...h.meta, [sessionId]: { ...h.meta[sessionId], place: place || undefined } };
+  const places = place ? [place, ...h.places.filter((p) => p.toLowerCase() !== place.toLowerCase())].slice(0, 8) : h.places;
+  return { ...h, meta, places };
+}
+
+export function withPhoto(h: History, sessionId: string, photo: string | undefined): History {
+  return { ...h, meta: { ...h.meta, [sessionId]: { ...h.meta[sessionId], photo } } };
+}
 
 /** Version 1 → 2: sessions get an id and a start time; results get start time, target and comeback depth. */
 export function migrate(data: { v: number; session: Record<string, unknown> }): Session {
@@ -67,7 +91,15 @@ export function parseHistory(raw: string | null, now: number): { history: Histor
   try {
     const data = JSON.parse(raw) as { v: number } & History;
     if (data.v !== HISTORY_SCHEMA || !Array.isArray(data.sessions)) return { history: emptyHistory(now), problem: `unknown history version ${String(data.v)}` };
-    return { history: { sessions: data.sessions, goals: Array.isArray(data.goals) ? data.goals : DEFAULT_GOALS(now), seen: Array.isArray(data.seen) ? data.seen : [] } };
+    return {
+      history: {
+        sessions: data.sessions,
+        goals: Array.isArray(data.goals) ? data.goals : DEFAULT_GOALS(now),
+        seen: Array.isArray(data.seen) ? data.seen : [],
+        meta: data.meta && typeof data.meta === 'object' ? data.meta : {},
+        places: Array.isArray(data.places) ? data.places : [],
+      },
+    };
   } catch (e) {
     return { history: emptyHistory(now), problem: `history unreadable: ${String(e)}` };
   }

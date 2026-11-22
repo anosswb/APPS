@@ -1,5 +1,5 @@
 jest.mock('@react-native-async-storage/async-storage', () => ({ getItem: jest.fn(), setItem: jest.fn() }));
-import { DEFAULT_PREFS, parseHistory, parseSaved, SCHEMA } from './storage';
+import { DEFAULT_PREFS, emptyHistory, parseHistory, parseSaved, SCHEMA, withPhoto, withPlace } from './storage';
 import { addPlayer, newSession } from '../logic/session';
 
 describe('saved data', () => {
@@ -43,6 +43,21 @@ describe('saved history', () => {
     const h = parseHistory(JSON.stringify({ v: 1, sessions: [{ id: 'a', startedAt: 0, endedAt: 1, players: [], games: [] }], goals: [], seen: ['host'] }), 0).history;
     expect(h.sessions).toHaveLength(1);
     expect(h.seen).toEqual(['host']);
+  });
+  it('an older history without places and photos still loads', () => {
+    const h = parseHistory(JSON.stringify({ v: 1, sessions: [], goals: [], seen: [] }), 0).history;
+    expect(h.meta).toEqual({});
+    expect(h.places).toEqual([]);
+  });
+  it('places are remembered newest first, once, trimmed', () => {
+    let h = withPlace(emptyHistory(0), 's1', '  Riverside   Park ');
+    h = withPlace(h, 's2', 'Oak Courts');
+    h = withPlace(h, 's3', 'riverside park');
+    expect(h.places).toEqual(['riverside park', 'Oak Courts']);
+    expect(h.meta.s1.place).toBe('Riverside Park');
+    h = withPhoto(h, 's1', 'file:///p.jpg');
+    expect(h.meta.s1).toEqual({ place: 'Riverside Park', photo: 'file:///p.jpg' });
+    expect(withPlace(h, 's1', '   ').meta.s1.place).toBeUndefined();
   });
   it('broken history gives an empty one and a reason', () => {
     expect(parseHistory('nope', 0).problem).toMatch(/unreadable/);

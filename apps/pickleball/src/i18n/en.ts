@@ -145,6 +145,31 @@ export const t = {
     shareFailed: 'Sharing did not work on this phone. Try again.',
     shareWeb: 'Sharing works in the phone app.',
   },
+  posts: {
+    title: (t: number) => {
+      const h = new Date(t).getHours();
+      return h < 12 ? 'Morning open play' : h < 17 ? 'Afternoon open play' : 'Evening open play';
+    },
+    when: (t: number) => `${dayFmt(t)} · ${timeFmt(t)}`,
+    wins: (n: number) => `${n} ${n === 1 ? 'WIN' : 'WINS'}`,
+    top: 'TOP PLAYER',
+    feed: 'Past sessions',
+    addPhoto: 'Add photo',
+    changePhoto: 'Photo',
+    addPlace: 'Add place',
+    changePlace: 'Place',
+    share: 'Share',
+    photoTitle: 'Photo of the day',
+    takePhoto: 'Take a photo',
+    fromGallery: 'Choose from gallery',
+    removePhoto: 'Remove the photo',
+    photoPrivate: 'The photo stays on this phone. It leaves only when you share the post.',
+    cameraDenied: 'The camera is off for Dinkline. You can still choose a photo from the gallery.',
+    photoFailed: 'That photo could not be added. Try another one.',
+    placeTitle: 'Where did you play?',
+    placeHint: 'Riverside Park courts',
+    save: 'Save',
+  },
   share: {
     top: "TODAY'S TOP PLAYER",
     wins: (n: number) => `${n} ${n === 1 ? 'WIN' : 'WINS'}`,
