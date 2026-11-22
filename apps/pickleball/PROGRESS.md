@@ -1,7 +1,8 @@
 # PROGRESS.md — Dinkline (pickleball open play)
 
 ## Download the test app
-Newest APK (22 Nov 2026, v3: dark/light liquid glass, history, 20 awards, goals, photo posts, voice call-out): https://github.com/anosswb/APPS/actions/runs/45009591082 → Artifacts → **dinkline-test-apk**. Steps: `docs/builds.md`.
+Newest APK (22 Nov 2026, v3.1: true black look, Android black-blob bug fixed): https://github.com/anosswb/APPS/actions/runs/45012552976
+Earlier v3 APK (had the black blobs on Android): https://github.com/anosswb/APPS/actions/runs/45009591082 → Artifacts → **dinkline-test-apk**. Steps: `docs/builds.md`.
 Emulator launch test on the same commit passed (Courts shown, Players opened, app still running): https://github.com/anosswb/APPS/actions/runs/45009593542
 
 ## v3 (22 Nov 2026) — what was built
@@ -11,6 +12,7 @@ Emulator launch test on the same commit passed (Courts shown, Players opened, ap
 - 70 tests. Not checked on a real phone: camera, gallery, share sheet, voice, haptics, readability in sun, the award detail sheet fade.
 
 ## Next for Anass
+0. Install v3.1 and send a screenshot of Courts, History and Awards from the Samsung.
 1. Install, play or fake a few games, open History, add a group photo, tap Share.
 2. Say what feels slow, ugly or wrong.
 
