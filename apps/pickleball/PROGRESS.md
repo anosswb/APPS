@@ -1,10 +1,18 @@
 # PROGRESS.md — Dinkline (pickleball open play)
 
 ## Download the test app
-Newest APK (22 Nov 2026; court opening animation, glass LIVE tag, Android test banner on Players/Settings): https://github.com/anosswb/APPS/actions/runs/45000400938 (emulator launch test on the same commit passed, incl. opening Players: https://github.com/anosswb/APPS/actions/runs/45000403342)
-Earlier APK (Licenses page): https://github.com/anosswb/APPS/actions/runs/44976336516
-Previous APK (blue style v2, board, winners split, one-tap back in): https://github.com/anosswb/APPS/actions/runs/44963456129 → Artifacts → **dinkline-test-apk**. Steps: `docs/builds.md`.
-Checked: emulator launch test on the same commit passed (app alive after 45 s, Courts screen shown): https://github.com/anosswb/APPS/actions/runs/44963458635
+Newest APK (22 Nov 2026, v3: dark/light liquid glass, history, 20 awards, goals, photo posts, voice call-out): https://github.com/anosswb/APPS/actions/runs/45009591082 → Artifacts → **dinkline-test-apk**. Steps: `docs/builds.md`.
+Emulator launch test on the same commit passed (Courts shown, Players opened, app still running): https://github.com/anosswb/APPS/actions/runs/45009593542
+
+## v3 (22 Nov 2026) — what was built
+- Redesign after Anass's screenshots: dark liquid glass + light (sun) mode, 5 tabs, live game clock, tilted court (PR #55).
+- History and stats (today / week / all time, game lengths chart, top players, every game), 20 awards with Anass's paddle badges, goals with rings, award banner, voice call-out (PR #55).
+- Photo posts: the group photo with time played, games, players, longest, top player and badges printed on it; shared as a picture; feed of past sessions. No map (Anass) (PR #56).
+- 70 tests. Not checked on a real phone: camera, gallery, share sheet, voice, haptics, readability in sun, the award detail sheet fade.
+
+## Next for Anass
+1. Install, play or fake a few games, open History, add a group photo, tap Share.
+2. Say what feels slow, ugly or wrong.
 
 ## Where it stands (21 Nov 2026, night)
 Version 1 is built and runs: the line, fair rotation onto 1–8 courts, the big scorer, players, settings, saved on the phone. 37 tests pass. Screens checked in a phone-size browser (`docs/screens/`). Android test APK: see "Builds" below.
