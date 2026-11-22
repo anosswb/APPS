@@ -150,7 +150,7 @@ function CourtFill({ active }: { active: boolean }) {
   }, [active, reduce]);
   return (
     <View style={{ width: '100%' }}>
-      <CourtSurface key={round} left={['Dana', 'Marcus']} right={['Priya', 'Ted']} height={120} live introKey={`guide-court-${round}`} />
+      <CourtSurface key={round} left={['Dana', 'Marcus']} right={['Priya', 'Ted']} height={120} introKey={`guide-court-${round}`} />
     </View>
   );
 }

@@ -27,12 +27,21 @@ if [ -z "$PID" ]; then
   echo "==== THE APP DIED ===="
   exit 1
 fi
-# Tap the first thing on screen whose text matches $1 (reads a fresh screen dump).
+# Tap the first thing on screen whose text matches $1. Reads a fresh screen dump; tries 6 times
+# (the dump can fail while an animation runs). Prints the words it saw when it gives up.
 tap_text() {
-  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
-  local B
-  B=$(adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o "text=\"$1[^\"]*\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]' | head -1)
-  [ -z "$B" ] && return 1
+  local B=""
+  for try in 1 2 3 4 5 6; do
+    adb shell uiautomator dump /sdcard/ui.xml 2>&1 | tail -1
+    B=$(adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o "text=\"$1[^\"]*\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]' | head -1)
+    [ -n "$B" ] && break
+    sleep 2
+  done
+  if [ -z "$B" ]; then
+    echo "---- words seen while looking for '$1' ----"
+    adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -30
+    return 1
+  fi
   read X1 Y1 X2 Y2 <<<"$(echo "$B" | tr -d '[]' | tr ',' ' ')"
   adb shell input tap $(( (X1 + X2) / 2 )) $(( (Y1 + Y2) / 2 ))
 }
