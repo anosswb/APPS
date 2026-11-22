@@ -52,4 +52,7 @@ export const touch = { min: 56, big: 64 } as const;
 
 export const line = { court: 3, hair: 1, button: 2 } as const;
 
-export const motion = { quick: 140, slide: 220 } as const;
+export const motion = { quick: 140, slide: 220, courtIn: 560, ballFlight: 760, sweep: 900, nameStagger: 90, livePulse: 1400 } as const;
+
+/** Frosted glass on the court paint (drawn, not blurred: same on every phone). */
+export const glass = { tint: 'rgba(26,58,166,0.72)', body: 'rgba(255,255,255,0.20)', rim: 'rgba(255,255,255,0.65)', shineTop: 0.45, sweep: 0.42, radius: 12 } as const;
