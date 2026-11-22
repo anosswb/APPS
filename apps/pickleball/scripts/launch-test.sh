@@ -43,6 +43,7 @@ tap_text() {
     return 1
   fi
   read X1 Y1 X2 Y2 <<<"$(echo "$B" | tr -d '[]' | tr ',' ' ')"
+  echo "tap '$1' at $B"
   adb shell input tap $(( (X1 + X2) / 2 )) $(( (Y1 + Y2) / 2 ))
 }
 # A fresh install opens the first-run guide: check it is there, then Skip and Start to reach the courts.
@@ -57,6 +58,15 @@ if grep -q "Add everyone who is here" screen-text.txt; then
       break
     fi
     tap_text "Next" || true
+    sleep 3
+    # If the tap did not move the page, swipe left like a thumb would.
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+    echo "---- page $page, words now ----"
+    adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,60\}"' | head -12
+    adb exec-out screencap -p > "guide-$page.png" || true
+    SIZE=$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)
+    W=${SIZE%x*}; H=${SIZE#*x}
+    adb shell input swipe $(( W * 8 / 10 )) $(( H / 2 )) $(( W * 2 / 10 )) $(( H / 2 )) 250
     sleep 2
   done
   [ -z "$STARTED" ] && { echo "==== COULD NOT REACH START ===="; exit 1; }

@@ -79,4 +79,5 @@ jobs:
             apps/pickleball/screen-text.txt
             apps/pickleball/logcat2.txt
             apps/pickleball/screen-players.png
+            apps/pickleball/guide-*.png
           retention-days: 7
