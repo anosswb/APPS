@@ -1,4 +1,5 @@
-// Android ads through Google AdMob: one full-screen ad after a game, when rules.ts says so. No banner.
+// Android ads through Google AdMob: one full-screen VIDEO ad after a game (skip after a few seconds, then an end page with close), when rules.ts says so. No banner.
+// In the AdMob console the real unit must allow only the "Video" ad type, so a plain picture ad never shows in its place.
 // TEST ads only: the real unit id comes later, after Anass makes the AdMob account. Never tap a real ad of our own app.
 import mobileAds, { AdEventType, AdsConsent, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
@@ -10,7 +11,7 @@ let loaded = false;
 function loadNext() {
   if (!allowed) return;
   loaded = false;
-  ad = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL);
+  ad = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL_VIDEO ?? TestIds.INTERSTITIAL);
   ad.addAdEventListener(AdEventType.LOADED, () => {
     loaded = true;
   });
