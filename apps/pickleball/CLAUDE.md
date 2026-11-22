@@ -14,18 +14,21 @@ The person running open play can see who is next and keep score from one phone, 
 Research: `research/2026-11-21-pickleball-reviews.md` at the repo root.
 
 ## Stack
-Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: three tabs and the scorer switch in `App.tsx`. Storage: AsyncStorage with `SCHEMA` (`src/state/storage.ts`). Add packages with `EXPO_OFFLINE=1 npx expo install <pkg>` in cloud sessions.
+Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: five tabs (floating glass tab bar) and the scorer, board and licences screens switch in `App.tsx`. Storage: AsyncStorage with `SCHEMA` (`src/state/storage.ts`). Add packages with `EXPO_OFFLINE=1 npx expo install <pkg>` in cloud sessions.
 
 ## Where the code is
 | Folder | What |
 |---|---|
 | `src/logic/scoring.ts` | Side-out and rally scoring, the "4-2-1" call, game point. Pure, tested |
-| `src/logic/session.ts` | Players, the line, courts, rotation (all four off / winners stay), fair partners. Pure, tested |
+| `src/logic/session.ts` | Players, the line, courts, rotation (all four off / winners stay / winners split), fair partners. Pure, tested |
+| `src/logic/history.ts` | Session records, game lengths, stats for today/week/all time. Pure, tested |
+| `src/logic/achievements.ts` | The 20 awards (player + host). Pure, tested |
+| `src/logic/goals.ts` | Goals and their progress. Pure, tested |
 | `src/state/` | Saving (versioned), the session hook with 30-step Undo, the clock |
 | `src/theme/tokens.ts` | Every colour, size, font. Nowhere else |
 | `src/i18n/en.ts` | Every word. The name is `APP_NAME` there |
-| `src/ui/` | Icon set, Button, CourtSurface (the signature), LineTag |
-| `src/screens/` | Courts (home), Scorer, Players, Settings |
+| `src/ui/` | Glass (drawn liquid glass), Ambient (background light), Bits (stat, ring, segments), Icon set, Button, CourtSurface (the signature), LineTag, ShareCard, badges |
+| `src/screens/` | Courts (home), Scorer, Board, Players, History, Awards, Settings, Licences |
 | `scripts/launch-test.sh` | Used by the emulator launch test workflow |
 | `scripts/make-licences.js` | Makes `src/config/licences.json` for the Licenses page. Run it after adding or updating a package (command at the top of the file) |
 | `store/listing.md` | Store listing draft |
@@ -35,7 +38,8 @@ Expo SDK 58 (React Native 0.88, React 19, TypeScript strict). No Expo Router: th
 - **Never an ad or pop-up on the Courts screen or the Scorer.** Those are the moments people look at the phone at the court.
 - The fairness test in `session.test.ts` (games played stay even, partners spread out) must stay green.
 - Storage changes: bump `SCHEMA`, migrate, test. Never lose a running session.
-- Light mode only (outdoor sun). Targets 56 pt minimum.
+- Dark and light mode (light = sun mode). Colours only from the palettes in `src/theme/tokens.ts`, styles through `themed()` in `src/theme/theme.tsx`. Targets 56 pt minimum.
+- Awards are worked out again from the session records every time (`src/logic/achievements.ts`); never store "earned" flags that can get out of step. Only `seen` (banner already shown) is stored.
 
 ## Checks before saying "done"
 `npx tsc --noEmit` · `npx jest` · `npx expo export --platform web`, then open it at 390×844 and look at the screen you changed.

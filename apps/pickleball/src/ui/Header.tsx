@@ -1,31 +1,24 @@
-// The blue band at the top of every tab, like the scoreboard on a court fence.
+// The big title at the top of every tab, Apple-style: large, bold, left-aligned, with a line under it.
 import { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { color, font, size, space } from '../theme/tokens';
+import { Text, View } from 'react-native';
+import { themed } from '../theme/theme';
+import { font, size, space } from '../theme/tokens';
 
-export function Header({ title, chip, right }: { title: string; chip?: string; right?: ReactNode }) {
+export function Header({ title, sub, right }: { title: string; sub?: string; right?: ReactNode }) {
+  const s = useS();
   return (
-    <View style={s.band}>
+    <View style={s.row}>
       <View style={{ flex: 1 }}>
-        <Text style={s.title}>{title.toUpperCase()}</Text>
-        {chip ? (
-          <View style={s.chip}>
-            <View style={s.dot} />
-            <Text style={s.chipText}>{chip.toUpperCase()}</Text>
-          </View>
-        ) : null}
+        <Text style={s.title} accessibilityRole="header">{title.toUpperCase()}</Text>
+        {sub ? <Text style={s.sub} numberOfLines={1}>{sub}</Text> : null}
       </View>
       {right}
-      <View style={s.baseline} />
     </View>
   );
 }
 
-const s = StyleSheet.create({
-  band: { flexDirection: 'row', alignItems: 'center', backgroundColor: color.court, paddingHorizontal: space.l + 2, paddingTop: space.s, paddingBottom: space.l },
-  title: { fontFamily: font.displayItalic, fontSize: size.hero + 4, lineHeight: size.hero + 8, color: color.paint, letterSpacing: 0.5 },
-  chip: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 6, backgroundColor: color.ball, paddingHorizontal: space.s, paddingVertical: 3, marginTop: 2 },
-  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: color.ink },
-  chipText: { fontFamily: font.label, fontSize: size.label, letterSpacing: 1.2, color: color.ballInk },
-  baseline: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 4, backgroundColor: color.paint },
-});
+const useS = themed((c) => ({
+  row: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: space.l + 4, paddingTop: space.m, paddingBottom: space.m },
+  title: { fontFamily: font.displayItalic, fontSize: size.hero, lineHeight: size.hero + 4, color: c.text, letterSpacing: 0.4 },
+  sub: { fontFamily: font.body, fontSize: size.small + 1, color: c.mute, marginTop: 2 },
+}));

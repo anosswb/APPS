@@ -83,3 +83,15 @@ export function isGamePoint(s: ScoreState, team: Team, rules: ScoreRules): boole
 export function switchEndsAt(rules: ScoreRules): number {
   return Math.ceil(rules.target / 2);
 }
+
+/** The biggest lead the other side ever had over `team` during the game (0 if `team` never trailed). */
+export function maxDeficit(rallies: readonly Team[], rules: ScoreRules, firstServe: Team, team: Team): number {
+  let s = startState(rules, firstServe);
+  let worst = 0;
+  for (const r of rallies) {
+    s = applyRally(s, r, rules);
+    const gap = team === 'A' ? s.b - s.a : s.a - s.b;
+    if (gap > worst) worst = gap;
+  }
+  return worst;
+}

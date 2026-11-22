@@ -1,5 +1,5 @@
 jest.mock('@react-native-async-storage/async-storage', () => ({ getItem: jest.fn(), setItem: jest.fn() }));
-import { parseSaved, SCHEMA } from './storage';
+import { DEFAULT_PREFS, parseHistory, parseSaved, SCHEMA } from './storage';
 import { addPlayer, newSession } from '../logic/session';
 
 describe('saved data', () => {
@@ -10,8 +10,20 @@ describe('saved data', () => {
     const s = addPlayer(newSession(), 'Dana', 1);
     const out = parseSaved(JSON.stringify({ v: SCHEMA, session: s, prefs: { haptics: false, keepAwake: true } }));
     expect(out.session.players.p1.name).toBe('Dana');
-    expect(out.prefs.haptics).toBe(false);
+    expect(out.prefs).toEqual({ ...DEFAULT_PREFS, haptics: false });
     expect(out.problem).toBeUndefined();
+  });
+  it('a version 1 save is upgraded, not lost', () => {
+    const old = addPlayer(newSession(), 'Dana', 1) as unknown as Record<string, unknown>;
+    delete old.id;
+    delete old.startedAt;
+    (old as { results: unknown[] }).results = [{ court: 0, winners: ['p1', 'p2'], losers: ['p3', 'p4'], score: [11, 4], endedAt: 500 }];
+    const out = parseSaved(JSON.stringify({ v: 1, session: old, prefs: {} }));
+    expect(out.problem).toBeUndefined();
+    expect(out.session.players.p1.name).toBe('Dana');
+    expect(out.session.results[0]).toMatchObject({ startedAt: 500, target: 11, maxDeficit: 0 });
+    expect(out.session.startedAt).toBe(500);
+    expect(typeof out.session.id).toBe('string');
   });
   it('broken text gives a fresh session and a reason', () => {
     const out = parseSaved('{oops');
@@ -20,5 +32,19 @@ describe('saved data', () => {
   });
   it('a future version is not trusted', () => {
     expect(parseSaved(JSON.stringify({ v: 99, session: newSession() })).problem).toMatch(/version/);
+  });
+});
+
+describe('saved history', () => {
+  it('starts with the two default goals', () => {
+    expect(parseHistory(null, 0).history.goals).toHaveLength(2);
+  });
+  it('reads back sessions and seen awards', () => {
+    const h = parseHistory(JSON.stringify({ v: 1, sessions: [{ id: 'a', startedAt: 0, endedAt: 1, players: [], games: [] }], goals: [], seen: ['host'] }), 0).history;
+    expect(h.sessions).toHaveLength(1);
+    expect(h.seen).toEqual(['host']);
+  });
+  it('broken history gives an empty one and a reason', () => {
+    expect(parseHistory('nope', 0).problem).toMatch(/unreadable/);
   });
 });

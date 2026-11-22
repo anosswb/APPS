@@ -14,6 +14,12 @@ Linda, 58, runs Tuesday-morning open play at a city park in Arizona. 14 people, 
 | C | Park Paint: court green everywhere, white paint, orange action | Readable, but white-on-green text is weaker than black-on-light outdoors, and it looks like a generic sports app. |
 Picked by Claude on 21 Nov 2026 while Anass slept, by the rule "readable in bright sun at arm's length". To switch: change `src/theme/tokens.ts` only.
 
+## v3: dark liquid glass (22 Nov 2026, Anass: "I don't like the design… like Apple Sports… liquid glass… premium iPhone look… we need dark and white mode")
+- Picture he approved: `docs/world/v3/v3-overview.png`. Built: dark default with soft court-coloured light behind everything (blue, green, a hint of ball yellow), glass panels (see-through body, bright rim, top shine), big italic scoreboard numbers, a floating glass tab bar with 5 tabs, a light palette (sun mode) with the same layout.
+- Glass is **drawn**, not blurred: the background light is already soft, so the panels look like frosted glass without a blur library. Same on every phone, no native risk. The liquid-glass-studio repo (MIT) was read but no code was taken.
+- The 20 award badges are paddle-shaped liquid glass (made by Anass), shown in a dark display case in both modes.
+- Kept from v1/v2: the painted court (now tilted back 22°, swoops in), the paddle-rack line, the yellow ball accent.
+
 ## Style pass v2 (21 Nov 2026, Anass: "I prefer the blue one, make it more stylish, it looks so simple, but not AI slop")
 Every new detail comes from a real court, nothing decorative:
 - **Blue scoreboard header** on every tab with a white baseline under it, white italic title, a yellow "11 HERE · 2 COURTS" chip.

@@ -1,12 +1,15 @@
 // The board: hold the phone up to the players. Who is on each court, and who goes next, in huge type.
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '../i18n/en';
 import { gamesToWait, Session } from '../logic/session';
 import { Icon } from '../ui/Icon';
-import { color, font, radius, size, space, touch } from '../theme/tokens';
+import { font, radius, size, space, touch } from '../theme/tokens';
+import { themed, useTheme } from '../theme/theme';
 
 export function BoardScreen({ session, onClose }: { session: Session; onClose: () => void }) {
+  const s = useS();
+  const color = useTheme();
   const insets = useSafeAreaInsets();
   const name = (id: string) => (session.players[id]?.name ?? '?').toUpperCase();
   const next = session.queue.slice(0, 4);
@@ -50,27 +53,27 @@ export function BoardScreen({ session, onClose }: { session: Session; onClose: (
       </ScrollView>
       <Pressable onPress={onClose} style={s.close} accessibilityRole="button" accessibilityLabel={t.board.close}>
         <Text style={s.closeText}>{t.board.close}</Text>
-        <Icon name="close" tint={color.ink} />
+        <Icon name="close" tint={color.text} />
       </Pressable>
     </View>
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.ground },
+const useS = themed((color) => ({
+  root: { flex: 1, backgroundColor: color.bg },
   pad: { padding: space.l },
-  label: { fontFamily: font.label, fontSize: 18, letterSpacing: 2, color: color.inkSoft, marginTop: space.l, marginBottom: space.s },
-  none: { fontFamily: font.body, fontSize: size.body + 2, color: color.ink },
+  label: { fontFamily: font.label, fontSize: 18, letterSpacing: 2, color: color.textSoft, marginTop: space.l, marginBottom: space.s },
+  none: { fontFamily: font.body, fontSize: size.body + 2, color: color.text },
   nextBox: { backgroundColor: color.court, borderWidth: 3, borderColor: color.paint, padding: space.m, gap: space.s },
   nextRow: { flexDirection: 'row', alignItems: 'center', gap: space.m },
-  ball: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.ball, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.ink },
+  ball: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.ball, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: color.text },
   ballText: { fontFamily: font.display, fontSize: 30, color: color.ballInk },
   nextName: { flex: 1, fontFamily: font.display, fontSize: 50, lineHeight: 56, color: color.paint },
-  later: { fontFamily: font.display, fontSize: 28, lineHeight: 36, color: color.ink },
-  laterNote: { fontFamily: font.body, fontSize: size.body, color: color.inkSoft },
+  later: { fontFamily: font.display, fontSize: 28, lineHeight: 36, color: color.text },
+  laterNote: { fontFamily: font.body, fontSize: size.body, color: color.textSoft },
   courtRow: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: space.s, borderBottomWidth: 2, borderColor: color.hair },
   courtNum: { width: 40, fontFamily: font.display, fontSize: 40, color: color.court },
-  courtNames: { flex: 1, fontFamily: font.display, fontSize: 24, lineHeight: 28, color: color.ink },
-  close: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, margin: space.l, marginTop: 0, borderWidth: 2, borderColor: color.ink, borderRadius: radius.box },
-  closeText: { fontFamily: font.bodyBold, fontSize: size.body + 1, color: color.ink },
-});
+  courtNames: { flex: 1, fontFamily: font.display, fontSize: 24, lineHeight: 28, color: color.text },
+  close: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, minHeight: touch.big, margin: space.l, marginTop: 0, borderWidth: 2, borderColor: color.text, borderRadius: radius.box },
+  closeText: { fontFamily: font.bodyBold, fontSize: size.body + 1, color: color.text },
+}));
