@@ -13,7 +13,7 @@ on:
       - '.github/workflows/pickleball-*.yml'
 
 concurrency:
-  group: pickleball-launch-test
+  group: pickleball-launch-test-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -77,4 +77,6 @@ jobs:
             apps/pickleball/logcat.txt
             apps/pickleball/screen.png
             apps/pickleball/screen-text.txt
+            apps/pickleball/logcat2.txt
+            apps/pickleball/screen-players.png
           retention-days: 7

@@ -100,6 +100,7 @@ export const t = {
     clearHelp: 'Removes all names from this phone.',
     sure: 'Tap again to confirm',
     privacy: 'Everything stays on this phone. No account, no sign-in.',
+    privacyAndroid: 'Your names and games stay on this phone. No account, no sign-in. A small Google ad shows on the Players and Settings tabs, never on the courts.',
     version: (v: string) => `${APP_NAME} ${v}`,
   },
   licences: {

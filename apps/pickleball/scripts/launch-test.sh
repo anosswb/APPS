@@ -14,7 +14,7 @@ adb logcat -d -v brief > logcat.txt
 adb exec-out screencap -p > screen.png || true
 echo "==== app process after 45 seconds: '${PID}' ===="
 echo "==== crash and error lines ===="
-grep -n -E "FATAL|AndroidRuntime|ReactNativeJS|SoLoader|UnsatisfiedLink|libc    :|DEBUG   :|ExpoModulesCore|$PKG" logcat.txt | grep -v -E "^[0-9]+:[VDI]/(ActivityTaskManager|WindowManager|PackageManager|installd|Zygote)" | head -220
+grep -n -E "FATAL|AndroidRuntime|ReactNativeJS|SoLoader|UnsatisfiedLink|libc    :|DEBUG   :|ExpoModulesCore|\[ads\]|$PKG" logcat.txt | grep -v -E "^[0-9]+:[VDI]/(ActivityTaskManager|WindowManager|PackageManager|installd|Zygote)" | head -220
 # A crash inside native code leaves a "tombstone" in the log: print all of it, with the reason and the call stack.
 echo "==== native crash report (empty when there was none) ===="
 grep -E "^F/|^A/|Abort message|JNI DETECTED|signal [0-9]+ \(SIG" logcat.txt | cut -c1-260 | head -120
@@ -32,3 +32,22 @@ if ! grep -q -i "open play" screen-text.txt; then
   exit 1
 fi
 echo "==== THE APP IS RUNNING AND SHOWS THE COURTS SCREEN ===="
+# Second step: open the Players tab (this starts the ads) and check the app is still alive 25 seconds later.
+BOUNDS=$(adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="Players"[^>]*bounds="\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]"' | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]' | head -1)
+if [ -z "$BOUNDS" ]; then
+  echo "==== COULD NOT FIND THE PLAYERS TAB ===="
+  exit 1
+fi
+read X1 Y1 X2 Y2 <<<"$(echo "$BOUNDS" | tr -d '[]' | tr ',' ' ')"
+adb shell input tap $(( (X1 + X2) / 2 )) $(( (Y1 + Y2) / 2 ))
+sleep 25
+PID2=$(adb shell pidof "$PKG" | tr -d '\r' || true)
+adb logcat -d -v brief > logcat2.txt
+adb exec-out screencap -p > screen-players.png || true
+echo "==== ads lines after opening Players ===="
+grep -E "\[ads\]|Ads|FATAL|AndroidRuntime" logcat2.txt | grep -v -E "^[VD]/" | head -40
+if [ -z "$PID2" ]; then
+  echo "==== THE APP DIED AFTER OPENING PLAYERS ===="
+  exit 1
+fi
+echo "==== PLAYERS TAB OPEN, APP STILL RUNNING ===="
