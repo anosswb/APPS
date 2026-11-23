@@ -28,12 +28,13 @@ import { prepareAds, showGameAd } from './src/money/ads';
 import { adAfterGame } from './src/money/rules';
 import { Ambient } from './src/ui/Ambient';
 import { BADGES } from './src/ui/badges';
+import { Celebrate } from './src/ui/Celebrate';
 import { Glass } from './src/ui/Glass';
 import { Icon, IconName } from './src/ui/Icon';
 import { Spectrum } from './src/ui/Spectrum';
 import { useReduceMotion } from './src/ui/useReduceMotion';
 import { ThemeProvider, themed, useTheme } from './src/theme/theme';
-import { dark, font, light, motion, radius, space } from './src/theme/tokens';
+import { celebrate, dark, font, light, motion, radius, space } from './src/theme/tokens';
 
 SplashScreen.preventAutoHideAsync().catch((e) => console.warn(`[splash] ${String(e)}`));
 
@@ -54,8 +55,9 @@ export default function App() {
   });
   const app = useSession();
   const system = useColorScheme();
-  // Dark or light follows the phone, always (Anass, 22 Nov 2026).
-  const palette = system === 'light' ? light : dark;
+  // Dark or light: Auto follows the phone, or the host's pick in Settings (Anass, 22 Nov 2026).
+  const look = app.prefs.look;
+  const palette = look === 'light' || (look === 'system' && system === 'light') ? light : dark;
 
   useEffect(() => {
     if (fontsLoaded && app.ready) SplashScreen.hideAsync().catch((e) => console.warn(`[splash] ${String(e)}`));
@@ -82,6 +84,8 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
   const [banner, setBanner] = useState<{ id: AwardId; who: string } | null>(null);
   const [guide, setGuide] = useState(false);
   const [startAdding, setStartAdding] = useState(false);
+  const [win, setWin] = useState<{ key: string; court: number; names: string[]; score: [number, number] } | null>(null);
+  const closeWin = useCallback(() => setWin(null), []);
 
   // One full-screen ad when a game ends, if src/money/rules.ts allows it (docs/money.md). The first game
   // that ends asks for ad consent and loads an ad; later games may show it. Never during a game.
@@ -92,12 +96,16 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
     const ended = count > lastResults.current ? session.results[count - 1] : null;
     lastResults.current = count;
     if (!ended) return;
+    setWin({ key: `${ended.endedAt}-${ended.court}`, court: ended.court, names: ended.winners.map((id) => session.players[id]?.name ?? '?'), score: ended.score });
     prepareAds().catch((e) => console.warn(`[ads] did not start: ${String(e)}`));
     const game = { started: ended.started ?? true, startedAt: ended.startedAt, endedAt: ended.endedAt };
-    if (adAfterGame(Platform.OS === 'android' ? 'android' : Platform.OS === 'ios' ? 'ios' : 'web', game, lastAdAt.current) && showGameAd()) {
-      lastAdAt.current = ended.endedAt;
-    }
-  }, [session.results]);
+    if (!adAfterGame(Platform.OS === 'android' ? 'android' : Platform.OS === 'ios' ? 'ios' : 'web', game, lastAdAt.current)) return;
+    // The ad waits for the win moment to finish, so the winners get their few seconds first.
+    const id = setTimeout(() => {
+      if (showGameAd()) lastAdAt.current = ended.endedAt;
+    }, celebrate.burst + celebrate.hold + 400);
+    return () => clearTimeout(id);
+  }, [session.results]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const tag = 'court';
@@ -141,7 +149,7 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
     if (!fresh.length) return;
     setHistory((h) => ({ ...h, seen: [...h.seen, ...fresh] }));
     const id = fresh[fresh.length - 1];
-    setBanner({ id, who: awards[id].by[0] ?? '' });
+    setBanner({ id, who: t.awards.how[id] });
     buzz('done');
   }, [awards, history.seen, setHistory, buzz]);
 
@@ -210,7 +218,7 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
       <StatusBar style={c.mode === 'dark' ? 'light' : 'dark'} />
       <Ambient />
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-        {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} openScorer={setScoring} openBoard={() => setBoard(true)} openGuide={() => setGuide(true)} startAdding={startAdding} buzz={buzz} /> : null}
+        {tab === 'courts' ? <CourtsScreen session={session} act={act} undo={undo} canUndo={canUndo} closeSession={closeSession} openScorer={setScoring} openBoard={() => setBoard(true)} openGuide={() => setGuide(true)} startAdding={startAdding} buzz={buzz} /> : null}
         {tab === 'players' ? <PlayersScreen session={session} act={act} /> : null}
         {tab === 'history' ? (
           <HistoryScreen
@@ -226,6 +234,7 @@ function Shell({ app }: { app: ReturnType<typeof useSession> }) {
         {tab === 'settings' ? <SettingsScreen session={session} act={act} closeSession={closeSession} prefs={prefs} setPrefs={setPrefs} openLicences={() => setLicences(true)} openGuide={() => setGuide(true)} /> : null}
       </SafeAreaView>
       <TabBar tab={tab} setTab={setTab} />
+      {win ? <Celebrate key={win.key} court={win.court} names={win.names} score={win.score} onDone={closeWin} /> : null}
       {banner ? <Banner id={banner.id} who={banner.who} onDone={() => setBanner(null)} onOpen={() => { setBanner(null); setTab('awards'); }} /> : null}
     </View>
   );
@@ -287,7 +296,7 @@ function Banner({ id, who, onDone, onOpen }: { id: AwardId; who: string; onDone:
           <View style={{ flex: 1 }}>
             <Text style={s.bannerKicker}>{t.awards.unlocked.toUpperCase()}</Text>
             <Text style={s.bannerName}>{t.awards.name[id]}</Text>
-            {who ? <Text style={s.bannerWho} numberOfLines={1}>{who}</Text> : null}
+            {who ? <Text style={s.bannerWho} numberOfLines={2}>{who}</Text> : null}
           </View>
         </Glass>
       </Pressable>

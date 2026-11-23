@@ -17,16 +17,20 @@ export interface Prefs {
   voice: boolean;
   /** The first-run guide was finished or skipped. */
   guideDone: boolean;
+  /** Dark or light: Auto follows the phone (the default), or the host picks one (Anass, 22 Nov 2026). */
+  look: LookChoice;
 }
-export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, guideDone: false };
+export type LookChoice = 'system' | 'dark' | 'light';
+export const DEFAULT_PREFS: Prefs = { haptics: true, keepAwake: true, voice: true, guideDone: false, look: 'system' };
 
 /**
- * Fills in missing prefs. Dark or light now follows the phone, always (Anass, 22 Nov 2026), so the old
- * look choice (`theme`, `lookV`) is dropped.
+ * Fills in missing prefs. The old look keys (`theme`, `lookV`, from before 22 Nov 2026) are dropped:
+ * everyone starts on Auto with the new `look` setting.
  */
 export function upgradePrefs(raw: (Partial<Prefs> & { theme?: unknown; lookV?: unknown }) | undefined): Prefs {
   const { theme: _theme, lookV: _lookV, ...rest } = raw ?? {};
-  return { ...DEFAULT_PREFS, ...rest };
+  const p = { ...DEFAULT_PREFS, ...rest };
+  return ['system', 'dark', 'light'].includes(p.look) ? p : { ...p, look: 'system' };
 }
 
 interface Saved {

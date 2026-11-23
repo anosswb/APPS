@@ -1,5 +1,5 @@
 import {
-  canOpenCourt, canRemoveCourt, addPlayer, bestTeams, cancelGame, checkIn, checkOut, counts, DEFAULT_SETTINGS, fillCourts, finishGame,
+  canOpenCourt, canRemoveCourt, clearCourts, clearLine, addPlayer, bestTeams, cancelGame, checkIn, checkOut, counts, DEFAULT_SETTINGS, fillCourts, finishGame,
   beginGame, gamesToWait, moveUp, newSession, removePlayer, renamePlayer, restartSession, scoreRally, Session, setCourtCount, undoRally,
 } from './session';
 
@@ -250,5 +250,25 @@ describe('start game', () => {
     let s = beginGame(fillCourts(withPlayers(8), 0), 0, 0);
     s = finishGame(s, 0, 'A', 600_000);
     expect(s.courts[0]?.started).toBe(false);
+  });
+});
+
+describe('clear', () => {
+  it('clear courts: games off, players back to the front of the line in court order, courts stay open', () => {
+    const s = fillCourts(withPlayers(10), 0);
+    const onOne = [...s.courts[0]!.teamA, ...s.courts[0]!.teamB];
+    const c = clearCourts(s);
+    expect(c.courts.every((g) => g === null)).toBe(true);
+    expect(c.queue).toHaveLength(10);
+    expect(c.queue.slice(0, 4)).toEqual(onOne);
+    expect(counts(c)).toMatchObject({ waiting: 10, playing: 0 });
+  });
+  it('clear the line: waiting and resting players go, the games on court keep going', () => {
+    let s = fillCourts(withPlayers(11), 0);
+    s = checkOut(s, s.queue[0]);
+    const c = clearLine(s);
+    expect(c.queue).toHaveLength(0);
+    expect(Object.keys(c.players)).toHaveLength(8);
+    expect(c.courts.filter(Boolean)).toHaveLength(2);
   });
 });

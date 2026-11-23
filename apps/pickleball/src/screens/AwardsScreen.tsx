@@ -1,5 +1,6 @@
-// Awards and goals. The 20 badges sit in a dark display case (in both modes): earned ones shine,
-// the rest wait, dimmed. Tap one to see how to earn it and who has it. Goals show a ring.
+// Awards and goals. The 20 badges belong to the person running the app (host or coach), not to players.
+// They sit in a dark display case (in both modes): earned ones shine, the rest wait, dimmed.
+// Tap one to see how to earn it and how close you are. Goals show a ring.
 import { useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { t } from '../i18n/en';
@@ -8,7 +9,7 @@ import { fraction, Goal, GOAL_KINDS, GoalKind, progress } from '../logic/goals';
 import { gamesIn, SessionRecord, stats } from '../logic/history';
 import { useNow } from '../state/useNow';
 import { Button } from '../ui/Button';
-import { Chip, Label, Ring, Section, Segments } from '../ui/Bits';
+import { Chip, Label, Ring, Section } from '../ui/Bits';
 import { BADGES } from '../ui/badges';
 import { Glass } from '../ui/Glass';
 import { Spectrum } from '../ui/Spectrum';
@@ -16,8 +17,6 @@ import { Header } from '../ui/Header';
 import { Icon } from '../ui/Icon';
 import { themed, useTheme } from '../theme/theme';
 import { font, radius, size, space, TAB_SPACE, touch } from '../theme/tokens';
-
-type Filter = 'all' | 'player' | 'host';
 
 interface Props {
   awards: Record<AwardId, AwardState>;
@@ -30,10 +29,9 @@ export function AwardsScreen({ awards, sessions, goals, setGoals }: Props) {
   const s = useS();
   const c = useTheme();
   const now = useNow(60000);
-  const [filter, setFilter] = useState<Filter>('all');
   const [open, setOpen] = useState<AwardId | null>(null);
   const [adding, setAdding] = useState(false);
-  const list = AWARDS.filter((a) => filter === 'all' || a.kind === filter);
+  const list = AWARDS;
   const earned = AWARDS.filter((a) => awards[a.id].earned).length;
   const top = stats(gamesIn(sessions, 'today', now)).table[0];
   const sel = open ? awards[open] : null;
@@ -43,9 +41,6 @@ export function AwardsScreen({ awards, sessions, goals, setGoals }: Props) {
     <View style={{ flex: 1 }}>
       <Header title={t.awards.title} sub={t.awards.sub(earned, AWARDS.length)} />
       <ScrollView contentContainerStyle={s.scroll}>
-        <View style={s.px}>
-          <Segments<Filter> items={[['all', t.awards.all], ['player', t.awards.players], ['host', t.awards.host]]} value={filter} onChange={setFilter} />
-        </View>
         <View style={s.case}>
           <Spectrum height={2} style={s.caseShine} />
           <View style={s.grid}>
@@ -125,7 +120,7 @@ export function AwardsScreen({ awards, sessions, goals, setGoals }: Props) {
               <Text style={s.detailName}>{t.awards.name[open]}</Text>
               <Text style={s.detailHow}>{t.awards.how[open]}</Text>
               {sel.earned ? (
-                <Text style={s.detailWho}>{def.kind === 'player' && sel.by.length ? t.awards.by(sel.by) : t.awards.earnedOn(sel.at ?? 0)}</Text>
+                <Text style={s.detailWho}>{t.awards.earnedOn(sel.at ?? 0)}</Text>
               ) : def.goal && sel.progress !== undefined ? (
                 <Text style={s.detailWho}>{t.awards.progress(sel.progress, def.goal)}</Text>
               ) : (

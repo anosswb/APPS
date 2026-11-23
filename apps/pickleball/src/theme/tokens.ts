@@ -155,7 +155,10 @@ export const touch = { min: 56, big: 64 } as const;
 
 export const line = { court: 3, hair: 1, button: 2 } as const;
 
-export const motion = { quick: 140, slide: 220, courtIn: 560, ballFlight: 760, sweep: 900, nameStagger: 90, livePulse: 1400, banner: 3600 } as const;
+/** The win moment (src/ui/Celebrate.tsx): burst length and how long the names stay. */
+export const celebrate = { burst: 1100, hold: 1700 } as const;
+
+export const motion = { quick: 140, slide: 220, courtIn: 560, ballFlight: 760, sweep: 900, nameStagger: 90, namesIn: 900, hotPulse: 650, livePulse: 1400, banner: 3600 } as const;
 
 /** Court tilt at rest: the court lies back a little, like seen from the stands. */
 export const courtTilt = 22;

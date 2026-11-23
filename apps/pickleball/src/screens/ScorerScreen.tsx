@@ -1,5 +1,6 @@
 // The big scorer: the phone lies at the net post or in a hand. Tap the half of the team that won the rally.
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '../i18n/en';
 import { isGamePoint, scoreCall, scoreFromRallies, switchEndsAt, Team } from '../logic/scoring';
@@ -7,7 +8,8 @@ import { Session } from '../logic/session';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/Icon';
 import { Spectrum } from '../ui/Spectrum';
-import { dark, font, line, radius, size, space, touch } from '../theme/tokens';
+import { useReduceMotion } from '../ui/useReduceMotion';
+import { dark, font, line, motion, radius, size, space, touch } from '../theme/tokens';
 
 /** The scorer looks the same in dark and light mode: a night court on a black canvas. */
 const color = { ...dark, ground: '#FFFFFF', ink: '#FFFFFF' };
@@ -65,7 +67,7 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
               <Text style={s.serveFirstText}>{t.scorer.servesFirst}</Text>
             </Pressable>
           ) : null}
-          {isGamePoint(sc, team, rules) ? <Text style={s.gp}>{t.scorer.gamePoint.toUpperCase()}</Text> : null}
+          {isGamePoint(sc, team, rules) ? <GamePoint /> : null}
         </View>
       </Pressable>
     );
@@ -95,7 +97,7 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
         </Pressable>
       </View>
       {sc.winner ? (
-        <View style={s.winBox}>
+        <WinSheet>
           <Spectrum height={3} radius={0} style={s.winLine} />
           <Text style={s.winText}>
             {t.scorer.wins(names(sc.winner).join(' & '), Math.max(sc.a, sc.b), Math.min(sc.a, sc.b))}
@@ -104,10 +106,44 @@ export function ScorerScreen({ session, court, onRally, onUndo, onFirstServe, on
             <Button label={t.scorer.undo} onPress={onUndo} style={{ flex: 1 }} />
             <Button label={t.scorer.nextGame} kind="go" onPress={() => onFinish(sc.winner!)} style={{ flex: 1.3 }} />
           </View>
-        </View>
+        </WinSheet>
       ) : null}
     </View>
   );
+}
+
+const native = Platform.OS !== 'web';
+
+/** "GAME POINT": pops in, then keeps breathing until the point is played. */
+function GamePoint() {
+  const reduce = useReduceMotion();
+  const v = useRef(new Animated.Value(reduce ? 1 : 0)).current;
+  useEffect(() => {
+    if (reduce) return;
+    const run = Animated.sequence([
+      Animated.spring(v, { toValue: 1, damping: 8, stiffness: 220, useNativeDriver: native }),
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(v, { toValue: 1.08, duration: motion.hotPulse, easing: Easing.inOut(Easing.quad), useNativeDriver: native }),
+          Animated.timing(v, { toValue: 1, duration: motion.hotPulse, easing: Easing.inOut(Easing.quad), useNativeDriver: native }),
+        ]),
+      ),
+    ]);
+    run.start();
+    return () => run.stop();
+  }, [reduce, v]);
+  return <Animated.Text style={[s.gp, { transform: [{ scale: v }] }]}>{t.scorer.gamePoint.toUpperCase()}</Animated.Text>;
+}
+
+/** The result sheet springs up from the bottom when the winning point is scored. */
+function WinSheet({ children }: { children: React.ReactNode }) {
+  const reduce = useReduceMotion();
+  const y = useRef(new Animated.Value(reduce ? 0 : 260)).current;
+  useEffect(() => {
+    if (reduce) return;
+    Animated.spring(y, { toValue: 0, damping: 15, stiffness: 150, useNativeDriver: native }).start();
+  }, [reduce, y]);
+  return <Animated.View style={[s.winBox, { transform: [{ translateY: y }] }]}>{children}</Animated.View>;
 }
 
 const KITCHEN = 64;

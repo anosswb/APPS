@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { t } from '../i18n/en';
 import { clock } from '../logic/history';
-import { scoreCall, scoreFromRallies, Team } from '../logic/scoring';
-import { addPlayer, beginGame, canOpenCourt, canRemoveCourt, cancelGame, checkIn, counts, fillCourts, findByName, finishGame, gamesToWait, MAX_COURTS, RotationRule, Session, updateSettings } from '../logic/session';
+import { isGamePoint, scoreCall, scoreFromRallies, Team } from '../logic/scoring';
+import { addPlayer, beginGame, canOpenCourt, canRemoveCourt, cancelGame, checkIn, clearCourts, clearLine, newSession, counts, fillCourts, findByName, finishGame, gamesToWait, MAX_COURTS, RotationRule, Session, updateSettings } from '../logic/session';
 import { minutesSince, useNow } from '../state/useNow';
 import { Button } from '../ui/Button';
 import { Chip, Heading, Label, Segments } from '../ui/Bits';
@@ -20,6 +20,8 @@ interface Props {
   act: (change: (s: Session, now: number) => Session) => void;
   undo: () => void;
   canUndo: boolean;
+  /** Saves the session to History and replaces it (used by Clear both). */
+  closeSession: (next: (s: Session, now: number) => Session) => void;
   openScorer: (court: number) => void;
   openBoard: () => void;
   openGuide: () => void;
@@ -28,7 +30,7 @@ interface Props {
   buzz: (kind: 'tap' | 'done') => void;
 }
 
-export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoard, openGuide, startAdding, buzz }: Props) {
+export function CourtsScreen({ session, act, undo, canUndo, closeSession, openScorer, openBoard, openGuide, startAdding, buzz }: Props) {
   const s = useS();
   const c = useTheme();
   const now = useNow(1000);
@@ -38,6 +40,8 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
   const [toast, setToast] = useState<string | null>(null);
   const [ending, setEnding] = useState<number | null>(null);
   const [courtSheet, setCourtSheet] = useState<number | null>(null);
+  const [clearing, setClearing] = useState(false);
+  const [sure, setSure] = useState(false);
   const name = (id: string) => session.players[id]?.name ?? '?';
   const n = counts(session);
   const nobody = Object.keys(session.players).length === 0;
@@ -99,12 +103,19 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         title={t.courts.title}
         sub={`${t.courts.here(n.waiting + n.playing, session.courts.length)} · ${t.menu.ruleShort[session.settings.rule]}`}
         right={
-          canUndo ? (
-            <Chip onPress={undo} a11y={t.a11y.undo}>
-              <Icon name="undo" size={18} />
-              <Text style={s.chipText}>{t.courts.undo}</Text>
-            </Chip>
-          ) : undefined
+          <View style={s.headChips}>
+            {canUndo ? (
+              <Chip onPress={undo} a11y={t.a11y.undo} style={s.iconChip}>
+                <Icon name="undo" size={20} />
+              </Chip>
+            ) : null}
+            {!nobody ? (
+              <Chip onPress={() => { setSure(false); setClearing(true); }} a11y={t.courts.clear}>
+                <Icon name="trash" size={18} />
+                <Text style={s.chipText}>{t.courts.clear}</Text>
+              </Chip>
+            ) : null}
+          </View>
         }
       />
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
@@ -132,7 +143,11 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
                       <Label>{t.courts.open}</Label>
                     </View>
                     <CourtSurface left={[]} right={[]} height={60} dim />
-                    <Text style={s.needs}>{t.courts.needs(missing)}</Text>
+                    {missing === 0 ? (
+                      <Button label={t.courts.fill} kind="go" onPress={() => { act((s2, at) => fillCourts(s2, at)); buzz('tap'); }} style={s.startBtn} />
+                    ) : (
+                      <Text style={s.needs}>{t.courts.needs(missing)}</Text>
+                    )}
                   </View>
                 </Glass>
               );
@@ -148,13 +163,13 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
                     <Label>{t.courts.court(i + 1)}</Label>
                     <Glass radius={radius.pill} style={s.timer} tint={c.cardHi}>
                       {g.started ? <View style={s.live} /> : null}
-                      <Text style={s.timerText}>{g.started ? clock(now - g.startedAt) : t.courts.ready}</Text>
+                      <Text style={s.timerText}>{g.started ? clock(Math.max(0, now - g.startedAt)) : t.courts.ready}</Text>
                     </Glass>
                   </View>
-                  <CourtSurface left={g.teamA.map(name)} right={g.teamB.map(name)} call={g.rallies.length ? scoreCall(sc, rules) : undefined} live={g.started} height={96} introKey={g.id} />
+                  <CourtSurface left={g.teamA.map(name)} right={g.teamB.map(name)} call={g.rallies.length ? scoreCall(sc, rules) : undefined} live={g.started} height={96} introKey={g.id} startKey={g.started ? `${g.id}:start` : undefined} hot={isGamePoint(sc, 'A', rules) || isGamePoint(sc, 'B', rules)} />
                   {g.started ? (
                     <View style={s.scoreRow}>
-                      <Text style={s.score} accessibilityLabel={`${sc.a} to ${sc.b}`}>{`${sc.a}–${sc.b}`}</Text>
+                      <Text style={[s.score, Math.max(sc.a, sc.b) >= 10 && s.scoreLong]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} accessibilityLabel={`${sc.a} to ${sc.b}`}>{`${sc.a}–${sc.b}`}</Text>
                       <View style={s.buttons}>
                         <Button label={t.courts.score} onPress={() => openScorer(i)} style={s.btn} />
                         <Button label={t.courts.gameOver} kind="go" onPress={() => setEnding(i)} style={s.btn} />
@@ -294,6 +309,32 @@ export function CourtsScreen({ session, act, undo, canUndo, openScorer, openBoar
         </Pressable>
       </Modal>
 
+      <Modal visible={clearing} transparent animationType="slide" onRequestClose={() => setClearing(false)}>
+        <Pressable style={s.scrim} onPress={() => setClearing(false)}>
+          <Pressable style={s.sheet} onPress={() => {}}>
+            <Text style={s.sheetTitle}>{t.courts.clearTitle}</Text>
+            <Button label={t.courts.clearCourts} onPress={() => { act((s2) => clearCourts(s2)); setClearing(false); buzz('tap'); }} disabled={session.courts.every((g) => !g)} />
+            <Text style={s.clearHelp}>{t.courts.clearCourtsHelp}</Text>
+            <Button label={t.courts.clearLine} onPress={() => { act((s2) => clearLine(s2)); setClearing(false); buzz('tap'); }} disabled={session.queue.length === 0 && n.resting === 0} />
+            <Text style={s.clearHelp}>{t.courts.clearLineHelp}</Text>
+            <Button
+              label={sure ? t.courts.clearSure : t.courts.clearBoth}
+              kind={sure ? 'stop' : 'glass'}
+              onPress={() => {
+                if (!sure) return setSure(true);
+                closeSession((s2, at) => newSession(s2.settings, at));
+                setClearing(false);
+                buzz('done');
+              }}
+            />
+            <Text style={s.clearHelp}>{t.courts.clearBothHelp}</Text>
+            <Pressable onPress={() => setClearing(false)} style={s.cancelLink} accessibilityRole="button">
+              <Text style={s.cancelText}>{t.courts.cancel}</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
       <Modal visible={sheetGame !== undefined} transparent animationType="slide" onRequestClose={() => setCourtSheet(null)}>
         <Pressable style={s.scrim} onPress={() => setCourtSheet(null)}>
           <Pressable style={s.sheet} onPress={() => {}}>
@@ -377,9 +418,13 @@ const useS = themed((c) => ({
   live: { width: 8, height: 8, borderRadius: 4, backgroundColor: c.live },
   timerText: { fontFamily: font.num, fontSize: 15, letterSpacing: 0.5, color: c.text, fontVariant: ['tabular-nums'] },
   scoreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.l + 2 },
-  score: { fontFamily: font.figure, fontSize: 34, lineHeight: 37, color: c.text, letterSpacing: 0.2 },
+  score: { flex: 1, marginRight: space.s, fontFamily: font.figure, fontSize: 34, lineHeight: 37, color: c.text, letterSpacing: 0.2 },
+  scoreLong: { fontSize: 26, lineHeight: 30 },
   buttons: { flexDirection: 'row', gap: space.s },
-  btn: { minWidth: 104 },
+  btn: { minWidth: 96 },
+  headChips: { flexDirection: 'row', gap: space.xs },
+  iconChip: { paddingHorizontal: space.m },
+  clearHelp: { fontFamily: font.body, fontSize: size.small, color: c.textSoft, marginTop: -2, marginBottom: space.xs, paddingHorizontal: space.xs },
   startBtn: { marginTop: space.l },
   sheetTeams: { fontFamily: font.name, textTransform: 'uppercase', fontSize: 24, letterSpacing: 3, color: c.textSoft, marginBottom: space.xs },
   serve: { fontFamily: font.body, fontSize: size.small, color: c.mute, marginTop: 2 },

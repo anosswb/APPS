@@ -44,7 +44,9 @@ tap_text() {
   fi
   read X1 Y1 X2 Y2 <<<"$(echo "$B" | tr -d '[]' | tr ',' ' ')"
   echo "tap '$1' at $B"
-  adb shell input tap $(( (X1 + X2) / 2 )) $(( (Y1 + Y2) / 2 ))
+  # A held press (150 ms) instead of a 0 ms tap: on the slow emulator React Native can miss a 0 ms tap.
+  local X=$(( (X1 + X2) / 2 )) Y=$(( (Y1 + Y2) / 2 ))
+  adb shell input swipe $X $Y $X $Y 150
 }
 # A fresh install opens the first-run guide: check it is there, then Skip and Start to reach the courts.
 if grep -q "Add everyone who is here" screen-text.txt; then
@@ -71,6 +73,14 @@ if grep -q "Add everyone who is here" screen-text.txt; then
   done
   [ -z "$STARTED" ] && { echo "==== COULD NOT REACH START ===="; exit 1; }
   sleep 5
+  # Still on the last page (the court setup)? Press Start again, up to 3 times.
+  for again in 1 2 3; do
+    adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+    adb shell cat /sdcard/ui.xml 2>/dev/null | grep -q 'text="Set up your courts"' || break
+    echo "---- still on the setup page, pressing Start again ($again) ----"
+    tap_text "Start" || true
+    sleep 4
+  done
   adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
   adb shell cat /sdcard/ui.xml 2>/dev/null | grep -o 'text="[^"]\{1,80\}"' | head -40 > screen-text.txt || true
   echo "==== words on the screen after the guide ===="
